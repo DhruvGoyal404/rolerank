@@ -1,0 +1,18 @@
+-- Roles and databases. One cluster, two databases, no access across them.
+-- Rendered by db/provision/init.sh, and by the integration tests with a test prefix,
+-- so the tests exercise this exact file. Tokens: __P__ role prefix, __APP_DB__,
+-- __CORPUS_DB__, __PW_*__ (hex only).
+CREATE ROLE __P__migrator_app LOGIN PASSWORD '__PW_MIGRATOR_APP__' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+CREATE ROLE __P__migrator_corpus LOGIN PASSWORD '__PW_MIGRATOR_CORPUS__' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+CREATE ROLE __P__app_rw LOGIN PASSWORD '__PW_APP_RW__' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+CREATE ROLE __P__corpus_rw LOGIN PASSWORD '__PW_CORPUS_RW__' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+CREATE ROLE __P__corpus_ro LOGIN PASSWORD '__PW_CORPUS_RO__' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+
+CREATE DATABASE __APP_DB__ OWNER __P__migrator_app;
+CREATE DATABASE __CORPUS_DB__ OWNER __P__migrator_corpus;
+
+REVOKE ALL ON DATABASE __APP_DB__ FROM PUBLIC;
+REVOKE ALL ON DATABASE __CORPUS_DB__ FROM PUBLIC;
+
+GRANT CONNECT ON DATABASE __APP_DB__ TO __P__app_rw;
+GRANT CONNECT ON DATABASE __CORPUS_DB__ TO __P__corpus_rw, __P__corpus_ro;

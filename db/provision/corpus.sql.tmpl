@@ -1,0 +1,10 @@
+-- Run inside the corpus database, as superuser.
+CREATE EXTENSION IF NOT EXISTS vector;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+GRANT USAGE ON SCHEMA public TO __P__corpus_rw, __P__corpus_ro;
+ALTER DEFAULT PRIVILEGES FOR ROLE __P__migrator_corpus IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO __P__corpus_rw;
+ALTER DEFAULT PRIVILEGES FOR ROLE __P__migrator_corpus IN SCHEMA public
+  GRANT USAGE, SELECT ON SEQUENCES TO __P__corpus_rw;
+ALTER DEFAULT PRIVILEGES FOR ROLE __P__migrator_corpus IN SCHEMA public
+  GRANT SELECT ON TABLES TO __P__corpus_ro;

@@ -1,0 +1,7 @@
+-- Run inside the app database, as superuser.
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+GRANT USAGE ON SCHEMA public TO __P__app_rw;
+ALTER DEFAULT PRIVILEGES FOR ROLE __P__migrator_app IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO __P__app_rw;
+ALTER DEFAULT PRIVILEGES FOR ROLE __P__migrator_app IN SCHEMA public
+  GRANT USAGE, SELECT ON SEQUENCES TO __P__app_rw;

@@ -1,0 +1,78 @@
+# Local development. Project "rolerank"; credentials come from the gitignored .env.
+name: rolerank
+
+x-labels: &labels
+  rolerank.managed: "true"
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg18-trixie@sha256:9d9c930220cb9bf2f956d10a8f909cf9973d9672ca0278aef2c1e6facccad2e0
+    labels: *labels
+    environment:
+      POSTGRES_PASSWORD: ${ROLERANK_PG_SUPERUSER_PASSWORD:?set in .env}
+      ROLERANK_PW_MIGRATOR_APP: ${ROLERANK_PW_MIGRATOR_APP:?set in .env}
+      ROLERANK_PW_MIGRATOR_CORPUS: ${ROLERANK_PW_MIGRATOR_CORPUS:?set in .env}
+      ROLERANK_PW_APP_RW: ${ROLERANK_PW_APP_RW:?set in .env}
+      ROLERANK_PW_CORPUS_RW: ${ROLERANK_PW_CORPUS_RW:?set in .env}
+      ROLERANK_PW_CORPUS_RO: ${ROLERANK_PW_CORPUS_RO:?set in .env}
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - pg:/var/lib/postgresql
+      - ./db/provision:/opt/rolerank/provision:ro
+      - ./db/provision/init.sh:/docker-entrypoint-initdb.d/10-rolerank.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  valkey:
+    image: valkey/valkey:9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11
+    labels: *labels
+    command: ["valkey-server", "--requirepass", "${ROLERANK_VALKEY_PASSWORD:?set in .env}", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
+    environment:
+      ROLERANK_VALKEY_PASSWORD: ${ROLERANK_VALKEY_PASSWORD:?set in .env}
+    ports:
+      - "127.0.0.1:56380:6379"
+    volumes:
+      - valkey:/data
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli --no-auth-warning -a \"$$ROLERANK_VALKEY_PASSWORD\" ping | grep -q PONG"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  migrate-app:
+    image: amacneil/dbmate:2.36.0@sha256:520c740c6e0ad73fde2cd1ea7e2b779aaf789d22aca8858f87a478e7094535fb
+    labels: *labels
+    profiles: ["tools"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://migrator_app:${ROLERANK_PW_MIGRATOR_APP:?set in .env}@postgres:5432/app?sslmode=disable
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+      DBMATE_NO_DUMP_SCHEMA: "true"
+    volumes:
+      - ./db/app/migrations:/db/migrations:ro
+
+  migrate-corpus:
+    image: amacneil/dbmate:2.36.0@sha256:520c740c6e0ad73fde2cd1ea7e2b779aaf789d22aca8858f87a478e7094535fb
+    labels: *labels
+    profiles: ["tools"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://migrator_corpus:${ROLERANK_PW_MIGRATOR_CORPUS:?set in .env}@postgres:5432/corpus?sslmode=disable
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+      DBMATE_NO_DUMP_SCHEMA: "true"
+    volumes:
+      - ./db/corpus/migrations:/db/migrations:ro
+
+volumes:
+  pg:
+    labels: *labels
+  valkey:
+    labels: *labels
