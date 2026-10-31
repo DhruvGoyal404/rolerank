@@ -104,6 +104,15 @@ jobs:
       - run: go vet ./...
       - run: go test ./...
       - run: go build ./...
+      - name: Start Valkey
+        working-directory: .
+        run: |
+          bash scripts/gen-env.sh
+          docker compose up -d --wait valkey
+      - name: Integration tests
+        run: |
+          . ../scripts/test-env.sh
+          go test -count=1 -tags integration ./internal/limiter/
       - run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 
   arm64:
