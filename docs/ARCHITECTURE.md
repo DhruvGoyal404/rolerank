@@ -104,9 +104,15 @@ Valkey Streams with consumer groups, exactly as CodeJudge proved it:
   worker can't overwrite a newer result.
 - Messages carry IDs only, never resume text or PII.
 
-Streams: `ingest:fetch` (board IDs), `ingest:enrich` (posting IDs), `ingest:embed`,
-`ai:extract`, `ai:parse`, `ai:explain`, `ai:tailor`, `alerts:compute`. Each is capped
-with `MAXLEN ~`.
+Streams: `ingest:fetch:<source>` (board IDs, one stream per source so a slow host can't
+hold up the others), `ingest:embed`, `ai:extract`, `ai:parse`, `ai:explain`, `ai:tailor`,
+`alerts:compute`.
+
+Ingestion adds a lease. A worker takes a numbered lease on a board before it starts, and
+each write checks it inside the transaction. A worker that's been overtaken stops without
+changing anything. Live workers refresh their stream entry after each page, so they aren't
+reclaimed. Without the lease, a superseded worker could finish a run on a late page and
+close jobs it never read; a concurrency test found exactly that.
 
 ## Ingestion pipeline
 
@@ -118,17 +124,14 @@ with `MAXLEN ~`.
        304 -> boards.last_checked = now; done
        200 -> adapter -> normalised postings
        404 x3 -> board retired
-       429/503 -> Retry-After, backoff, circuit breaker
-     upsert postings by (source, source_job_id); content_hash decides "changed"
-     postings missing from a COMPLETE board response -> closed_at = now
-       (guard: if the board's count drops by > 50% at once, hold and recheck next cycle)
-     changed postings -> ingest:enrich
-   enrich worker:
-     HTML -> plain text; language; is_engineering; level; employment type;
-     geography (countries[], remote_scope); skills required / nice-to-have (taxonomy);
-     dedupe key + MinHash signature -> cluster
-     in scope and text changed -> ingest:embed
-   embed worker: batch of 64 -> embeddings -> corpus
+       429/503 -> Retry-After, backoff for every worker
+     normalise in the worker, deterministic and cheap: HTML -> plain text, is_engineering,
+       level, geography (countries[], remote_scope)
+     in one transaction: upsert postings by (source, source_job_id), and save the position
+     after the last page, postings missing from a COMPLETE run -> closed_at = now
+       (guard: if the board's count drops by > 50% at once, hold and recheck in an hour)
+   dedupe pass: dedupe key + MinHash signature -> cluster
+   embed worker: in scope and text changed -> batch of 64 -> embeddings -> corpus
 ```
 
 - **Refresh:** every 6 hours per board while up, plus a catch-up cycle at `up`. Board
