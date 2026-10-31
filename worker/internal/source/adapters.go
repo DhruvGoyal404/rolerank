@@ -279,7 +279,9 @@ func (a Ashby) Parse(token string, body []byte) (Page, error) {
 // Himalayas reads the public remote jobs feed.
 type Himalayas struct{}
 
-const himalayasFeed = "https://himalayas.app/jobs/api?limit=20"
+// The India-eligible search, not the whole feed: it's the part in scope, and 300 pages
+// instead of many thousands. It pages by number, unlike the browse feed's cursor.
+const himalayasSearch = "https://himalayas.app/jobs/api/search?country=IN&sort=recent"
 
 // Name implements Adapter.
 func (Himalayas) Name() string { return "himalayas" }
@@ -291,13 +293,15 @@ func (Himalayas) Hosts() []string { return []string{"himalayas.app"} }
 func (Himalayas) Attribution() Attribution { return Attribution{Credit: "Himalayas"} }
 
 // FirstURL implements Adapter.
-func (Himalayas) FirstURL(string) string { return himalayasFeed }
+func (Himalayas) FirstURL(string) string { return himalayasSearch + "&page=1" }
 
 // Parse implements Adapter.
 func (a Himalayas) Parse(_ string, body []byte) (Page, error) {
 	var data struct {
-		NextCursor string `json:"nextCursor"`
-		Jobs       *[]struct {
+		Offset int `json:"offset"`
+		Limit  int `json:"limit"`
+		Total  int `json:"totalCount"`
+		Jobs   *[]struct {
 			GUID        string   `json:"guid"`
 			Title       string   `json:"title"`
 			Company     string   `json:"companyName"`
@@ -322,8 +326,8 @@ func (a Himalayas) Parse(_ string, body []byte) (Page, error) {
 		return Page{}, decodeError(a.Name(), fmt.Errorf("no jobs field"))
 	}
 	var page Page
-	if data.NextCursor != "" && len(*data.Jobs) > 0 {
-		page.NextURL = himalayasFeed + "&cursor=" + url.QueryEscape(data.NextCursor)
+	if data.Limit > 0 && len(*data.Jobs) > 0 && data.Offset+data.Limit < data.Total {
+		page.NextURL = himalayasSearch + "&page=" + strconv.Itoa(data.Offset/data.Limit+2)
 	}
 	for _, j := range *data.Jobs {
 		keep(&page, Posting{

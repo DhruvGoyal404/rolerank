@@ -55,6 +55,10 @@ type Result struct {
 
 // Options configures a Client. AllowHTTP and AllowPrivate exist for local fake sources.
 type Options struct {
+	Spacing time.Duration // test-only, and refused unless AllowPrivate is set
+	// Bearer maps a host to its API key. A key goes only to its own host, and nothing
+	// here ever logs it or puts it in an error.
+	Bearer       map[string]string
 	UserAgent    string
 	Agent        string
 	Hosts        []string
@@ -71,12 +75,13 @@ type cachedPolicy struct {
 
 // Client is safe for concurrent use.
 type Client struct {
-	opts   Options
-	hosts  map[string]bool
-	http   *http.Client
-	now    func() time.Time
-	mu     sync.Mutex
-	robots map[string]cachedPolicy
+	opts    Options
+	spacing time.Duration
+	hosts   map[string]bool
+	http    *http.Client
+	now     func() time.Time
+	mu      sync.Mutex
+	robots  map[string]cachedPolicy
 }
 
 // New builds a Client.
@@ -93,6 +98,11 @@ func New(opts Options) *Client {
 	for _, h := range opts.Hosts {
 		c.hosts[h] = true
 	}
+	// Real sources are never fetched faster than DefaultSpacing, whatever the caller asks.
+	c.spacing = DefaultSpacing
+	if opts.AllowPrivate && opts.Spacing > 0 {
+		c.spacing = opts.Spacing
+	}
 	dialer := &net.Dialer{Timeout: 10 * time.Second}
 	if !opts.AllowPrivate {
 		dialer.Control = refusePrivate
@@ -108,6 +118,11 @@ func New(opts Options) *Client {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			if len(via) >= 3 {
 				return errors.New("fetch: too many redirects")
+			}
+			// Go keeps Authorization across ports of one host, so decide on every hop.
+			req.Header.Del("Authorization")
+			if token := opts.Bearer[req.URL.Host]; token != "" {
+				req.Header.Set("Authorization", "Bearer "+token)
 			}
 			return c.checkURL(req.URL)
 		},
@@ -156,7 +171,7 @@ func (c *Client) Get(ctx context.Context, rawURL, etag string) (*Result, error) 
 	if !policy.Allowed(u.RequestURI()) {
 		return nil, ErrDisallowed
 	}
-	spacing := DefaultSpacing
+	spacing := c.spacing
 	if delay := policy.CrawlDelay(); delay > spacing {
 		spacing = delay
 	}
@@ -182,6 +197,9 @@ func (c *Client) do(ctx context.Context, u *url.URL, etag string) (*Result, erro
 	req.Header.Set("User-Agent", c.opts.UserAgent)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Accept-Encoding", "gzip")
+	if token := c.opts.Bearer[u.Host]; token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
 	if etag != "" {
 		req.Header.Set("If-None-Match", etag)
 	}
@@ -261,7 +279,7 @@ func (c *Client) policy(ctx context.Context, u *url.URL) (robots.Policy, error) 
 	if ok && c.now().Sub(cached.fetched) < RobotsTTL {
 		return cached.policy, nil
 	}
-	if err := c.opts.Limiter.Wait(ctx, u.Host, DefaultSpacing); err != nil {
+	if err := c.opts.Limiter.Wait(ctx, u.Host, c.spacing); err != nil {
 		return robots.Policy{}, err
 	}
 	target := &url.URL{Scheme: u.Scheme, Host: u.Host, Path: "/robots.txt"}

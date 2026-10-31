@@ -106,7 +106,7 @@ func TestAshby(t *testing.T) {
 }
 
 func TestHimalayas(t *testing.T) {
-	page := parse(t, Himalayas{}, "", `{"nextCursor":"ab c=","jobs":[{
+	page := parse(t, Himalayas{}, "", `{"offset":20,"limit":20,"totalCount":61,"jobs":[{
 	  "guid":"https://himalayas.app/companies/acme/jobs/sde","title":"SDE","companyName":"Acme",
 	  "description":"<p>x</p>","locationRestrictions":["India"],"seniority":["Entry-level"],
 	  "categories":["Engineering"],"applicationLink":"https://himalayas.app/apply/1",
@@ -116,12 +116,16 @@ func TestHimalayas(t *testing.T) {
 	if p.ApplyURL != "https://himalayas.app/apply/1" || p.ExpiresAt.IsZero() || p.Remote != RemoteYes {
 		t.Fatalf("%+v", p)
 	}
-	if page.NextURL != himalayasFeed+"&cursor=ab+c%3D" {
+	if page.NextURL != himalayasSearch+"&page=3" {
 		t.Fatalf("next %q", page.NextURL)
 	}
-	last := parse(t, Himalayas{}, "", `{"nextCursor":"","jobs":[]}`)
-	if last.NextURL != "" {
-		t.Fatal("no next page expected")
+	for _, body := range []string{
+		`{"offset":6220,"limit":20,"totalCount":6175,"jobs":[]}`,
+		`{"offset":40,"limit":20,"totalCount":60,"jobs":[{"guid":"https://x.example/1","title":"T"}]}`,
+	} {
+		if last := parse(t, Himalayas{}, "", body); last.NextURL != "" {
+			t.Fatalf("no next page expected, got %q", last.NextURL)
+		}
 	}
 }
 

@@ -189,6 +189,60 @@ func TestEveryRequestPassesTheLimiter(t *testing.T) {
 	}
 }
 
+func TestSpacingCannotBeLoweredForRealSources(t *testing.T) {
+	c := New(Options{Spacing: time.Millisecond, Limiter: &fakeLimiter{}})
+	if c.spacing != DefaultSpacing {
+		t.Fatalf("spacing %v on a client that can reach real hosts", c.spacing)
+	}
+}
+
+func TestBearerGoesOnlyToItsOwnHost(t *testing.T) {
+	const secret = "planted-key"
+	other := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "" {
+			t.Errorf("the key reached another host on %s", r.URL.Path)
+		}
+	}))
+	defer other.Close()
+	s := newSource(t, openRobots, func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/hop" {
+			http.Redirect(w, r, other.URL+"/landing", http.StatusFound)
+			return
+		}
+		if r.Header.Get("Authorization") != "Bearer "+secret {
+			t.Errorf("own host got %q", r.Header.Get("Authorization"))
+		}
+	})
+	own, _ := url.Parse(s.server.URL)
+	second, _ := url.Parse(other.URL)
+	c := New(Options{
+		UserAgent: ua, Agent: "RoleRankBot", Hosts: []string{own.Host, second.Host},
+		Limiter: &fakeLimiter{}, AllowHTTP: true, AllowPrivate: true,
+		Bearer: map[string]string{own.Host: secret},
+	})
+	for _, target := range []string{s.server.URL + "/jobs", other.URL + "/jobs", s.server.URL + "/hop"} {
+		if _, err := c.Get(context.Background(), target, ""); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestBearerIsNeverInAnError(t *testing.T) {
+	const secret = "planted-key"
+	s := newSource(t, openRobots, func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusTooManyRequests)
+	})
+	own, _ := url.Parse(s.server.URL)
+	c := New(Options{
+		Agent: "RoleRankBot", Hosts: []string{own.Host}, Limiter: &fakeLimiter{},
+		AllowHTTP: true, AllowPrivate: true, Bearer: map[string]string{own.Host: secret},
+	})
+	_, err := c.Get(context.Background(), s.server.URL+"/jobs", "")
+	if err == nil || strings.Contains(err.Error(), secret) {
+		t.Fatalf("got %v", err)
+	}
+}
+
 func TestRetryAfterBlocksTheHost(t *testing.T) {
 	for _, status := range []int{http.StatusTooManyRequests, http.StatusServiceUnavailable} {
 		s := newSource(t, openRobots, func(w http.ResponseWriter, _ *http.Request) {

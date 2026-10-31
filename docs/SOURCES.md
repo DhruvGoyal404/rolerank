@@ -254,13 +254,16 @@ host whose robots.txt disallows us.
 
 - **Docs:** https://himalayas.app/api; terms: https://himalayas.app/terms (clause 113,
   "Terms and Conditions for API Users")
+- **What we read:** the India-eligible search, `country=IN`, about 310 pages at 20 a page,
+  because that's the part in scope.
 - **Endpoints:** `GET https://himalayas.app/jobs/api` (browse feed, `limit` up to 20,
   cursor paging with `nextCursor`); `GET /jobs/api/search` (`q`, `country`,
   `worldwide`, `seniority`, `employment_type`, `timezone`, `sort`, `page`, 20 a page);
   `GET /jobs/api/companies/{company}/jobs/{slug}`: 200 open, **410 closed** (with
   `expiryDate`), 404 unknown.
 - **Auth:** optional free key, `Authorization: Bearer`. Without one, callers share a
-  public allowance.
+  public allowance. We use a key, `HIMALAYAS_API`, read from the environment on the server
+  and sent to `himalayas.app` only.
 - **Rate limits:** with a key, **60 requests per minute and 10,000 per UTC day**; 429
   with `Retry-After`. Data refreshes daily, so we poll at most a few times a day.
 - **Terms (quoted):** personal and commercial use allowed without asking. "Every
