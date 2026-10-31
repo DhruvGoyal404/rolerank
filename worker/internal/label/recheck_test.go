@@ -206,7 +206,7 @@ func TestApplyBodiesRefusesAMissingPosting(t *testing.T) {
 
 // The rule sits in the question, so every pass over the pairs shows it, and D6 shows none.
 func TestPairPagesCarryTheRule(t *testing.T) {
-	for _, dataset := range []string{"d5", "d5-recheck", "d5-redo"} {
+	for _, dataset := range []string{"d5", "d5-recheck", "d5-redo", "d5-redo-2"} {
 		q := Questions[dataset][0]
 		if !strings.Contains(q.Rule, "same location") || !strings.Contains(q.Rule, "different city") {
 			t.Errorf("%s: %q", dataset, q.Rule)

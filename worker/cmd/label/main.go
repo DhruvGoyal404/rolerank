@@ -3,7 +3,7 @@
 //	label select <root> <seed>     draw the items into evals/private
 //	label serve <root> <dataset>   open http://127.0.0.1:8765, keyboard only
 //	label recheck <root> <dataset> <ids file> <seed> [full]   draw a blind second pass
-//	label redo <root> <dataset> <ids file> <seed>   draw a blind redo, with full text
+//	label redo <root> <dataset> <ids file> <seed> [name]   draw a blind redo, with full text
 //	label agree <root> <dataset>   score a finished second pass
 package main
 
@@ -47,12 +47,15 @@ func run(args []string) error {
 	if len(args) == 5 && args[0] == "redo" {
 		return draw(args[1], args[2], "redo", args[3], args[4], true)
 	}
+	if len(args) == 6 && args[0] == "redo" {
+		return draw(args[1], args[2], args[5], args[3], args[4], true)
+	}
 	if len(args) == 3 && args[0] == "agree" {
 		return agree(args[1], args[2])
 	}
 	return fmt.Errorf("usage: label select <root> <seed> | label serve <root> <dataset> | " +
 		"label recheck <root> <dataset> <ids file> <seed> [full] | " +
-		"label redo <root> <dataset> <ids file> <seed> | label agree <root> <dataset>")
+		"label redo <root> <dataset> <ids file> <seed> [name] | label agree <root> <dataset>")
 }
 
 func draw(root, dataset, pass, idsFile, seed string, full bool) error {

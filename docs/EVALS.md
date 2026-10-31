@@ -109,6 +109,15 @@ exactly; they're sub-second from now on. Item text and the band similarity cover
 the first 2,500 characters of each posting, while dedupe compares the whole text. Until a
 second pass clears this, no dedupe score from D5 counts toward the P2 exit.
 
+**D5 recheck (2026-11-01): kappa 0.171, interval 0.040 to 0.344, 13 of 30 agreed.** Below
+0.8, so the hard pairs are redone. Every change went to no: 12 of 17 first-pass yes answers
+and all 5 unsure. The second pass ran at a mean of 8.4 s and came 1.7 hours after the
+first, not the day this method asks for, so memory could only have raised agreement. It
+followed the report of the first pass and showed the written rule, so this is mostly a
+changed reading of the rule, not random noise. The 30 pairs were chosen as suspect, so 12 of
+17 isn't an error rate for the whole set. `d5-redo-2` holds the other 162 pairs, so
+every D5 label ends up under one rule with full text.
+
 The rule now sits at the top of the page for every D5 pass: same employer + same role +
 same location (or same remote scope) = same job; a different city is a different job.
 The recheck uses the same excerpts as the first pass. Then `d5-redo` covers 138 pairs, the 91

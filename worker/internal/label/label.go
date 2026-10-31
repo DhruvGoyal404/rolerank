@@ -99,6 +99,7 @@ var Questions = map[string][]Question{
 	"d5":         d5Questions,
 	"d5-recheck": d5Questions,
 	"d5-redo":    d5Questions,
+	"d5-redo-2":  d5Questions,
 	"d6":         d6Questions,
 	"d6-recheck": d6Questions,
 }

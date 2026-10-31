@@ -9,6 +9,8 @@
 #   bash scripts/label.sh recheck d6 evals/labels/d6-recheck-ids.txt <seed> full   same, with full text
 #   bash scripts/label.sh redo d5 evals/labels/d5-redo-ids.txt <seed>   draw a redo, with full text
 #   bash scripts/label.sh d5-redo            label it, after the recheck
+#   bash scripts/label.sh redo d5 evals/labels/d5-redo-2-ids.txt <seed> redo-2   the other pairs
+#   bash scripts/label.sh d5-redo-2          label them
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
@@ -22,7 +24,7 @@ cd worker
 case "$1" in
   select) exec go run ./cmd/label select "$win" "$2" ;;
   recheck) exec go run ./cmd/label recheck "$win" "$2" "$win/$3" "$4" ${5:+"$5"} ;;
-  redo) exec go run ./cmd/label redo "$win" "$2" "$win/$3" "$4" ;;
+  redo) exec go run ./cmd/label redo "$win" "$2" "$win/$3" "$4" ${5:+"$5"} ;;
   agree) exec go run ./cmd/label agree "$win" "$2" ;;
 esac
 exec go run ./cmd/label serve "$win" "$1"
