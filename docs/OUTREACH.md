@@ -9,9 +9,9 @@ second per host while waiting, and stops at once if a provider says no.
 
 | Provider | Sent to | Date | Reply |
 |---|---|---|---|
-| Greenhouse | partner-support@greenhouse.io | unknown | none yet |
-| Ashby | support@ashbyhq.com | unknown | none yet |
-| Workable | unknown (form or support@workable.com) | unknown | none yet |
+| Greenhouse | partner-support@greenhouse.io | 2026-10-31 | none yet |
+| Ashby | support@ashbyhq.com | 2026-10-31 | none yet |
+| Workable | support@workable.com | 2026-10-31 | none yet |
 
 ---
 
