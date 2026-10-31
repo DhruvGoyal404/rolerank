@@ -67,6 +67,7 @@ type Options struct {
 	Bearer       map[string]string
 	UserAgent    string
 	Agent        string
+	Accept       string // defaults to application/json
 	Hosts        []string
 	Limiter      Limiter
 	AllowHTTP    bool
@@ -205,7 +206,11 @@ func (c *Client) do(ctx context.Context, u *url.URL, etag string) (*Result, erro
 		return nil, err
 	}
 	req.Header.Set("User-Agent", c.opts.UserAgent)
-	req.Header.Set("Accept", "application/json")
+	accept := c.opts.Accept
+	if accept == "" {
+		accept = "application/json"
+	}
+	req.Header.Set("Accept", accept)
 	req.Header.Set("Accept-Encoding", "gzip")
 	if token := c.opts.Bearer[u.Host]; token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)

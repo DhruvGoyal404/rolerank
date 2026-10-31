@@ -134,6 +134,13 @@ Measured on 2026-10-31 from the two newest indexes: 4,900 Greenhouse, 2,984 Ashb
 Lever boards. **Lever is badly undercounted.** `jobs.lever.co`'s robots.txt blocks Common
 Crawl's bot, so the index barely sees it. Lever needs methods 2 to 4.
 
+**Lever step 1 (2026-11-01).** Names and official sites come from Wikipedia's ordinary
+category and article pages, read through the fetcher, with one try per name on Lever.
+Wikipedia's text is CC BY-SA; names and URLs are facts, and we credit the source. Wikidata
+would be the cleaner source (CC0), but `query.wikidata.org/robots.txt` disallows `/sparql`,
+so it isn't used. Lever's response doesn't name the company, so a hit counts only if the
+company's own site links to that exact board, on a page robots.txt allows.
+
 Not used: search engine scraping, guessing at scale beyond one try per name, or any
 host whose robots.txt disallows us.
 
