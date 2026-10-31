@@ -58,8 +58,8 @@ Trust boundaries (TB1 to TB9) are defined in [THREAT_MODEL.md](THREAT_MODEL.md).
 | `aiworker` | TypeScript | Consumes `parse`, `explain`, `tailor` streams. Owns the only LLM client, the schemas, validators, grounding gate and spend ledger | Consumers in the group; capped by the ledger, not CPU |
 | `extractor` | Go | Consumes `extract`. Starts one gVisor container per file, reads text and layout metadata over stdout | Containers per host |
 | `ingest` | Go | Scheduler, fetchers, adapters, normaliser, deduper, classifiers, embedder | Workers in the group; the shared per-host limiter caps the rate |
-| `db-app` | Postgres | Users, profiles, tracker, ledger. Holds PII | Vertical |
-| `db-corpus` | Postgres + pgvector | Postings, boards, embeddings, indexes. No PII | Vertical; read replica later |
+| `db-app` | Postgres database `app` | Users, profiles, tracker, ledger. Holds PII | Vertical |
+| `db-corpus` | Postgres database `corpus`, with pgvector | Postings, boards, embeddings, indexes. No PII | Vertical; read replica later |
 | `valkey` | Valkey | Streams, rate-limit buckets, OAuth `state`, short caches | Vertical |
 | `caddy` | Caddy | TLS, HTTP/3, security headers, static SPA | n/a |
 
@@ -69,9 +69,28 @@ off and CodeJudge's runner code can be reused. TypeScript for everything a user
 touches, including the LLM gateway, so schemas (Zod) are shared between the API and
 the validators.
 
-Why two Postgres clusters on one host: PII and public data are kept apart by credentials,
-not only by convention. The corpus can be dropped, rebuilt or dumped without touching user
-data, and the corpus cluster's memory tuning (HNSW) doesn't fight the app's.
+**One Postgres cluster, two databases.** `app` and `corpus` run in one Postgres 18
+cluster, which is simpler to run, back up and bring up than two. PII and public data are
+still kept apart by credentials, not by convention:
+
+| Role | Can connect to | Used by |
+|---|---|---|
+| `app_rw` | `app` only | `api`, `aiworker` |
+| `corpus_rw` | `corpus` only | `ingest` |
+| `corpus_ro` | `corpus` only | `api` (search and job cards) |
+| `migrator_app`, `migrator_corpus` | One database each | dbmate, at deploy time |
+
+`CONNECT` is revoked from `PUBLIC` on both databases, there are no cross-database grants,
+and `dblink` and `postgres_fdw` are not installed. Tests prove each role is refused by
+the other database, and that no PII column exists in `corpus`. The corpus can be
+dropped, rebuilt or dumped without touching user data, and `pg_dump` works per database,
+so the backup split still holds.
+
+What this gives up: the databases share memory, WAL, CPU and one superuser, so a heavy
+ingest can slow user queries, and a Postgres-level compromise crosses both (THREAT_MODEL.md,
+R11). **Split into two clusters only if the P3 bench shows interference, with numbers:**
+`/api/matches` p95 with `ingest` at full rate more than 25% above p95 with `ingest`
+stopped, and the 200 ms target missed because of it.
 
 ## Queues: reuse the CodeJudge pattern
 
@@ -305,7 +324,7 @@ too young on 2026-10-31.
 | Part | Choice | Version | Newer | Why |
 |---|---|---|---|---|
 | Runtime | Node.js LTS | 24.22.0 (2026-10-14) | 24.22.1, 24.22.2; 26 became LTS on 2026-10-28 | Supported until 2028-04-30 |
-| Language | TypeScript | 7.0.2 | | |
+| Language | TypeScript | 7.0.2 (P1 must prove it, below) | | |
 | API | Express | 5.3.0 | | Same as CodeJudge |
 | Validation | Zod | 4.6.7 | | Shared schemas for API and LLM output |
 | DB driver | pg | 8.23.1 | | No ORM |
@@ -348,6 +367,13 @@ too young on 2026-10-31.
 
 Base images are pinned by digest, chosen from tags at least 14 days old. ClamAV is not
 used, for the reason given in THREAT_MODEL.md.
+
+**TypeScript 7 is on probation.** P1 must prove 7.0.2 works with typescript-eslint,
+Vitest and the build. If any of them doesn't support it yet, we pin the newest TS 6.x
+that passes the 14-day rule and record why here.
+
+**Host:** m7g.xlarge (Q9), with x86 t3.xlarge as the fallback if gVisor or any image
+fails on arm64 in P1.
 
 ## Measured in Phase 0
 
@@ -446,7 +472,7 @@ smoke test and automatic rollback.
 | `RoleRankProd` (persistent) | S3 backup bucket (versioned, Object Lock on `backups/`, lifecycle), ECR repositories keeping 2 images each, SSM parameters, SNS topic and `BackupMissing` alarm, OIDC deploy role, SES domain identity, monthly budget | Always |
 | `RoleRankHost` (ephemeral) | One EC2 host (Q9) with a gp3 volume, security group, instance role, public IP | Created by up, destroyed by down |
 
-The host runs Caddy, `api`, `aiworker`, both Postgres clusters and Valkey under Docker
+The host runs Caddy, `api`, `aiworker`, Postgres and Valkey under Docker
 Compose, and `ingest` and `extractor` under systemd (gVisor needs the host runtime).
 
 **`rolerank-down.sh`:**

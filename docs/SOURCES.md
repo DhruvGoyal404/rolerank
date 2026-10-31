@@ -4,7 +4,8 @@ Every source RoleRank may fetch from, what it allows, and what it actually conta
 Everything here was checked on **2026-10-30 and 2026-10-31 (IST)** against the
 provider's own documentation, its robots.txt, and live calls from a script that
 identified itself honestly (`RoleRank-research/0.1 (student project; contact ...)`)
-and made about 1 request per second per host. Nothing was fetched through a browser,
+and made about 1 request per second per host. From now on, research scripts use
+`bot@dhruvgoyal.tech` as the contact, never a personal address. Nothing was fetched through a browser,
 proxy or faked identity.
 
 This is an engineering record, not legal advice. Where a provider publishes no terms
@@ -19,8 +20,8 @@ for its public endpoint, this document says **unknown** rather than guessing.
 | Ashby posting API | **Approved** | None | Medium; ~1.2% India engineering | Skip `isListed: false` jobs |
 | Himalayas API | **Approved** | Optional free key | **Best for India-eligible remote** | Attribution, `applicationLink`, no redistribution |
 | RemoteOK API | **Approved, small** | None | ~100 jobs per snapshot, ~1 India | Followable link back, name credit, no logo |
-| Workable public widget | **Owner decision (Q7)** | None | Medium; ~3% India | Endpoint not officially documented |
-| Remotive, Jobicy | **Owner decision (Q7)** | None | Small, remote only | Strict rate and link rules |
+| Workable public widget | **Not in v1 (Q7)** | None | Medium; ~3% India | Endpoint not officially documented |
+| Remotive, Jobicy | **Not in v1 (Q7)** | None | Small, remote only | Strict rate and link rules |
 | SmartRecruiters | **Excluded** | | | robots.txt on the API host disallows us |
 | Internshala | **Excluded** | | | Terms forbid automated access |
 | LinkedIn, Naukri, Indeed | **Excluded** | | | Owner's rule; terms forbid it |
@@ -302,7 +303,7 @@ host whose robots.txt disallows us.
 - **UI rule:** the job card links to `url` with a normal followable link and says
   "via Remote OK". No logo.
 
-## Workable public widget (owner decision, Q7)
+## Workable public widget (not in v1, Q7)
 
 - **Official docs** cover only the customer API (`{subdomain}.workable.com/spi/v3`,
   bearer token, scope `r_jobs`). That isn't usable by us.
@@ -318,10 +319,10 @@ host whose robots.txt disallows us.
   `url`, `shortlink`, `application_url`, `published_on`, `created_at`, `country`,
   `city`, `state`, `education`, `experience`, `function`, `industry`, `locations`.
 - **Risk:** an undocumented endpoint can change or close with no notice, and its
-  permission is implied only by robots.txt. Recommendation in Q7: leave it out of v1;
-  add it in P2 only if the coverage report needs it.
+  permission is implied only by robots.txt. Decision (Q7): left out of v1;
+  revisit after the P2 coverage report and any reply from Workable.
 
-## Remotive, Jobicy (owner decision, Q7)
+## Remotive, Jobicy (not in v1, Q7)
 
 - **Remotive** (https://github.com/remotive-com/remote-jobs-api): `GET
   https://remotive.com/api/remote-jobs`. Advised at most 4 requests a day; more than
@@ -331,7 +332,7 @@ host whose robots.txt disallows us.
 - **Jobicy** (https://jobicy.com/jobs-rss-feed): `GET https://jobicy.com/api/jobs`,
   automated passes at most once an hour. Credit Jobicy; apply links must go to Jobicy's
   pages. No India geo slug is documented.
-- Both are remote-only and small. Recommendation: add in P2 only if they add in-scope
+- Both are remote-only and small. Decision (Q7): revisit only if they add in-scope
   jobs the others don't have.
 
 ---
@@ -352,9 +353,9 @@ host whose robots.txt disallows us.
 
 ## Open items
 
-- Rate limits for Greenhouse and Ashby GETs are **unknown**. Before P2 we email both
-  providers' developer support, describing our rate and User-Agent, and record the
-  answer here. Until then, 1 request per second per host.
+- Rate limits for Greenhouse and Ashby GETs are **unknown**. Drafts to both providers,
+  and to Workable about its widget, are in OUTREACH.md for the owner to send. Replies are
+  recorded here. Until then, 1 request per second per host.
 - Greenhouse's website terms for the public API: **unknown**. Same email.
 - Re-check every source's terms and robots.txt quarterly; a CI job diffs each robots.txt
   weekly while the project is active and opens an issue on change.

@@ -1,8 +1,28 @@
 # Decisions for the owner
 
-Each question names who it affects, the options with the recommendation first, and
-why. Answer by number (for example "Q1 A, Q2 B"). Until answered, the docs assume
-the recommendation and mark it **(Qn)**.
+**All answered on 2026-10-31.** This file keeps the reasoning behind each decision.
+
+| # | Decision |
+|---|---|
+| Q1 | A: on-demand only |
+| Q2 | A: invite-only until the security review |
+| Q3 | A: `rolerank.dhruvgoyal.tech`. Owner accepts the trademark risk for a student project |
+| Q4 | A: small reviewed allowlist, decided after P2 |
+| Q5 | A: Claude Haiku 5.5 via the Anthropic API |
+| Q6 | A: local bge-small by default, confirmed by bake-off in P3 |
+| Q7 | A: not in v1 |
+| Q8 | A: $5.27 monthly alert; $0.05 per user and $1.00 global per day |
+| Q9 | A: m7g.xlarge, with D (x86 t3.xlarge) as the fallback if gVisor or any image fails on arm64 in P1 |
+| Q10 | A: delete the original after extraction |
+| Q11 | A: `pg_dump` to S3 |
+| Q12 | 140 hours a week; P1 to P5 by 2026-11-10, P6 to P8 after (ROADMAP.md) |
+| Q13 | A: public. Repository created 2026-10-31 |
+| Q14 | A: 18+ |
+| Q15 | No decision needed: the account is already on the PAID plan (`codejudge-down.sh` printed "plan: PAID ACTIVE" on 2026-10-30). Same account, separated by tags and stack names. Both budgets move to the current rate in P8 |
+| Q16 | A: `bot@dhruvgoyal.tech` through Cloudflare Email Routing; drafts in OUTREACH.md |
+
+Later changes by the owner (2026-10-31): one Postgres cluster with two databases instead
+of two clusters; D3, D5 and D6 reduced; Bring a JD moved to P4b. The docs reflect these.
 
 Prices: USD, checked 2026-10-30/31; Rs at the ECB rate of 94.95 per USD (2026-10-30).
 

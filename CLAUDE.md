@@ -7,8 +7,8 @@ India, with freshers and interns as first-class users.
 This file is the project's constitution. It binds every change, human or AI.
 To weaken a rule, change this file in its own PR and say why.
 
-**Status: Phase 0 (research and design docs). There is no application code yet.**
-Read these before changing anything:
+**Status: Phase 1 (foundation and CI).** Phase 0 is complete. Read these before
+changing anything:
 
 | Doc | What it holds |
 |---|---|
@@ -18,7 +18,8 @@ Read these before changing anything:
 | [docs/EVALS.md](docs/EVALS.md) | Datasets, metrics, pass thresholds |
 | [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) | STRIDE per component, mitigations, residual risks |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phases and exit criteria |
-| [docs/QUESTIONS.md](docs/QUESTIONS.md) | Decisions that belong to the owner |
+| [docs/QUESTIONS.md](docs/QUESTIONS.md) | The owner's decisions and their reasoning |
+| [docs/OUTREACH.md](docs/OUTREACH.md) | Emails to providers, for the owner to send |
 
 ## How we work
 
@@ -76,8 +77,11 @@ Read these before changing anything:
 - dbmate migrations, forward-only. Expand first, contract in a later release.
   Every migration works with the previous release too.
 - No ORM. SQL is reviewed like code. Queries are parameterised.
-- Two Postgres clusters, kept apart on purpose: `app` holds user data, `corpus`
-  holds postings. PII never enters `corpus` (ARCHITECTURE.md).
+- One Postgres cluster with two databases, kept apart on purpose: `app` holds user
+  data, `corpus` holds postings. Each has its own login role, with `CONNECT` revoked
+  from `PUBLIC` and no grants across them. No `dblink` or `postgres_fdw`.
+- **PII never enters `corpus`.** Tests prove each role can't reach the other database.
+- Split into two clusters only if the P3 bench shows interference, with numbers.
 
 ## Source and ingestion invariants (never weaken without explicit approval)
 
@@ -86,7 +90,9 @@ Read these before changing anything:
 - Never scrape LinkedIn, Naukri, Indeed, Internshala or any site whose terms or
   robots.txt forbid it. No stealth browsers, no proxy rotation, no CAPTCHA
   solving, no faked User-Agent.
-- Every request carries `RoleRankBot/<version> (+https://<site>/about/bot; <contact email>)`.
+- Every request, including one-off research scripts, carries
+  `RoleRankBot/<version> (+https://<site>/about/bot; bot@dhruvgoyal.tech)`. Never the
+  owner's personal email address.
 - robots.txt is fetched, cached for 24 hours and obeyed per host, including
   `Crawl-delay`. A 5xx on robots.txt means stop for that host; a 4xx means no rules
   apply (RFC 9309).

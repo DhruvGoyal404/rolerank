@@ -3,7 +3,38 @@
 Each phase ends with something you can demo and numbers you can rerun. A phase is
 done when every exit criterion is met and written up in `docs/PHASE<n>.md`: what
 was built, how it was measured, what surprised us, what's left. Moving a criterion
-takes a written reason. Time estimates are unknown until Q12 is answered.
+takes a written reason.
+
+## Schedule
+
+The owner's target (Q12): 140 hours a week, **P1 to P5 done by 2026-11-10**, P6 to P8
+after, ahead of an internship starting in January 2027. Dates are ends of phases.
+
+| Phase | Done by | Owner's time needed |
+|---|---|---|
+| P1 Foundation and CI | 2026-11-02 | Create the Google and GitHub OAuth apps |
+| P2 Ingestion | 2026-11-04 | Label D5 and D6 (600 labels). Send the three outreach emails |
+| P3 Search and ranking | 2026-11-06 | Grade D3 (500 pairs, plus 50 repeats) |
+| P4 Resume parsing | 2026-11-08 | Review the hostile-file results |
+| P4b Bring a JD | 2026-11-09 | Audit 50 tailoring suggestions |
+| P5 Explanations and gaps | 2026-11-10 | Review the demo |
+| P6 Product UI | 2026-11-24 | Walkthrough with someone new |
+| P7 Alerts and tracker | 2026-12-05 | Real use for real applications |
+| P8 Deploy, up and down | 2026-12-15 | AWS SSO login, budget and alarm emails |
+| Buffer | 2026-12-31 | |
+
+Risks to these dates:
+
+- P1 to P5 in 10 days is aggressive even at this pace, and the phases are sequential.
+  A gate is never skipped to hold a date. If a date slips, it slips, and the report says
+  so.
+- The eval gates need the owner's hands: about 1,150 labels and grades between P2 and P3.
+- Providers may not reply to the outreach emails in time. P2 proceeds at 1 request per
+  second per host regardless.
+- The first full ingestion cycle runs at polite rates, so it can't be rushed. Common
+  Crawl's index server was also unreliable in Phase 0.
+- A new dependency release needs 14 days before it can be adopted, so a version bug
+  found now can't always be fixed by upgrading.
 
 Every phase also has these standing criteria:
 
@@ -13,20 +44,29 @@ Every phase also has these standing criteria:
 - Dependencies pass the 14-day rule (a CI script checks publish dates).
 - The doc that owns a decision is updated in the same PR.
 
-## P0: research and design (this phase)
+## P0: research and design (done 2026-10-31)
 
-**Done when:** the eight docs exist, every claim has a source or says "unknown",
-and the owner has answered QUESTIONS.md.
+The eight docs exist, every claim has a source or says "unknown", and the owner has
+answered QUESTIONS.md.
 
 ## P1: foundation and CI
 
-Monorepo: `api/`, `web/`, `worker/` (Go), `db/`, `evals/`, `infra/`. Compose with two
-Postgres clusters and Valkey. Express API with config validation, health, structured
-logs. Google and GitHub sign-in, sessions, Origin check, helmet CSP, rate limits. Empty
-React shell. dbmate on both clusters. CI from the first commit.
+Monorepo: `api/`, `web/`, `worker/` (Go), `db/`, `evals/`, `infra/`. Compose with one
+Postgres cluster (databases `app` and `corpus`, separate roles) and Valkey. Express API
+with config validation, health, structured logs. Google and GitHub sign-in, sessions,
+invite codes, 18+ confirmation, Origin check, helmet CSP, rate limits. Empty React shell.
+dbmate on both databases. CI from the first commit.
 
 **Exit criteria**
 
+- **TypeScript 7.0.2 is proven** with typescript-eslint, Vitest and the build. If any of
+  them doesn't support it, pin the newest TS 6.x that passes the 14-day rule and record
+  why in ARCHITECTURE.md.
+- **arm64 is proven:** gVisor and every image run on arm64 (Q9), or the host falls back to
+  x86 t3.xlarge.
+- **Database isolation is proven:** `app_rw` is refused by `corpus`, the corpus roles are
+  refused by `app`, `PUBLIC` has no `CONNECT`, and a schema test finds no PII column in
+  `corpus`.
 - Sign in with both providers locally. Sign out and session expiry work.
 - Negative auth tests pass: bad `state`, reused `state`, bad `nonce`, wrong `aud`,
   expired token, `alg=none`, unsigned token, foreign `next`, missing Origin.
@@ -88,6 +128,9 @@ harness with the 5 lakh synthetic corpus.
 - Rebuild time for all indexes is measured and fits the up/down design.
 - The rank of a given (profile, corpus) is reproducible from stored features.
 
+- Run the bench with `ingest` on and off. If `/api/matches` p95 rises by more than 25% and
+  misses 200 ms because of it, split `app` and `corpus` into two clusters, with numbers.
+
 **Demo:** type a profile, get ranked jobs with matched and missing skills, then show the
 bench report and eval report side by side.
 
@@ -112,20 +155,41 @@ encrypted storage; LLM ledger and caps. Datasets D1 and D7.
 
 **Demo:** upload a synthetic resume, see the parse, correct a field, watch a zip bomb fail.
 
-## P5: explanations, gaps and tailoring
+## P4b: Bring a JD (first user-facing milestone)
 
-Deterministic explanation; on-demand LLM prose; skill-gap analysis; Bring a JD;
-tailoring with the grounding gate. Dataset D4.
+The first thing a real person can use. Paste a job description, get the same breakdown
+as an indexed job: matched skills, missing skills, level fit, and tailoring with the
+grounding gate. Includes a minimal real UI: upload, confirm profile, paste JD, results.
+Dataset D4.
 
 **Exit criteria**
 
 - All tailoring thresholds pass. Zero invented skills on pressure cases.
 - A test proves that a suggestion failing the gate can't reach the API response.
+- Pasted JD text is treated as untrusted (D7 cases included) and never joins the shared
+  index.
 - Human audit of 50 suggestions recorded in the phase report.
-- Mean cost per explanation and per tailoring run reported, within budget.
+- Mean cost per tailoring run reported, within budget.
+- e2e of the whole flow on an isolated database, axe-checked.
+
+**Demo:** upload a synthetic resume, paste a JD demanding Kubernetes, get matched and
+missing skills and grounded tailoring, with RoleRank saying honestly that the resume
+doesn't show Kubernetes.
+
+## P5: explanations and gaps
+
+Deterministic explanations on indexed jobs, on-demand LLM prose, skill-gap analysis.
+
+**Exit criteria**
+
+- All explanation thresholds in EVALS.md pass.
+- The gate rejects any skill in LLM prose that isn't in the deterministic lists (test).
+- The gap view is checked against D2's known skill sets.
+- Mean cost per explanation reported, within budget.
 - Explanation p95 <= 3 s.
 
-**Demo:** a JD demanding Kubernetes, a resume without it, and RoleRank saying so honestly.
+**Demo:** a resume's ranked matches, each explained, and the skills that would unlock the
+most near-matches.
 
 ## P6: product UI
 
@@ -147,7 +211,7 @@ tailoring view, settings, /privacy. Design pass and a real accessibility pass.
 ## P7: alerts and tracker
 
 Tracker states and persistence past posting closure. Email digests through SES:
-opt-in, unsubscribe, bounces, complaints. Depends on Q1.
+opt-in, unsubscribe, bounces, complaints. Sent only while the site is up (Q1).
 
 **Exit criteria**
 

@@ -4,8 +4,8 @@ RoleRank ranks real job postings from legal, public sources against your resume 
 tells you why each one fits: which skills match, which are missing, and whether the
 role suits your level and location.
 
-Status: proposal for Phase 0. Items marked **(Qn)** wait on a decision in
-[QUESTIONS.md](QUESTIONS.md). The defaults here assume the recommended answer.
+Status: agreed at the end of Phase 0. Decisions and their reasoning are in
+[QUESTIONS.md](QUESTIONS.md).
 
 ## Who it is for
 
@@ -86,7 +86,10 @@ Priority: **M** must have for v1, **S** should, **C** could.
 
 This serves the primary user directly. A fresher hears about a role through campus,
 a friend or LinkedIn, and needs help with that role. The user supplies the text, so
-there's no sourcing problem, and the job isn't added to the shared index.
+there's no sourcing problem, and the job isn't added to the shared index. It's the
+**first user-facing milestone** (P4b): upload a resume, paste a JD, and get matched and
+missing skills with grounded tailoring. Ingestion scale in P2 and P3 is the engineering
+showcase.
 
 ### Skill gaps
 
@@ -130,7 +133,8 @@ view; tailoring with the grounding gate; tracker; cost caps; deletion and export
 
 ### Conditional
 
-Email alerts (Q1). First-party career pages (Q4). Public signup (Q2).
+Email alerts send only while the site is up (Q1). First-party career pages are decided
+after P2 (Q4). Signup is invite-only until the security review (Q2).
 
 ### Out of v1
 

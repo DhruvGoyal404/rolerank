@@ -43,7 +43,7 @@ This is an engineering document, not legal advice.
  TB3 API --> parser sandbox (hostile bytes, no network)
  TB4 API or worker --> LLM provider (data leaves AWS or our account)
  TB5 ingestion workers --> third-party job sources (hostile content in)
- TB6 app cluster <-/-> corpus cluster (PII must not cross)
+ TB6 app database <-/-> corpus database (PII must not cross; separate roles, one cluster)
  TB7 GitHub Actions --> AWS (OIDC role)
  TB8 host --> S3 backups (create-only)
  TB9 Model output --> application (treated as untrusted input)
@@ -130,12 +130,12 @@ this decision reopens.
 Deleting the wrapped DEK makes every ciphertext of that user unreadable, wherever a
 copy survives. That is how deletion reaches object storage at once.
 
-### App cluster (PII) and corpus cluster
+### Postgres: `app` database (PII) and `corpus` database
 
 | STRIDE | Threat | Mitigation |
 |---|---|---|
 | T | Migration damages data | Expand/contract, restore drill, backup before migrating |
-| I | PII leaks into corpus | Separate clusters and credentials. The corpus role cannot read the app database. Match requests send a vector and filters, never profile text |
+| I | PII leaks into corpus | Separate databases and login roles, `CONNECT` revoked from `PUBLIC`, no cross-database grants, no `dblink` or `postgres_fdw`. Tests prove each role is refused by the other database. Match requests send a vector and filters, never profile text |
 | I | A profile embedding reveals the resume | Embeddings are personal data. Stored only in `app`, deleted with the account. Passed to the corpus cluster per query, never stored there |
 | D | Slow query starves the API | `statement_timeout`, separate pools, HNSW scan limits, indexes verified by the bench |
 | E | App role can alter schema | Migrations run with a separate role; the runtime role has DML only |
@@ -225,7 +225,7 @@ something bad, and the gate requires all facts to come from the user's own resum
 
 | Data | Where | Retention |
 |---|---|---|
-| Original upload | Sandbox stdin only, or encrypted S3 quarantine for a parse retry | Deleted after extraction (proposed, Q10) |
+| Original upload | Sandbox stdin only, or encrypted S3 quarantine for a parse retry | Deleted after extraction (Q10) |
 | Resume text, line-numbered | `app` DB, encrypted | Until the user deletes it or the account |
 | Parsed profile, embedding | `app` DB | Same |
 | Matches, tracker | `app` DB | Same |
@@ -234,7 +234,7 @@ something bad, and the gate requires all facts to come from the user's own resum
 | LLM ledger | `app` DB | 90 days, counts and costs only |
 | Backups of `app` | S3 | **14 days**, then expired |
 | Final backup taken at `down` | S3 | Newest 2, removed once superseded. See below |
-| Provider side | LLM provider | Per Q5: zero retention where offered. Flagged content may be held longer by the provider |
+| Provider side | LLM provider | Anthropic API (Q5): prompts and outputs not retained by default. Flagged content may be held longer by the provider |
 
 ### Deletion, including backups
 
@@ -263,7 +263,7 @@ something bad, and the gate requires all facts to come from the user's own resum
   for employers, which is a different and heavier regulatory category. It stays out
   of that category by design (SPEC.md non-goals).
 - A student project is still a data fiduciary if it holds real users' resumes. Legal
-  review is unaffordable, which is one reason Q2 recommends a limited launch.
+  review is unaffordable, which is one reason signup is invite-only (Q2).
 
 ## Residual risks
 
@@ -279,6 +279,7 @@ something bad, and the gate requires all facts to come from the user's own resum
 | R8 | Backup window: deleted data readable for 14 days to someone holding both a backup and its key | Backups must exist | Stated on /privacy; key held apart |
 | R9 | Single host, single owner | Budget | Not a production service; stated plainly |
 | R10 | Terms of a source change | Outside our control | Re-check quarterly; each source can be switched off by config |
+| R11 | `app` and `corpus` share one Postgres cluster: a superuser or server-level compromise crosses both, and heavy ingest can slow user queries | One cluster is simpler to run on one host | Roles are separate and tested; the corpus holds no PII; split if the P3 bench shows interference (ARCHITECTURE.md) |
 
 ## Proving it
 
