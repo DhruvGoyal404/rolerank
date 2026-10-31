@@ -1,0 +1,40 @@
+# Secrets and local config. Never commit these.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.age
+*.dump
+
+# Resumes and real postings never enter this repo (docs/EVALS.md, "Data rules").
+*.pdf
+*.docx
+evals/private/
+data/
+
+# Node
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Go
+*.exe
+*.test
+*.out
+
+# CDK
+cdk.out/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Tooling output
+.claude/
+graphify-out/
