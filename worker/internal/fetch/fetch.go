@@ -21,9 +21,11 @@ import (
 	"github.com/DhruvGoyal404/rolerank/worker/internal/robots"
 )
 
-// Limits. MaxBody covers both the wire size and the decompressed size.
+// Limits. The largest real boards send 13 MB of gzip that expands well past 25 MB, so the
+// wire and the decompressed size have separate caps.
 const (
 	MaxBody        = 25 << 20
+	MaxDecoded     = 256 << 20
 	Timeout        = 120 * time.Second // large boards are slow to send; this isn't a rate
 	RobotsTTL      = 24 * time.Hour
 	robotsRetry    = 5 * time.Minute
@@ -268,7 +270,14 @@ func readBody(resp *http.Response) ([]byte, error) {
 			return nil, err
 		}
 		defer zipped.Close()
-		reader = io.LimitReader(zipped, MaxBody+1)
+		body, err := io.ReadAll(io.LimitReader(zipped, MaxDecoded+1))
+		if err != nil {
+			return nil, err
+		}
+		if len(body) > MaxDecoded {
+			return nil, ErrTooLarge
+		}
+		return body, nil
 	}
 	body, err := io.ReadAll(reader)
 	if err != nil {

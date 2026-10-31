@@ -360,7 +360,7 @@ func TestGzipBomb(t *testing.T) {
 	var buf bytes.Buffer
 	z := gzip.NewWriter(&buf)
 	chunk := make([]byte, 1<<20)
-	for range 30 {
+	for range 260 {
 		_, _ = z.Write(chunk)
 	}
 	_ = z.Close()
@@ -374,6 +374,28 @@ func TestGzipBomb(t *testing.T) {
 	_, err := client(s, &fakeLimiter{}).Get(context.Background(), s.server.URL+"/jobs", "")
 	if !errors.Is(err, ErrTooLarge) {
 		t.Fatalf("want ErrTooLarge, got %v", err)
+	}
+}
+
+// The largest real boards expand well past the wire limit, and must still arrive.
+func TestLargeRealBoardIsNotMistakenForABomb(t *testing.T) {
+	var buf bytes.Buffer
+	z := gzip.NewWriter(&buf)
+	chunk := bytes.Repeat([]byte("a"), 1<<20)
+	for range 60 {
+		_, _ = z.Write(chunk)
+	}
+	_ = z.Close()
+	s := newSource(t, openRobots, func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Encoding", "gzip")
+		_, _ = w.Write(buf.Bytes())
+	})
+	res, err := client(s, &fakeLimiter{}).Get(context.Background(), s.server.URL+"/jobs", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Body) != 60<<20 {
+		t.Fatalf("%d bytes", len(res.Body))
 	}
 }
 

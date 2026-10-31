@@ -200,6 +200,7 @@ func (w *Worker) process(ctx context.Context, id int64) error {
 		page, err := w.Adapter.Parse(board.Token, res.Body)
 		if err != nil {
 			// A bad body proves nothing about the jobs, so nothing is closed.
+			fmt.Fprintf(os.Stderr, "%s: board %d: unreadable response: %v\n", w.Consumer, id, err)
 			return w.Store.Fail(ctx, id, attempt, res.Status)
 		}
 		// An ETag is only meaningful for a board that fits in one response.
@@ -224,6 +225,8 @@ func (w *Worker) process(ctx context.Context, id int64) error {
 }
 
 func (w *Worker) failed(ctx context.Context, id int64, attempt int, err error) error {
+	// A failure must be visible. A silent one left the biggest boards out of a whole run.
+	fmt.Fprintf(os.Stderr, "%s: board %d failed: %v\n", w.Consumer, id, err)
 	switch {
 	case errors.Is(err, fetch.ErrBackoff):
 		// The fetcher already blocked the host for every worker.
