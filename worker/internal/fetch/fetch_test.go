@@ -138,8 +138,30 @@ func TestRobots5xxBlocksTheHost(t *testing.T) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}, func(http.ResponseWriter, *http.Request) {})
 	_, err := client(s, &fakeLimiter{}).Get(context.Background(), s.server.URL+"/jobs", "")
-	if !errors.Is(err, ErrDisallowed) || s.count("/jobs") != 0 {
+	if !errors.Is(err, ErrRobotsUnavailable) || s.count("/jobs") != 0 {
 		t.Fatalf("a 5xx on robots.txt must stop the host, got %v", err)
+	}
+}
+
+func TestUnreadableRobotsIsRetriedSoon(t *testing.T) {
+	failing := true
+	s := newSource(t, func(w http.ResponseWriter) {
+		if failing {
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}, func(http.ResponseWriter, *http.Request) {})
+	now := time.Now()
+	c := client(s, &fakeLimiter{})
+	c.now = func() time.Time { return now }
+	if _, err := c.Get(context.Background(), s.server.URL+"/jobs", ""); !errors.Is(err, ErrRobotsUnavailable) {
+		t.Fatalf("got %v", err)
+	}
+	failing = false
+	now = now.Add(robotsRetry + time.Second)
+	if _, err := c.Get(context.Background(), s.server.URL+"/jobs", ""); err != nil {
+		t.Fatalf("a brief outage must clear within minutes, got %v", err)
 	}
 }
 

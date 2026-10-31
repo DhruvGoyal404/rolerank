@@ -21,9 +21,13 @@ var ErrStale = errors.New("ingest: board taken over by another worker")
 
 // Scheduling. A fresh cycle runs every RefreshEvery while up.
 const (
-	RefreshEvery  = 6 * time.Hour
-	requeueAfter  = 30 * time.Minute
-	retireAfter   = 3
+	RefreshEvery = 6 * time.Hour
+	requeueAfter = 30 * time.Minute
+	retireAfter  = 3
+	// Himalayas refreshes daily, and a full walk is about 6,500 requests against a limit of
+	// 10,000 a day, so four walks a day would break their limit for no new data.
+	dailyRefresh  = 24 * time.Hour
+	maxBackoff    = 6 * time.Hour
 	holdThreshold = 10
 )
 
@@ -270,15 +274,22 @@ func (s *Store) SavePage(ctx context.Context, b *Board, attempt int, postings []
 		}
 		return tx.Commit(ctx)
 	}
-	if err := finishRun(ctx, tx, b.ID, etag, status); err != nil {
+	if err := finishRun(ctx, tx, b.ID, etag, status, refreshFor(b.Source)); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)
 }
 
+func refreshFor(sourceName string) time.Duration {
+	if sourceName == "himalayas" {
+		return dailyRefresh
+	}
+	return RefreshEvery
+}
+
 // finishRun closes what the run didn't see. A board that suddenly loses over half its
 // jobs is held for one retry, because that looks more like a source fault than reality.
-func finishRun(ctx context.Context, tx pgx.Tx, id int64, etag string, status int) error {
+func finishRun(ctx context.Context, tx pgx.Tx, id int64, etag string, status int, refresh time.Duration) error {
 	var active, unseen, hold int
 	err := tx.QueryRow(ctx, `
 		SELECT count(*) FILTER (WHERE p.closed_at IS NULL),
@@ -304,15 +315,15 @@ func finishRun(ctx context.Context, tx pgx.Tx, id int64, etag string, status int
 			return err
 		}
 	}
-	return schedule(ctx, tx, id, etag, status)
+	return schedule(ctx, tx, id, etag, status, refresh)
 }
 
-func schedule(ctx context.Context, tx pgx.Tx, id int64, etag string, status int) error {
+func schedule(ctx context.Context, tx pgx.Tx, id int64, etag string, status int, refresh time.Duration) error {
 	_, err := tx.Exec(ctx, `
 		UPDATE boards SET etag = NULLIF($2, ''), last_status = $3, last_checked_at = now(), fail_count = 0,
 		  hold_count = 0, next_url = NULL, run_started_at = NULL, enqueued_at = NULL,
 		  next_due_at = now() + make_interval(secs => $4 * (0.95 + random() * 0.1))
-		WHERE id = $1`, id, etag, status, RefreshEvery.Seconds())
+		WHERE id = $1`, id, etag, status, refresh.Seconds())
 	return err
 }
 
@@ -326,7 +337,7 @@ func (s *Store) NotModified(ctx context.Context, id int64, attempt int, etag str
 	if err := fence(ctx, tx, id, attempt); err != nil {
 		return err
 	}
-	if err := schedule(ctx, tx, id, etag, 304); err != nil {
+	if err := schedule(ctx, tx, id, etag, 304, RefreshEvery); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)
@@ -344,8 +355,16 @@ func (s *Store) Defer(ctx context.Context, id int64, attempt int, wait time.Dura
 	return err
 }
 
-// Fail records a failed attempt. After retireAfter failures in a row a board is retired,
-// and its jobs close. The fail count resets on any success.
+// gone reports a status meaning the board itself no longer exists. Nothing else may retire
+// a board: a network failure says nothing about its jobs, and treating one as evidence
+// would close thousands of live jobs on a flaky connection.
+func gone(status int) bool {
+	return status == 404 || status == 410
+}
+
+// Fail records a failed attempt and backs off, up to maxBackoff. Only retireAfter 404s or
+// 410s in a row retire a board and close its jobs. Any success resets the count. A 4xx in
+// the middle of a walk means the saved position went stale, so the walk starts again.
 func (s *Store) Fail(ctx context.Context, id int64, attempt int, status int) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -357,13 +376,16 @@ func (s *Store) Fail(ctx context.Context, id int64, attempt int, status int) err
 	}
 	var fails int
 	err = tx.QueryRow(ctx, `
-		UPDATE boards SET fail_count = fail_count + 1, enqueued_at = NULL, last_status = $2,
-		  last_checked_at = now(), next_due_at = now() + make_interval(mins => 5 * power(4, fail_count)::int)
-		WHERE id = $1 RETURNING fail_count`, id, status).Scan(&fails)
+		UPDATE boards SET fail_count = fail_count + 1, enqueued_at = NULL, last_status = $2::int::smallint,
+		  last_checked_at = now(),
+		  next_url = CASE WHEN $2::int BETWEEN 400 AND 499 THEN NULL ELSE next_url END,
+		  run_started_at = CASE WHEN $2::int BETWEEN 400 AND 499 THEN NULL ELSE run_started_at END,
+		  next_due_at = now() + LEAST(make_interval(mins => 5 * power(4, LEAST(fail_count, 5))::int), make_interval(secs => $3))
+		WHERE id = $1 RETURNING fail_count`, id, status, maxBackoff.Seconds()).Scan(&fails)
 	if err != nil {
 		return err
 	}
-	if fails >= retireAfter {
+	if fails >= retireAfter && gone(status) {
 		if _, err := tx.Exec(ctx, `UPDATE boards SET status = 'retired' WHERE id = $1`, id); err != nil {
 			return err
 		}

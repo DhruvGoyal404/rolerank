@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"time"
 
@@ -24,6 +25,7 @@ const (
 	reclaimIdle = 5 * time.Minute
 	readBlock   = 2 * time.Second
 	field       = "board"
+	retryDelay  = 15 * time.Second
 )
 
 // Stream names the queue for a source. One per source, so a slow host can't hold up the
@@ -73,7 +75,13 @@ func Enqueue(ctx context.Context, store *Store, client valkey.Client, limit int)
 func (w *Worker) Run(ctx context.Context) error {
 	for ctx.Err() == nil {
 		if err := w.Step(ctx); err != nil && ctx.Err() == nil {
-			return err
+			// A laptop waking from sleep, or a restarting container, lands here. Progress is
+			// saved, so wait and carry on rather than exit.
+			fmt.Fprintf(os.Stderr, "%s: will retry: %v\n", w.Consumer, err)
+			select {
+			case <-ctx.Done():
+			case <-time.After(retryDelay):
+			}
 		}
 	}
 	return nil
@@ -222,6 +230,8 @@ func (w *Worker) failed(ctx context.Context, id int64, attempt int, err error) e
 		return w.Store.Defer(ctx, id, attempt, 15*time.Minute, http.StatusTooManyRequests)
 	case errors.Is(err, fetch.ErrDisallowed):
 		return w.Store.Defer(ctx, id, attempt, fetch.RobotsTTL, 0)
+	case errors.Is(err, fetch.ErrRobotsUnavailable):
+		return w.Store.Defer(ctx, id, attempt, 10*time.Minute, 0)
 	default:
 		return w.Store.Fail(ctx, id, attempt, 0)
 	}

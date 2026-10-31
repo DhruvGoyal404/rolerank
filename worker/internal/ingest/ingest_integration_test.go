@@ -394,6 +394,83 @@ func TestBoardRetiresAfterThree404s(t *testing.T) {
 	}
 }
 
+// Three failures from a dead connection must not look like three 404s.
+func TestNetworkFailuresNeverRetireABoard(t *testing.T) {
+	h := newHarness(t)
+	h.server.set("acme", "1,2")
+	h.board("acme")
+	h.cycle()
+	ctx := context.Background()
+	var id int64
+	if err := h.pool.QueryRow(ctx, `SELECT id FROM boards`).Scan(&id); err != nil {
+		t.Fatal(err)
+	}
+	for _, status := range []int{0, 0, 0, 0, 500, 502, 500} {
+		attempt, err := h.store.Acquire(ctx, id)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := h.store.Fail(ctx, id, attempt, status); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var state string
+	var wait time.Duration
+	if err := h.pool.QueryRow(ctx, `SELECT status, next_due_at - now() FROM boards`).Scan(&state, &wait); err != nil {
+		t.Fatal(err)
+	}
+	if state != "active" || h.count("closed_at IS NOT NULL") != 0 {
+		t.Fatalf("status %s, %d closed", state, h.count("closed_at IS NOT NULL"))
+	}
+	if wait > maxBackoff+time.Minute {
+		t.Fatalf("backed off %v, over the %v cap", wait, maxBackoff)
+	}
+}
+
+func TestStaleCursorRestartsTheWalk(t *testing.T) {
+	h := newHarness(t)
+	h.server.set("big", "1,2", "3,4", "5,6")
+	h.board("big")
+	ctx, stop := context.WithCancel(context.Background())
+	defer stop()
+	if _, err := Enqueue(ctx, h.store, h.valkey, 10); err != nil {
+		t.Fatal(err)
+	}
+	w := h.worker("w")
+	w.OnPage = func() { stop() }
+	_ = w.Step(ctx)
+	bg := context.Background()
+	if _, err := h.pool.Exec(bg, `UPDATE boards SET next_url = $1`, h.server.server.URL+"/expired?page=9"); err != nil {
+		t.Fatal(err)
+	}
+	h.server.status["expired"] = http.StatusBadRequest
+	time.Sleep(80 * time.Millisecond)
+	if err := h.worker("second").Step(bg); err != nil {
+		t.Fatal(err)
+	}
+	var next *string
+	if err := h.pool.QueryRow(bg, `SELECT next_url FROM boards`).Scan(&next); err != nil {
+		t.Fatal(err)
+	}
+	if next != nil {
+		t.Fatalf("a dead cursor must be dropped, still %q", *next)
+	}
+	if got := h.count("closed_at IS NOT NULL"); got != 0 {
+		t.Fatalf("%d closed by a dead cursor", got)
+	}
+	h.makeDue()
+	h.cycle()
+	if got := h.count("closed_at IS NULL"); got != 6 {
+		t.Fatalf("%d active after the restart", got)
+	}
+}
+
+func TestDailySourceRefreshesDaily(t *testing.T) {
+	if refreshFor("himalayas") != 24*time.Hour || refreshFor("lever") != RefreshEvery {
+		t.Fatal("wrong refresh interval")
+	}
+}
+
 func TestDenylistedBoardIsNeverFetched(t *testing.T) {
 	h := newHarness(t)
 	h.server.set("acme", "1")

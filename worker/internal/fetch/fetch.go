@@ -26,6 +26,7 @@ const (
 	MaxBody        = 25 << 20
 	Timeout        = 45 * time.Second
 	RobotsTTL      = 24 * time.Hour
+	robotsRetry    = 5 * time.Minute
 	DefaultSpacing = time.Second
 	maxRetryAfter  = time.Hour
 )
@@ -34,9 +35,12 @@ const (
 var (
 	ErrHostNotAllowed = errors.New("fetch: host not on the allowlist")
 	ErrDisallowed     = errors.New("fetch: disallowed by robots.txt")
-	ErrTooLarge       = errors.New("fetch: response over the size limit")
-	ErrBackoff        = errors.New("fetch: source asked us to back off")
-	ErrInsecure       = errors.New("fetch: https only")
+	// ErrRobotsUnavailable means robots.txt couldn't be read, so nothing may be fetched for
+	// now. It's a pause, not a verdict: a Wi-Fi drop mustn't look like a refusal.
+	ErrRobotsUnavailable = errors.New("fetch: robots.txt unavailable")
+	ErrTooLarge          = errors.New("fetch: response over the size limit")
+	ErrBackoff           = errors.New("fetch: source asked us to back off")
+	ErrInsecure          = errors.New("fetch: https only")
 )
 
 // Limiter is the shared per-host schedule.
@@ -69,8 +73,9 @@ type Options struct {
 }
 
 type cachedPolicy struct {
-	policy  robots.Policy
-	fetched time.Time
+	policy      robots.Policy
+	fetched     time.Time
+	unavailable bool
 }
 
 // Client is safe for concurrent use.
@@ -164,9 +169,12 @@ func (c *Client) Get(ctx context.Context, rawURL, etag string) (*Result, error) 
 	if err := c.checkURL(u); err != nil {
 		return nil, err
 	}
-	policy, err := c.policy(ctx, u)
+	policy, unavailable, err := c.policy(ctx, u)
 	if err != nil {
 		return nil, err
+	}
+	if unavailable {
+		return nil, ErrRobotsUnavailable
 	}
 	if !policy.Allowed(u.RequestURI()) {
 		return nil, ErrDisallowed
@@ -272,15 +280,19 @@ func readBody(resp *http.Response) ([]byte, error) {
 	return body, nil
 }
 
-func (c *Client) policy(ctx context.Context, u *url.URL) (robots.Policy, error) {
+func (c *Client) policy(ctx context.Context, u *url.URL) (robots.Policy, bool, error) {
 	c.mu.Lock()
 	cached, ok := c.robots[u.Host]
 	c.mu.Unlock()
-	if ok && c.now().Sub(cached.fetched) < RobotsTTL {
-		return cached.policy, nil
+	ttl := RobotsTTL
+	if cached.unavailable {
+		ttl = robotsRetry
+	}
+	if ok && c.now().Sub(cached.fetched) < ttl {
+		return cached.policy, cached.unavailable, nil
 	}
 	if err := c.opts.Limiter.Wait(ctx, u.Host, c.spacing); err != nil {
-		return robots.Policy{}, err
+		return robots.Policy{}, false, err
 	}
 	target := &url.URL{Scheme: u.Scheme, Host: u.Host, Path: "/robots.txt"}
 	status, body := 0, ""
@@ -291,8 +303,9 @@ func (c *Client) policy(ctx context.Context, u *url.URL) (robots.Policy, error) 
 		status = http.StatusServiceUnavailable
 	}
 	policy := robots.ForStatus(status, body, c.opts.Agent)
+	unavailable := status == 0 || status >= 500
 	c.mu.Lock()
-	c.robots[u.Host] = cachedPolicy{policy: policy, fetched: c.now()}
+	c.robots[u.Host] = cachedPolicy{policy: policy, fetched: c.now(), unavailable: unavailable}
 	c.mu.Unlock()
-	return policy, nil
+	return policy, unavailable, nil
 }
