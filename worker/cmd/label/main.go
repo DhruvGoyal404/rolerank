@@ -2,7 +2,8 @@
 //
 //	label select <root> <seed>     draw the items into evals/private
 //	label serve <root> <dataset>   open http://127.0.0.1:8765, keyboard only
-//	label recheck <root> <dataset> <ids file> <seed>   draw a blind second pass
+//	label recheck <root> <dataset> <ids file> <seed> [full]   draw a blind second pass
+//	label redo <root> <dataset> <ids file> <seed>   draw a blind redo, with full text
 //	label agree <root> <dataset>   score a finished second pass
 package main
 
@@ -38,42 +39,61 @@ func run(args []string) error {
 		return serve(args[1], args[2])
 	}
 	if len(args) == 5 && args[0] == "recheck" {
-		return recheck(args[1], args[2], args[3], args[4])
+		return draw(args[1], args[2], "recheck", args[3], args[4], false)
+	}
+	if len(args) == 6 && args[0] == "recheck" && args[5] == "full" {
+		return draw(args[1], args[2], "recheck", args[3], args[4], true)
+	}
+	if len(args) == 5 && args[0] == "redo" {
+		return draw(args[1], args[2], "redo", args[3], args[4], true)
 	}
 	if len(args) == 3 && args[0] == "agree" {
 		return agree(args[1], args[2])
 	}
 	return fmt.Errorf("usage: label select <root> <seed> | label serve <root> <dataset> | " +
-		"label recheck <root> <dataset> <ids file> <seed> | label agree <root> <dataset>")
+		"label recheck <root> <dataset> <ids file> <seed> [full] | " +
+		"label redo <root> <dataset> <ids file> <seed> | label agree <root> <dataset>")
 }
 
-func recheck(root, dataset, idsFile, seed string) error {
+func draw(root, dataset, pass, idsFile, seed string, full bool) error {
 	data, err := os.ReadFile(idsFile)
 	if err != nil {
 		return err
 	}
 	ids := strings.Fields(string(data))
-	if err := label.Recheck(root, dataset, dataset+"-recheck", ids, seed); err != nil {
+	var refresh func([]label.Item) error
+	if full {
+		ctx := context.Background()
+		pool, err := pgxpool.New(ctx, os.Getenv("ROLERANK_CORPUS_URL"))
+		if err != nil {
+			return fmt.Errorf("ROLERANK_CORPUS_URL is missing or invalid")
+		}
+		defer pool.Close()
+		refresh = func(items []label.Item) error { return label.FullText(ctx, pool, items) }
+	}
+	if err := label.Recheck(root, dataset, dataset+"-"+pass, ids, seed, refresh); err != nil {
 		return err
 	}
-	fmt.Printf("wrote %s-recheck with %d items\n", dataset, len(ids))
+	fmt.Printf("wrote %s-%s with %d items\n", dataset, pass, len(ids))
 	return nil
 }
 
 func agree(root, dataset string) error {
-	got, err := label.Compare(root, dataset, dataset+"-recheck")
+	results, err := label.Compare(root, dataset, dataset+"-recheck")
 	if err != nil {
 		return err
 	}
-	fmt.Printf("agreed on %d of %d, Cohen's kappa %.3f (95%% interval %.3f to %.3f)\n",
-		got.Same, got.Pairs, got.Kappa, got.Low, got.High)
-	keys := make([][2]string, 0, len(got.Table))
-	for k := range got.Table {
-		keys = append(keys, k)
-	}
-	sort.Slice(keys, func(i, j int) bool { return keys[i][0]+keys[i][1] < keys[j][0]+keys[j][1] })
-	for _, k := range keys {
-		fmt.Printf("  first %s, second %s: %d\n", k[0], k[1], got.Table[k])
+	for _, got := range results {
+		fmt.Printf("%s: agreed on %d of %d, Cohen's kappa %.3f (95%% interval %.3f to %.3f)\n",
+			got.Question, got.Same, got.Pairs, got.Kappa, got.Low, got.High)
+		keys := make([][2]string, 0, len(got.Table))
+		for k := range got.Table {
+			keys = append(keys, k)
+		}
+		sort.Slice(keys, func(i, j int) bool { return keys[i][0]+keys[i][1] < keys[j][0]+keys[j][1] })
+		for _, k := range keys {
+			fmt.Printf("  first %s, second %s: %d\n", k[0], k[1], got.Table[k])
+		}
 	}
 	return nil
 }

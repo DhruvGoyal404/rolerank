@@ -231,6 +231,56 @@ func SelectD5(ctx context.Context, pool *pgxpool.Pool, seed string) ([]Item, map
 	return items, counts, nil
 }
 
+// FullText puts each posting's whole text into the items, for a pass that shouldn't be
+// limited to the excerpt the first pass saw. Closed postings keep their text, so a posting
+// that's gone is an error, not something to skip quietly.
+func FullText(ctx context.Context, pool *pgxpool.Pool, items []Item) error {
+	var ids []string
+	for _, item := range items {
+		ids = append(ids, item.A.ID)
+		if item.B != nil {
+			ids = append(ids, item.B.ID)
+		}
+	}
+	rows, err := pool.Query(ctx, `SELECT s.name || ':' || p.source_job_id, p.body
+		FROM postings p JOIN sources s ON s.id = p.source_id
+		WHERE s.name || ':' || p.source_job_id = ANY($1)`, ids)
+	if err != nil {
+		return fmt.Errorf("full text: %w", err)
+	}
+	bodies := map[string]string{}
+	var id, body string
+	if _, err := pgx.ForEachRow(rows, []any{&id, &body}, func() error {
+		bodies[id] = body
+		return nil
+	}); err != nil {
+		return fmt.Errorf("full text: %w", err)
+	}
+	return applyBodies(items, bodies)
+}
+
+func applyBodies(items []Item, bodies map[string]string) error {
+	set := func(side *Side) error {
+		body, ok := bodies[side.ID]
+		if !ok {
+			return fmt.Errorf("no posting %q", side.ID)
+		}
+		side.Body = body
+		return nil
+	}
+	for i := range items {
+		if err := set(&items[i].A); err != nil {
+			return err
+		}
+		if items[i].B != nil {
+			if err := set(items[i].B); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func cutKey(key string) (string, string, bool) {
 	for i := range key {
 		if key[i] == '|' {

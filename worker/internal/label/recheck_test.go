@@ -2,6 +2,7 @@ package label
 
 import (
 	"math"
+	"strings"
 	"testing"
 )
 
@@ -61,7 +62,7 @@ func TestRecheckIsItsOwnDatasetInANewOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 	answer(t, root, "d5", "y", "y", "y", "y", "y", "y", "y", "y")
-	if err := Recheck(root, "d5", "d5-recheck", ids[:6], "seed"); err != nil {
+	if err := Recheck(root, "d5", "d5-recheck", ids[:6], "seed", nil); err != nil {
 		t.Fatal(err)
 	}
 	path, _ := Paths(root, "d5-recheck")
@@ -94,7 +95,7 @@ func TestRecheckRefusesAnUnknownItem(t *testing.T) {
 	if err := WriteItems(root, "d5", pairItems("a")); err != nil {
 		t.Fatal(err)
 	}
-	if err := Recheck(root, "d5", "d5-recheck", []string{"nope"}, "seed"); err == nil {
+	if err := Recheck(root, "d5", "d5-recheck", []string{"nope"}, "seed", nil); err == nil {
 		t.Fatal("want an error")
 	}
 }
@@ -105,7 +106,7 @@ func TestCompareRefusesAnUnfinishedPass(t *testing.T) {
 		t.Fatal(err)
 	}
 	answer(t, root, "d5", "y", "n")
-	if err := Recheck(root, "d5", "d5-recheck", []string{"a", "b"}, "seed"); err != nil {
+	if err := Recheck(root, "d5", "d5-recheck", []string{"a", "b"}, "seed", nil); err != nil {
 		t.Fatal(err)
 	}
 	answer(t, root, "d5-recheck", "y")
@@ -128,7 +129,90 @@ func TestCompareUsesFinalAnswers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got.Pairs != 2 || got.Same != 1 || got.Table[[2]string{"yes", "no"}] != 1 {
+	if len(got) != 1 || got[0].Pairs != 2 || got[0].Same != 1 || got[0].Table[[2]string{"yes", "no"}] != 1 {
 		t.Fatalf("%+v", got)
+	}
+}
+
+// Each question has its own score, and level counts only where both passes asked it.
+func TestCompareScoresEachQuestion(t *testing.T) {
+	root := t.TempDir()
+	items := []Item{{ID: "a"}, {ID: "b"}, {ID: "c"}}
+	if err := WriteItems(root, "d6", items); err != nil {
+		t.Fatal(err)
+	}
+	answer(t, root, "d6", "y", "e", "y", "y", "m", "n", "n", "n")
+	if err := WriteItems(root, "d6-recheck", items); err != nil {
+		t.Fatal(err)
+	}
+	answer(t, root, "d6-recheck", "y", "e", "y", "n", "n", "y", "i", "n")
+	got, err := Compare(root, "d6", "d6-recheck")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 3 {
+		t.Fatalf("%+v", got)
+	}
+	want := map[string][2]int{"engineering": {3, 1}, "level": {1, 1}, "india": {3, 3}}
+	for _, a := range got {
+		if w := want[a.Question]; a.Pairs != w[0] || a.Same != w[1] {
+			t.Errorf("%s: %+v", a.Question, a)
+		}
+	}
+}
+
+func TestCompareRefusesAConditionalQuestionLeftOpen(t *testing.T) {
+	root := t.TempDir()
+	items := []Item{{ID: "a"}}
+	if err := WriteItems(root, "d6", items); err != nil {
+		t.Fatal(err)
+	}
+	answer(t, root, "d6", "y", "e", "y")
+	if err := WriteItems(root, "d6-recheck", items); err != nil {
+		t.Fatal(err)
+	}
+	answer(t, root, "d6-recheck", "y", "e")
+	if _, err := Compare(root, "d6", "d6-recheck"); err == nil {
+		t.Fatal("want an error")
+	}
+}
+
+func TestRefreshRunsBeforeItemsAreSaved(t *testing.T) {
+	root := t.TempDir()
+	if err := WriteItems(root, "d5", pairItems("a")); err != nil {
+		t.Fatal(err)
+	}
+	refresh := func(items []Item) error {
+		return applyBodies(items, map[string]string{"aa": "whole text a", "ab": "whole text b"})
+	}
+	if err := Recheck(root, "d5", "d5-redo", []string{"a"}, "seed", refresh); err != nil {
+		t.Fatal(err)
+	}
+	path, _ := Paths(root, "d5-redo")
+	got, err := loadItems(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got[0].A.Body != "whole text a" || got[0].B.Body != "whole text b" {
+		t.Fatalf("%+v", got[0])
+	}
+}
+
+func TestApplyBodiesRefusesAMissingPosting(t *testing.T) {
+	if err := applyBodies(pairItems("a"), map[string]string{"aa": "x"}); err == nil {
+		t.Fatal("a pair can't go out with one side still cut short")
+	}
+}
+
+// The rule sits in the question, so every pass over the pairs shows it, and D6 shows none.
+func TestPairPagesCarryTheRule(t *testing.T) {
+	for _, dataset := range []string{"d5", "d5-recheck", "d5-redo"} {
+		q := Questions[dataset][0]
+		if !strings.Contains(q.Rule, "same location") || !strings.Contains(q.Rule, "different city") {
+			t.Errorf("%s: %q", dataset, q.Rule)
+		}
+	}
+	if Questions["d6"][0].Rule != "" {
+		t.Error("D6 has no rule line")
 	}
 }

@@ -46,6 +46,7 @@ type Question struct {
 	ID       string   `json:"id"`
 	Text     string   `json:"text"`
 	Help     string   `json:"help"`
+	Rule     string   `json:"rule,omitempty"` // shown at the top of the page, above the postings
 	Choices  []Choice `json:"choices"`
 	OnlyIf   string   `json:"-"` // question ID that must not have the value in SkipWhen
 	SkipWhen string   `json:"-"`
@@ -56,45 +57,50 @@ var unsure = Choice{"s", "unsure", "skip / unsure"}
 var d5Questions = []Question{{
 	ID:   "same",
 	Text: "Are these the same job?",
-	Help: "Same role at the same employer. The same role in a different city is a different job. A re-listing of one posting on another site is the same job.",
+	Rule: "Same employer + same role + same location (or same remote scope) = same job. A different city is a different job.",
+	Help: "A re-listing of one posting on another site is the same job.",
 	Choices: []Choice{
 		{"y", "yes", "same job"}, {"n", "no", "different"}, unsure,
 	},
 }}
 
-// Questions lists what each dataset asks. A recheck asks exactly what its dataset asked.
+var d6Questions = []Question{
+	{
+		ID:   "engineering",
+		Text: "Is this a software or engineering role in our scope?",
+		Help: "Yes for software, data, ML, QA, DevOps and security engineering. No for sales engineers, recruiters, and civil or mechanical engineering.",
+		Choices: []Choice{
+			{"y", "yes", "in scope"}, {"n", "no", "out of scope"}, unsure,
+		},
+	},
+	{
+		ID:       "level",
+		Text:     "What level is this role?",
+		Help:     "Entry means open to freshers or up to about 1 year. Judge by what the posting asks for, not only the title.",
+		OnlyIf:   "engineering",
+		SkipWhen: "no",
+		Choices: []Choice{
+			{"i", "intern", "intern"}, {"e", "entry", "entry, 0-1 yr"}, {"m", "mid", "mid, 2-4 yr"},
+			{"r", "senior", "senior, 5+ yr"}, {"k", "unknown", "can't tell"}, unsure,
+		},
+	},
+	{
+		ID:   "india",
+		Text: "Can someone living in India take this job?",
+		Help: "Yes if it's based in India, or remote and genuinely open to India. A remote role limited to another region is no.",
+		Choices: []Choice{
+			{"y", "yes", "yes"}, {"n", "no", "no"}, unsure,
+		},
+	},
+}
+
+// Questions lists what each dataset asks. A recheck or redo asks what its dataset asked.
 var Questions = map[string][]Question{
 	"d5":         d5Questions,
 	"d5-recheck": d5Questions,
-	"d6": {
-		{
-			ID:   "engineering",
-			Text: "Is this a software or engineering role in our scope?",
-			Help: "Yes for software, data, ML, QA, DevOps and security engineering. No for sales engineers, recruiters, and civil or mechanical engineering.",
-			Choices: []Choice{
-				{"y", "yes", "in scope"}, {"n", "no", "out of scope"}, unsure,
-			},
-		},
-		{
-			ID:       "level",
-			Text:     "What level is this role?",
-			Help:     "Entry means open to freshers or up to about 1 year. Judge by what the posting asks for, not only the title.",
-			OnlyIf:   "engineering",
-			SkipWhen: "no",
-			Choices: []Choice{
-				{"i", "intern", "intern"}, {"e", "entry", "entry, 0-1 yr"}, {"m", "mid", "mid, 2-4 yr"},
-				{"r", "senior", "senior, 5+ yr"}, {"k", "unknown", "can't tell"}, unsure,
-			},
-		},
-		{
-			ID:   "india",
-			Text: "Can someone living in India take this job?",
-			Help: "Yes if it's based in India, or remote and genuinely open to India. A remote role limited to another region is no.",
-			Choices: []Choice{
-				{"y", "yes", "yes"}, {"n", "no", "no"}, unsure,
-			},
-		},
-	},
+	"d5-redo":    d5Questions,
+	"d6":         d6Questions,
+	"d6-recheck": d6Questions,
 }
 
 // Answer is one line of the label log. Undo appends a line too: the log is never rewritten,

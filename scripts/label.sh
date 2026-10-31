@@ -6,6 +6,9 @@
 #   bash scripts/label.sh recheck d5 evals/labels/d5-recheck-ids.txt <seed>   draw a second pass
 #   bash scripts/label.sh d5-recheck         label it, at least a day after the first pass
 #   bash scripts/label.sh agree d5           score the finished second pass
+#   bash scripts/label.sh recheck d6 evals/labels/d6-recheck-ids.txt <seed> full   same, with full text
+#   bash scripts/label.sh redo d5 evals/labels/d5-redo-ids.txt <seed>   draw a redo, with full text
+#   bash scripts/label.sh d5-redo            label it, after the recheck
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
@@ -18,7 +21,8 @@ win=$(cygpath -w "$root" 2>/dev/null || echo "$root")
 cd worker
 case "$1" in
   select) exec go run ./cmd/label select "$win" "$2" ;;
-  recheck) exec go run ./cmd/label recheck "$win" "$2" "$win/$3" "$4" ;;
+  recheck) exec go run ./cmd/label recheck "$win" "$2" "$win/$3" "$4" ${5:+"$5"} ;;
+  redo) exec go run ./cmd/label redo "$win" "$2" "$win/$3" "$4" ;;
   agree) exec go run ./cmd/label agree "$win" "$2" ;;
 esac
 exec go run ./cmd/label serve "$win" "$1"

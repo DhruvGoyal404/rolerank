@@ -109,6 +109,30 @@ exactly; they're sub-second from now on. Item text and the band similarity cover
 the first 2,500 characters of each posting, while dedupe compares the whole text. Until a
 second pass clears this, no dedupe score from D5 counts toward the P2 exit.
 
+The rule now sits at the top of the page for every D5 pass: same employer + same role +
+same location (or same remote scope) = same job; a different city is a different job.
+The recheck uses the same excerpts as the first pass. Then `d5-redo` covers 138 pairs, the 91
+different-place yes answers and the 60 reworded-title pairs (13 are in both), with full
+text. Redo answers replace first answers for those pairs.
+
+**D6 status (2026-11-01): labels not accepted.** First pass: 300 postings in 52.3 minutes,
+mean 10.5 s, no runs of fast answers. Engineering 210 yes, 90 no. India 109 yes, 190 no,
+1 unsure. Level 86 senior, 52 mid, 51 entry, 16 intern, 4 unknown, 1 unsure. A spot-check
+against the full text found real errors, so they aren't accepted yet:
+- 8 of 23 intern titles were answered entry, and 17 of 99 postings with stated years clash
+  with the level answer. The years in 11 of those 17 sat past the 2,500-character excerpt.
+- In a seeded sample of 24, 6 are clear errors on one reader's judgement (0.25, interval
+  0.12 to 0.45). That reader was the assistant, so it's a screen, not a score.
+- Help-text gaps made scope answers inconsistent: data analysts 5 of 15 yes, solutions and
+  customer roles 19 of 32 yes, hardware and similar 13 of 19 yes. The text rules on none
+  of these. It's also silent on a remote role that names no region.
+- One company is 10 of the 30 bare-remote items. The India yes rate there is 10 of 30, or
+  1 of 20 without it, so that stratum doesn't size the gap it was drawn to size. Strata
+  need a per-company cap, as D5 has.
+
+`d6-recheck` is 30 items with full text, scored per question at the same 0.8 threshold. No
+classifier score from D6 counts toward the P2 exit until it clears.
+
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.
 

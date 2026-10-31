@@ -16,11 +16,14 @@
   footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 18px; background: Canvas; border-top: 1px solid GrayText; }
   .q { font-weight: 600; font-size: 17px; }
   .help { font-size: 15px; }
+  .rule { font-size: 18px; font-weight: 700; padding: 8px 18px; border-bottom: 2px solid CanvasText; }
+  .rule:empty { display: none; }
   kbd { border: 1px solid GrayText; border-radius: 4px; padding: 0 6px; font-size: 14px; margin-right: 3px; }
   .keys span { margin-right: 14px; }
 </style>
 </head>
 <body>
+<div class="rule" id="rule"></div>
 <header>
   <strong id="set"></strong>
   <progress id="bar" max="1" value="0"></progress>
@@ -55,6 +58,7 @@ function side(s) {
 
 function show(s) {
   $("set").textContent = s.dataset.toUpperCase();
+  $("rule").textContent = (s.question && s.question.rule) || "";
   $("bar").value = s.total ? s.done / s.total : 0;
   $("count").textContent = s.done + " / " + s.total;
   if (startDone === null) startDone = s.done;
