@@ -114,6 +114,16 @@ test("an exception holds through its expiry day, then lapses", () => {
   assert.equal(expiredExceptions(rows, "2026-11-03T00:00:00Z").length, 1);
 });
 
+test("an exact timestamp with a zone is honoured to the minute", () => {
+  const rows = [{ ecosystem: "go-toolchain", name: "go", version: "1", expires: "2026-11-03T23:59+05:30" }];
+  assert.deepEqual(expiredExceptions(rows, "2026-11-03T18:28:00Z"), []);
+  assert.equal(expiredExceptions(rows, "2026-11-03T18:30:00Z").length, 1);
+  const { errors } = parseExceptions(
+    `${header}| go-toolchain | go | 1.27.3 | 2026-10-19 | GO-1 | 2026-10-31 | 2026-11-03T23:59+05:30 |\n`,
+  );
+  assert.deepEqual(errors, []);
+});
+
 test("reads the table", () => {
   const { rows, errors } = parseExceptions(
     `${header}| go-toolchain | go | 1.27.3 | 2026-10-19 | GO-2026-6809 | 2026-10-31 | 2026-11-02 |\n`,

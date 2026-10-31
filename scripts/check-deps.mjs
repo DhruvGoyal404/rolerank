@@ -13,7 +13,9 @@ import { join } from "node:path";
 const DAY_MS = 86_400_000;
 const MIN_AGE_DAYS = 14;
 const ECOSYSTEMS = new Set(["npm", "go", "go-toolchain"]);
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
+// A plain date runs to the end of that day, UTC. A timestamp is exact.
+const EXPIRY = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2}))?$/;
+const expiryTime = (expires) => new Date(expires.includes("T") ? expires : `${expires}T23:59:59Z`);
 
 /** Reads the table. Anything that looks like a row but can't be read is an error. */
 export function parseExceptions(markdown) {
@@ -23,7 +25,7 @@ export function parseExceptions(markdown) {
     if (!line.startsWith("|") || /^\|[\s:|-]+\|?$/.test(line) || /^\|\s*Ecosystem\b/.test(line)) continue;
     const cells = line.split("|").slice(1, -1).map((cell) => cell.trim());
     const [ecosystem, name, version, , advisory, , expires] = cells;
-    if (cells.length !== 7 || !ECOSYSTEMS.has(ecosystem) || !DATE.test(expires ?? "") || !advisory) {
+    if (cells.length !== 7 || !ECOSYSTEMS.has(ecosystem) || !EXPIRY.test(expires ?? "") || !advisory) {
       errors.push(`exceptions table: can't read "${line}"`);
       continue;
     }
@@ -35,7 +37,7 @@ export function parseExceptions(markdown) {
 export function expiredExceptions(rows, now) {
   const nowDate = new Date(now);
   return rows
-    .filter((row) => new Date(`${row.expires}T23:59:59Z`) < nowDate)
+    .filter((row) => expiryTime(row.expires) < nowDate)
     .map(
       (row) =>
         `${row.ecosystem} ${row.name}@${row.version}: exception expired on ${row.expires}; remove it or fix the dependency`,
