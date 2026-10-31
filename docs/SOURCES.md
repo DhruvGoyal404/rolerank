@@ -141,6 +141,12 @@ would be the cleaner source (CC0), but `query.wikidata.org/robots.txt` disallows
 so it isn't used. Lever's response doesn't name the company, so a hit counts only if the
 company's own site links to that exact board, on a page robots.txt allows.
 
+Result: 299 names, 4 hits, 2 verified (`paytm`, already known, and `cred`, new) and 2 not
+linked (`meesho` and `zeta`, not trusted, not ingested). CRED holds 14 active postings, 2
+engineering, both in India, none intern or entry. Paytm holds 201, 10 engineering, 8 in
+India, none intern or entry. So step 1 added no India early-career posting. Step 2, bulk
+guesses, is on hold for the owner's decision; this result is the case against it.
+
 Not used: search engine scraping, guessing at scale beyond one try per name, or any
 host whose robots.txt disallows us.
 
