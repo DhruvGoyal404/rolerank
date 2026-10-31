@@ -2,9 +2,8 @@
 
 Run date: 2026-10-31. Everything below is reproducible from `main`.
 
-**Summary.** The foundation is built and the gate is green on every job, on x86 and arm64.
-One exit criterion is open: sign-in has been proven only against a local fake provider,
-because the real Google and GitHub OAuth apps don't exist yet.
+**Summary. Phase 1 is closed.** The foundation is built, the gate is green on every job on
+x86 and arm64, and the owner has signed in with real Google and GitHub accounts.
 
 ## What was built
 
@@ -25,7 +24,7 @@ because the real Google and GitHub OAuth apps don't exist yet.
 | TypeScript 7.0.2 tested | typescript-eslint rejects it, so 6.0.3 is pinned (ARCHITECTURE.md) |
 | arm64 proven | **Passed.** See below |
 | Database isolation proven | **Passed.** 8 tests: each role is refused by the other database, `PUBLIC` has no `CONNECT`, runtime roles can't change schema, `corpus_ro` can't write, no PII column in `corpus` |
-| Sign in with both real providers | **Open.** Needs the owner's OAuth apps. 33 auth tests pass against a fake provider that speaks both protocols |
+| Sign in with both real providers | **Passed** 2026-10-31. See "Real sign-in" below. 33 auth tests also pass against a fake provider that speaks both protocols |
 | Negative auth tests | **Passed:** bad and reused `state`, cross-provider `state`, bad `nonce`, wrong `aud` and `iss`, expired token, `alg=none`, HS256 key confusion, unsigned and tampered tokens, foreign `next`, missing and foreign Origin |
 | Shortcut refused outside tests | **Passed.** The built server is started with the flag in production and development, and exits 1 |
 | e2e refuses a database not ending in `_test` | **Passed** (config test and real-process test) |
@@ -69,6 +68,24 @@ tests pass on arm64 with those services under the default runtime.
 Graviton. Caddy, the Node base image and the extraction sandbox don't exist yet, so P4 and
 P8 repeat the check for them, and the P8 load test runs on the real host.
 
+## Real sign-in
+
+The owner signed in on `localhost` with real OAuth apps, using a 2-use invite. The `app`
+database then held:
+
+| Provider | User | Email verified | 18+ confirmed | Invite recorded | Created (IST) |
+|---|---|---|---|---|---|
+| google | `e018ee3d` | yes | yes | yes | 16:00:51 |
+| github | `6cadc343` | no | yes | yes | 16:27:06 |
+
+Also 2 `signup` audit rows, 2 sessions, and 0 invite uses left. They are two separate
+accounts, by design: identity is (provider, subject), never email. GitHub shows no verified
+email because the `read:user` scope doesn't read one, and P7 needs that for alerts.
+
+The first GitHub attempt left no rows in the database, although it was reported as working.
+Its cause wasn't found, because the API's terminal output was gone. The retry worked, so
+P1 was closed on the database evidence, not on the report.
+
 ## What went wrong
 
 1. **TS 7 proof, first attempt:** `tsc` and Vitest failed on setup mistakes of mine (no
@@ -89,5 +106,4 @@ P8 repeat the check for them, and the P8 load test runs on the real host.
 
 ## Next
 
-The owner creates the two OAuth apps and runs a real sign-in, which closes P1. P2
-(ingestion) can start meanwhile, because it doesn't depend on sign-in.
+P2 (ingestion) is under way.
