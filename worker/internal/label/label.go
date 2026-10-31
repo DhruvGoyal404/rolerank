@@ -53,16 +53,19 @@ type Question struct {
 
 var unsure = Choice{"s", "unsure", "skip / unsure"}
 
-// Questions lists what each dataset asks.
+var d5Questions = []Question{{
+	ID:   "same",
+	Text: "Are these the same job?",
+	Help: "Same role at the same employer. The same role in a different city is a different job. A re-listing of one posting on another site is the same job.",
+	Choices: []Choice{
+		{"y", "yes", "same job"}, {"n", "no", "different"}, unsure,
+	},
+}}
+
+// Questions lists what each dataset asks. A recheck asks exactly what its dataset asked.
 var Questions = map[string][]Question{
-	"d5": {{
-		ID:   "same",
-		Text: "Are these the same job?",
-		Help: "Same role at the same employer. The same role in a different city is a different job. A re-listing of one posting on another site is the same job.",
-		Choices: []Choice{
-			{"y", "yes", "same job"}, {"n", "no", "different"}, unsure,
-		},
-	}},
+	"d5":         d5Questions,
+	"d5-recheck": d5Questions,
 	"d6": {
 		{
 			ID:   "engineering",
@@ -237,7 +240,7 @@ func (s *Session) Close() error {
 }
 
 func (s *Session) write(a Answer) error {
-	a.At = s.now().UTC().Format(time.RFC3339)
+	a.At = s.now().UTC().Format(time.RFC3339Nano) // whole seconds can't show a 1.5 s answer
 	data, err := json.Marshal(a)
 	if err != nil {
 		return err

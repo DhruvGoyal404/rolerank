@@ -94,6 +94,20 @@ Grades, per (profile, job):
 - Both are labelled blind with `scripts/label.sh`. The system's guess is kept for scoring
   and never shown. Item text stays in `evals/private/`; `evals/labels/` holds only IDs and
   answers. Skill labels wait until the skill extractor exists in P3.
+- **Labels are checked before they're used.** For D5: 30 pairs, mostly hard and fast-answered
+  ones, are labelled again at least a day later through `d5-recheck`, which never shows
+  the first answers. `scripts/label.sh agree d5` scores them only once the pass is finished,
+  as three-value Cohen's kappa with a bootstrap interval. Below 0.8, the hard pairs are
+  redone slowly. Kappa measures consistency, not correctness, so a consistent
+  misreading of the rule passes it: labels also have to match the written rule.
+
+**D5 status (2026-11-01): labels not accepted.** First pass: 300 pairs in 12.1 minutes, 262
+yes, 28 no, 10 unsure, median 1 s per pair. 91 yes answers are on pairs in different
+places, which the rule calls different jobs, including 31 of 31 such pairs in the
+other-city band. Timestamps were whole seconds, so answers under 1.5 s can't be counted
+exactly; they're sub-second from now on. Item text and the band similarity cover only
+the first 2,500 characters of each posting, while dedupe compares the whole text. Until a
+second pass clears this, no dedupe score from D5 counts toward the P2 exit.
 
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.

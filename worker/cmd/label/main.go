@@ -1,7 +1,9 @@
 // Command label prepares and collects the hand labels for D5 and D6.
 //
 //	label select <root> <seed>     draw the items into evals/private
-//	label serve <root> d5|d6       open http://127.0.0.1:8765, keyboard only
+//	label serve <root> <dataset>   open http://127.0.0.1:8765, keyboard only
+//	label recheck <root> <dataset> <ids file> <seed>   draw a blind second pass
+//	label agree <root> <dataset>   score a finished second pass
 package main
 
 import (
@@ -11,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -34,7 +37,45 @@ func run(args []string) error {
 	if len(args) == 3 && args[0] == "serve" {
 		return serve(args[1], args[2])
 	}
-	return fmt.Errorf("usage: label select <root> <seed> | label serve <root> d5|d6")
+	if len(args) == 5 && args[0] == "recheck" {
+		return recheck(args[1], args[2], args[3], args[4])
+	}
+	if len(args) == 3 && args[0] == "agree" {
+		return agree(args[1], args[2])
+	}
+	return fmt.Errorf("usage: label select <root> <seed> | label serve <root> <dataset> | " +
+		"label recheck <root> <dataset> <ids file> <seed> | label agree <root> <dataset>")
+}
+
+func recheck(root, dataset, idsFile, seed string) error {
+	data, err := os.ReadFile(idsFile)
+	if err != nil {
+		return err
+	}
+	ids := strings.Fields(string(data))
+	if err := label.Recheck(root, dataset, dataset+"-recheck", ids, seed); err != nil {
+		return err
+	}
+	fmt.Printf("wrote %s-recheck with %d items\n", dataset, len(ids))
+	return nil
+}
+
+func agree(root, dataset string) error {
+	got, err := label.Compare(root, dataset, dataset+"-recheck")
+	if err != nil {
+		return err
+	}
+	fmt.Printf("agreed on %d of %d, Cohen's kappa %.3f (95%% interval %.3f to %.3f)\n",
+		got.Same, got.Pairs, got.Kappa, got.Low, got.High)
+	keys := make([][2]string, 0, len(got.Table))
+	for k := range got.Table {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool { return keys[i][0]+keys[i][1] < keys[j][0]+keys[j][1] })
+	for _, k := range keys {
+		fmt.Printf("  first %s, second %s: %d\n", k[0], k[1], got.Table[k])
+	}
+	return nil
 }
 
 func report(name string, counts map[string]int) {

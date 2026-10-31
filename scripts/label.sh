@@ -3,6 +3,9 @@
 #   bash scripts/label.sh select 2026-p2     draw the items
 #   bash scripts/label.sh d6                 label postings, then open the page it prints
 #   bash scripts/label.sh d5                 label pairs
+#   bash scripts/label.sh recheck d5 evals/labels/d5-recheck-ids.txt <seed>   draw a second pass
+#   bash scripts/label.sh d5-recheck         label it, at least a day after the first pass
+#   bash scripts/label.sh agree d5           score the finished second pass
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
@@ -13,7 +16,9 @@ set +a
 export ROLERANK_CORPUS_URL="postgres://corpus_ro:${ROLERANK_PW_CORPUS_RO}@127.0.0.1:55433/corpus"
 win=$(cygpath -w "$root" 2>/dev/null || echo "$root")
 cd worker
-if [ "$1" = select ]; then
-  exec go run ./cmd/label select "$win" "$2"
-fi
+case "$1" in
+  select) exec go run ./cmd/label select "$win" "$2" ;;
+  recheck) exec go run ./cmd/label recheck "$win" "$2" "$win/$3" "$4" ;;
+  agree) exec go run ./cmd/label agree "$win" "$2" ;;
+esac
 exec go run ./cmd/label serve "$win" "$1"
