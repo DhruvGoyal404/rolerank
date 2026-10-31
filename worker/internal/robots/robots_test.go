@@ -76,6 +76,24 @@ func TestRealFiles(t *testing.T) {
 	}
 }
 
+// Himalayas' real rules, as served on 2026-10-31. Its search pages with `&page=`, which
+// these disallow, so ingestion walks the browse feed by cursor.
+func TestHimalayasPagingRules(t *testing.T) {
+	body := "User-Agent: *\nAllow: /\nDisallow: /apply\nDisallow: /jobs?page=\nDisallow: /jobs*&page=\nDisallow: /jobs/*?page=\n"
+	policy := Parse(body, bot)
+	for path, want := range map[string]bool{
+		"/jobs/api?limit=20":                 true,
+		"/jobs/api?limit=20&cursor=abc":      true,
+		"/jobs/api/search?country=IN":        true,
+		"/jobs/api/search?country=IN&page=2": false,
+		"/jobs/api/search?page=2":            false,
+	} {
+		if got := policy.Allowed(path); got != want {
+			t.Errorf("Allowed(%q) = %v, want %v", path, got, want)
+		}
+	}
+}
+
 func TestRFC9309Precedence(t *testing.T) {
 	body := "User-agent: *\nDisallow: /a\nAllow: /a/b\nDisallow: /a/b/c\nAllow: /tie\nDisallow: /tie\n"
 	policy := Parse(body, bot)

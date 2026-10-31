@@ -254,8 +254,10 @@ host whose robots.txt disallows us.
 
 - **Docs:** https://himalayas.app/api; terms: https://himalayas.app/terms (clause 113,
   "Terms and Conditions for API Users")
-- **What we read:** the India-eligible search, `country=IN`, about 310 pages at 20 a page,
-  because that's the part in scope.
+- **What we read:** the browse feed by cursor, filtered locally with their India rule,
+  which is what their docs say to do to collect one country. Their search can't be used
+  for this: it pages with `&page=`, and robots.txt disallows `/jobs*&page=`. A page can
+  hold under 20 jobs, so only an empty page or a missing cursor ends a walk.
 - **Endpoints:** `GET https://himalayas.app/jobs/api` (browse feed, `limit` up to 20,
   cursor paging with `nextCursor`); `GET /jobs/api/search` (`q`, `country`,
   `worldwide`, `seniority`, `employment_type`, `timezone`, `sort`, `page`, 20 a page);
@@ -353,6 +355,14 @@ host whose robots.txt disallows us.
 | **SimplifyJobs and similar GitHub lists** | No licence visible on the repository page. Without a licence there's no permission to reuse. |
 | **HN "Who is hiring"** | Posts are personal comments, not employer feeds. HN API terms for this use: **unknown**. |
 | **Google Jobs, job search engines** | Their results are other sites' content. Not a source. |
+
+## Compliance record
+
+On 2026-10-31, during P2, two manual `curl` test requests went to
+`himalayas.app/jobs/api/search?country=IN&page=...`, which the rule `/jobs*&page=` in
+Himalayas' robots.txt disallows. They were sent by hand, outside the fetcher. The fetcher
+enforces robots.txt and later refused the same URL on its own. One-off research requests
+now check robots.txt first.
 
 ## Open items
 

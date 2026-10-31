@@ -1,6 +1,7 @@
 package source
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -106,7 +107,7 @@ func TestAshby(t *testing.T) {
 }
 
 func TestHimalayas(t *testing.T) {
-	page := parse(t, Himalayas{}, "", `{"offset":20,"limit":20,"totalCount":61,"jobs":[{
+	page := parse(t, Himalayas{}, "", `{"nextCursor":"ab c=","jobs":[{
 	  "guid":"https://himalayas.app/companies/acme/jobs/sde","title":"SDE","companyName":"Acme",
 	  "description":"<p>x</p>","locationRestrictions":["India"],"seniority":["Entry-level"],
 	  "categories":["Engineering"],"applicationLink":"https://himalayas.app/apply/1",
@@ -116,16 +117,35 @@ func TestHimalayas(t *testing.T) {
 	if p.ApplyURL != "https://himalayas.app/apply/1" || p.ExpiresAt.IsZero() || p.Remote != RemoteYes {
 		t.Fatalf("%+v", p)
 	}
-	if page.NextURL != himalayasSearch+"&page=3" {
+	if page.NextURL != himalayasFeed+"&cursor=ab+c%3D" {
 		t.Fatalf("next %q", page.NextURL)
 	}
 	for _, body := range []string{
-		`{"offset":6220,"limit":20,"totalCount":6175,"jobs":[]}`,
-		`{"offset":40,"limit":20,"totalCount":60,"jobs":[{"guid":"https://x.example/1","title":"T"}]}`,
+		`{"nextCursor":"x","jobs":[]}`,
+		`{"nextCursor":"","jobs":[{"guid":"https://x.example/1","title":"T"}]}`,
 	} {
 		if last := parse(t, Himalayas{}, "", body); last.NextURL != "" {
 			t.Fatalf("no next page expected, got %q", last.NextURL)
 		}
+	}
+}
+
+func TestHimalayasKeepsOnlyJobsOpenToIndia(t *testing.T) {
+	job := func(id, locations, zones string) string {
+		return fmt.Sprintf(`{"guid":"https://x.example/%s","title":"T","locationRestrictions":%s,"timezoneRestrictions":%s}`, id, locations, zones)
+	}
+	body := `{"jobs":[` + strings.Join([]string{
+		job("anywhere", `[]`, `[]`),
+		job("india", `["India"]`, `[5.5]`),
+		job("india-and-more", `["Canada","India"]`, `[-5,5.5]`),
+		job("all-zones", `[]`, `[-5,0,5.5,9]`),
+		job("us-only", `["United States"]`, `[-5]`),
+		job("named-but-wrong-zone", `["India"]`, `[-5]`),
+		job("no-region-wrong-zone", `[]`, `[-8,-5]`),
+	}, ",") + `]}`
+	page := parse(t, Himalayas{}, "", body)
+	if len(page.Postings) != 4 || page.Skipped != 3 {
+		t.Fatalf("%d kept, %d skipped", len(page.Postings), page.Skipped)
 	}
 }
 

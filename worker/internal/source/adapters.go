@@ -279,9 +279,36 @@ func (a Ashby) Parse(token string, body []byte) (Page, error) {
 // Himalayas reads the public remote jobs feed.
 type Himalayas struct{}
 
-// The India-eligible search, not the whole feed: it's the part in scope, and 300 pages
-// instead of many thousands. It pages by number, unlike the browse feed's cursor.
-const himalayasSearch = "https://himalayas.app/jobs/api/search?country=IN&sort=recent"
+// The browse feed, walked by cursor and filtered here, which is what their docs say to do
+// to collect one country. The search endpoint pages with `&page=`, which their robots.txt
+// disallows, so it's not an option.
+const himalayasFeed = "https://himalayas.app/jobs/api?limit=20"
+
+// indiaOffset is India's standard UTC offset, for their timezone rule.
+const indiaOffset = 5.5
+
+// openToIndia applies the rule in their docs: no location restrictions or India among
+// them, and India's UTC offset among the timezones. An empty timezone list is no limit.
+func openToIndia(locations []string, zones []float64) bool {
+	located := len(locations) == 0
+	for _, l := range locations {
+		if strings.EqualFold(l, "India") || strings.EqualFold(l, "IN") {
+			located = true
+		}
+	}
+	if !located {
+		return false
+	}
+	if len(zones) == 0 {
+		return true
+	}
+	for _, z := range zones {
+		if z == indiaOffset {
+			return true
+		}
+	}
+	return false
+}
 
 // Name implements Adapter.
 func (Himalayas) Name() string { return "himalayas" }
@@ -293,30 +320,29 @@ func (Himalayas) Hosts() []string { return []string{"himalayas.app"} }
 func (Himalayas) Attribution() Attribution { return Attribution{Credit: "Himalayas"} }
 
 // FirstURL implements Adapter.
-func (Himalayas) FirstURL(string) string { return himalayasSearch + "&page=1" }
+func (Himalayas) FirstURL(string) string { return himalayasFeed }
 
 // Parse implements Adapter.
 func (a Himalayas) Parse(_ string, body []byte) (Page, error) {
 	var data struct {
-		Offset int `json:"offset"`
-		Limit  int `json:"limit"`
-		Total  int `json:"totalCount"`
-		Jobs   *[]struct {
-			GUID        string   `json:"guid"`
-			Title       string   `json:"title"`
-			Company     string   `json:"companyName"`
-			Type        string   `json:"employmentType"`
-			Description string   `json:"description"`
-			Countries   []string `json:"locationRestrictions"`
-			Seniority   []string `json:"seniority"`
-			Categories  []string `json:"categories"`
-			Application string   `json:"applicationLink"`
-			Published   int64    `json:"pubDate"`
-			Expires     int64    `json:"expiryDate"`
-			Min         float64  `json:"minSalary"`
-			Max         float64  `json:"maxSalary"`
-			Currency    string   `json:"currency"`
-			Period      string   `json:"salaryPeriod"`
+		NextCursor string `json:"nextCursor"`
+		Jobs       *[]struct {
+			GUID        string    `json:"guid"`
+			Title       string    `json:"title"`
+			Company     string    `json:"companyName"`
+			Type        string    `json:"employmentType"`
+			Description string    `json:"description"`
+			Countries   []string  `json:"locationRestrictions"`
+			Zones       []float64 `json:"timezoneRestrictions"`
+			Seniority   []string  `json:"seniority"`
+			Categories  []string  `json:"categories"`
+			Application string    `json:"applicationLink"`
+			Published   int64     `json:"pubDate"`
+			Expires     int64     `json:"expiryDate"`
+			Min         float64   `json:"minSalary"`
+			Max         float64   `json:"maxSalary"`
+			Currency    string    `json:"currency"`
+			Period      string    `json:"salaryPeriod"`
 		} `json:"jobs"`
 	}
 	if err := json.Unmarshal(body, &data); err != nil {
@@ -326,10 +352,15 @@ func (a Himalayas) Parse(_ string, body []byte) (Page, error) {
 		return Page{}, decodeError(a.Name(), fmt.Errorf("no jobs field"))
 	}
 	var page Page
-	if data.Limit > 0 && len(*data.Jobs) > 0 && data.Offset+data.Limit < data.Total {
-		page.NextURL = himalayasSearch + "&page=" + strconv.Itoa(data.Offset/data.Limit+2)
+	// A page can be short before the end, so only an empty page or no cursor stops us.
+	if data.NextCursor != "" && len(*data.Jobs) > 0 {
+		page.NextURL = himalayasFeed + "&cursor=" + url.QueryEscape(data.NextCursor)
 	}
 	for _, j := range *data.Jobs {
+		if !openToIndia(j.Countries, j.Zones) {
+			page.Skipped++
+			continue
+		}
 		keep(&page, Posting{
 			SourceJobID: j.GUID, Title: j.Title, Company: j.Company, EmploymentType: j.Type,
 			Body: j.Description, BodyIsHTML: true, Remote: RemoteYes, Countries: j.Countries,
