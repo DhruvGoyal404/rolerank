@@ -65,6 +65,12 @@ func run(args []string) error {
 	if err := store.EnsureSources(ctx, adapters); err != nil {
 		return err
 	}
+	// Feeds have no boards of their own, so each is one board.
+	for _, feed := range []string{"himalayas", "remoteok"} {
+		if _, err := store.AddBoard(ctx, feed, "feed"); err != nil {
+			return err
+		}
+	}
 
 	switch args[0] {
 	case "boards":
