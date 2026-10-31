@@ -324,7 +324,7 @@ too young on 2026-10-31.
 | Part | Choice | Version | Newer | Why |
 |---|---|---|---|---|
 | Runtime | Node.js LTS | 24.22.0 (2026-10-14) | 24.22.1, 24.22.2; 26 became LTS on 2026-10-28 | Supported until 2028-04-30 |
-| Language | TypeScript | 7.0.2 (P1 must prove it, below) | | |
+| Language | TypeScript | **6.0.3** (2026-04-16) | 7.0.2 fails: see below | Newest 6.x under the 14-day rule |
 | API | Express | 5.3.0 | | Same as CodeJudge |
 | Validation | Zod | 4.6.7 | | Shared schemas for API and LLM output |
 | DB driver | pg | 8.23.1 | | No ORM |
@@ -368,9 +368,17 @@ too young on 2026-10-31.
 Base images are pinned by digest, chosen from tags at least 14 days old. ClamAV is not
 used, for the reason given in THREAT_MODEL.md.
 
-**TypeScript 7 is on probation.** P1 must prove 7.0.2 works with typescript-eslint,
-Vitest and the build. If any of them doesn't support it yet, we pin the newest TS 6.x
-that passes the 14-day rule and record why here.
+**Why TypeScript 6, not 7.** P1 tested TS 7.0.2 and 6.0.3 on 2026-10-31 in one project
+with typescript-eslint 8.71.2, Vitest 5.0.5 and `tsc`:
+
+| | `tsc` build | Vitest | ESLint with type-aware rules |
+|---|---|---|---|
+| TS 7.0.2 | pass | pass | **fails**: "typescript-eslint does not support TS 7.0." |
+| TS 6.0.3 | pass | pass | pass |
+
+typescript-eslint declares `typescript >=4.8.4 <6.1.0`, including its newest release
+8.72.1, and TS 7's package exports no classic compiler API. Revisit when a
+typescript-eslint release older than 14 days supports TS 7.
 
 **Host:** m7g.xlarge (Q9), with x86 t3.xlarge as the fallback if gVisor or any image
 fails on arm64 in P1.

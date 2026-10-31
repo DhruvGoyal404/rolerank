@@ -135,7 +135,7 @@ host whose robots.txt disallows us.
 
 ## Common rules for every source
 
-- User-Agent: `RoleRankBot/<version> (+https://<site>/about/bot; <contact email>)`.
+- User-Agent: `RoleRankBot/<version> (+https://rolerank.dhruvgoyal.tech/about/bot; bot@dhruvgoyal.tech)`.
 - robots.txt fetched per host, cached for 24 h, obeyed including `Crawl-delay`
   (RFC 9309: a 4xx means no restrictions; a 5xx or network error means assume
   complete disallow, and retry later).

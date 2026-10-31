@@ -91,7 +91,7 @@ changing anything:
   robots.txt forbid it. No stealth browsers, no proxy rotation, no CAPTCHA
   solving, no faked User-Agent.
 - Every request, including one-off research scripts, carries
-  `RoleRankBot/<version> (+https://<site>/about/bot; bot@dhruvgoyal.tech)`. Never the
+  `RoleRankBot/<version> (+https://rolerank.dhruvgoyal.tech/about/bot; bot@dhruvgoyal.tech)`. Never the
   owner's personal email address.
 - robots.txt is fetched, cached for 24 hours and obeyed per host, including
   `Crawl-delay`. A 5xx on robots.txt means stop for that host; a 4xx means no rules

@@ -59,9 +59,8 @@ dbmate on both databases. CI from the first commit.
 
 **Exit criteria**
 
-- **TypeScript 7.0.2 is proven** with typescript-eslint, Vitest and the build. If any of
-  them doesn't support it, pin the newest TS 6.x that passes the 14-day rule and record
-  why in ARCHITECTURE.md.
+- **TypeScript 7.0.2 was tested:** typescript-eslint doesn't support it, so TS 6.0.3 is
+  pinned and the reason is recorded in ARCHITECTURE.md. Done 2026-10-31.
 - **arm64 is proven:** gVisor and every image run on arm64 (Q9), or the host falls back to
   x86 t3.xlarge.
 - **Database isolation is proven:** `app_rw` is refused by `corpus`, the corpus roles are
