@@ -12,7 +12,7 @@
 | Q6 | A: local bge-small by default, confirmed by bake-off in P3 |
 | Q7 | A: not in v1 |
 | Q8 | A: $5.27 monthly alert; $0.05 per user and $1.00 global per day |
-| Q9 | A: m7g.xlarge, with D (x86 t3.xlarge) as the fallback if gVisor or any image fails on arm64 in P1 |
+| Q9 | A: m7g.xlarge. Confirmed in P1: the compose images run under gVisor on arm64 and 45 integration tests pass there (PHASE1.md). D (x86 t3.xlarge) stays the fallback if a later image fails |
 | Q10 | A: delete the original after extraction |
 | Q11 | A: `pg_dump` to S3 |
 | Q12 | 140 hours a week; P1 to P5 by 2026-11-10, P6 to P8 after (ROADMAP.md) |

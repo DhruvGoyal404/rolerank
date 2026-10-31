@@ -380,8 +380,8 @@ typescript-eslint declares `typescript >=4.8.4 <6.1.0`, including its newest rel
 8.72.1, and TS 7's package exports no classic compiler API. Revisit when a
 typescript-eslint release older than 14 days supports TS 7.
 
-**Host:** m7g.xlarge (Q9), with x86 t3.xlarge as the fallback if gVisor or any image
-fails on arm64 in P1.
+**Host:** m7g.xlarge (Q9). P1 proved the compose images under gVisor on arm64
+(PHASE1.md). x86 t3.xlarge stays the fallback if a later image fails.
 
 ## Measured in Phase 0
 

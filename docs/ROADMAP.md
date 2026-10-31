@@ -62,7 +62,7 @@ dbmate on both databases. CI from the first commit.
 - **TypeScript 7.0.2 was tested:** typescript-eslint doesn't support it, so TS 6.0.3 is
   pinned and the reason is recorded in ARCHITECTURE.md. Done 2026-10-31.
 - **arm64 is proven:** every image runs under gVisor on arm64 and the integration suite
-  passes there (Q9), or the host falls back to x86 t3.xlarge.
+  passes there (Q9), or the host falls back to x86 t3.xlarge. Done 2026-10-31.
 - **Database isolation is proven:** `app_rw` is refused by `corpus`, the corpus roles are
   refused by `app`, `PUBLIC` has no `CONNECT`, and a schema test finds no PII column in
   `corpus`.
