@@ -346,7 +346,7 @@ too young on 2026-10-31.
 | e2e | @playwright/test, @axe-core/playwright | 1.64.1, 4.14.0 | | |
 | API tests | supertest, msw | 7.3.1, 3.0.3 | | |
 | Lint | eslint, typescript-eslint, prettier | 10.13.0, 8.71.2, 3.9.10 | 10.14.0, 8.72.1 | |
-| Workers | Go | go1.27.2 toolchain in `go.mod` | go1.27.3 (2026-10-19) | Same as CodeJudge |
+| Workers | Go | go1.27.3 toolchain in `go.mod`, under the security exception for GO-2026-6809 | | Same as CodeJudge |
 | PG driver (Go) | jackc/pgx/v5 | v5.11.0 | | |
 | Valkey (Go) | valkey-io/valkey-go | v1.0.79 | | |
 | Rate (Go) | golang.org/x/time | v0.16.0 | | |
