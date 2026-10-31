@@ -5,7 +5,7 @@ match. Focus: software and engineering roles in India and remote roles open to
 India, with freshers and interns as first-class users.
 
 This file is the project's constitution. It binds every change, human or AI.
-To weaken a rule, change this file in its own PR and say why.
+To weaken a rule, change this file in its own commit and say why.
 
 **Status: Phase 1 (foundation and CI).** Phase 0 is complete. Read these before
 changing anything:
@@ -29,8 +29,16 @@ changing anything:
 - **Evidence in reports.** A report states what ran, the command, the numbers
   and what failed. "Should work" is not a result. "Measured" means there is a
   command someone else can rerun.
-- **Small PRs, one commit per logical piece.** Every piece passes the full gate
-  before the next one starts: typecheck, lint, unit, integration, e2e, build.
+- **Direct to main, one commit per logical piece.** No branches and no pull requests.
+  Every piece passes the full local gate before it's committed: typecheck, lint, unit,
+  integration, e2e, build. Then push. CI runs on the push. If CI goes red, the next
+  commit fixes it. Never force-push main.
+- **Identity.** Every commit is authored and committed by the owner only, set in the
+  repo's local git config. No co-author trailer, no generated-by line, and no mention of
+  any AI tool in a commit message, tag, release or other GitHub-visible metadata.
+  Attribution is off in the git-ignored `.claude/settings.local.json`. After each
+  commit, `git log -1 --format='%an <%ae> | %cn <%ce>%n%B'` must show only the owner. If
+  that can't be guaranteed, don't commit: give the owner the commands.
 - **A red gate stops the line.** No skipping hooks, no `--no-verify`, no
   disabling a test to get green. Fix the cause.
 - **Each phase ends with something demoable and measured.** The exit criteria in
@@ -46,7 +54,7 @@ changing anything:
   newest is younger, take the newest that is older, even if that crosses a major
   version. Check with `npm view <pkg> time --json` or the Go module proxy.
 - **Exact pins.** No `^` or `~`. Lockfiles are committed. `npm ci` only in CI.
-- **`npm audit` clean** and `govulncheck` clean on every PR.
+- **`npm audit` clean** and `govulncheck` clean on every commit.
 - **Security exception:** a fix for a published advisory may be younger than 14
   days. Record it in `docs/DEPENDENCY_EXCEPTIONS.md` with the advisory ID, the
   date and an expiry date. Remove the entry when the rule is met again.
@@ -54,8 +62,8 @@ changing anything:
   days old; GitHub Actions pinned by commit SHA; Go toolchain pinned in `go.mod`;
   embedding models pinned by revision hash.
 - Add a dependency only if the alternative is clearly worse. Fewer is better.
-- Dependabot PRs are never merged directly; recreate them as our own PR, as in
-  CodeJudge's MAINTENANCE.md.
+- Dependabot alerts are on. Apply each fix as our own commit on main, after checking
+  the advisory and the publish date.
 
 ## Testing and CI
 
@@ -158,7 +166,7 @@ changing anything:
   immediately in live systems and within the window stated on /privacy in
   backups. Restores re-apply the deletion tombstones.
 - /privacy says what actually happens. If behaviour changes, it changes in the
-  same PR.
+  same commit.
 
 ## Web baseline
 

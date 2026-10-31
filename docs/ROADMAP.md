@@ -42,7 +42,7 @@ Every phase also has these standing criteria:
   `govulncheck`.
 - One commit per logical piece, each passing the gate.
 - Dependencies pass the 14-day rule (a CI script checks publish dates).
-- The doc that owns a decision is updated in the same PR.
+- The doc that owns a decision is updated in the same commit.
 
 ## P0: research and design (done 2026-10-31)
 
@@ -61,8 +61,8 @@ dbmate on both databases. CI from the first commit.
 
 - **TypeScript 7.0.2 was tested:** typescript-eslint doesn't support it, so TS 6.0.3 is
   pinned and the reason is recorded in ARCHITECTURE.md. Done 2026-10-31.
-- **arm64 is proven:** gVisor and every image run on arm64 (Q9), or the host falls back to
-  x86 t3.xlarge.
+- **arm64 is proven:** every image runs under gVisor on arm64 and the integration suite
+  passes there (Q9), or the host falls back to x86 t3.xlarge.
 - **Database isolation is proven:** `app_rw` is refused by `corpus`, the corpus roles are
   refused by `app`, `PUBLIC` has no `CONNECT`, and a schema test finds no PII column in
   `corpus`.

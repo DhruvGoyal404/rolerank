@@ -6,8 +6,8 @@ datasets, the metrics, the pass thresholds and how they run.
 
 **Status of the thresholds.** No baseline exists yet, so every number here is a
 proposal, chosen to be strict enough to catch the failure that matters. The first
-real run may show one is wrong. Changing a threshold takes a PR that gives the
-reason and the measured distribution. Thresholds never move in the same PR as the
+real run may show one is wrong. Changing a threshold takes a commit that gives the
+reason and the measured distribution. Thresholds never move in the same commit as the
 change they would have blocked.
 
 ## Data rules
@@ -250,8 +250,8 @@ Any non-zero here is a release blocker.
 
 | Tier | Trigger | What | LLM spend |
 |---|---|---|---|
-| T0 | Every PR | Deterministic: gates, metrics code, D2 ranking with a pinned embedding fixture, dedupe on labelled pairs, replay of recorded LLM responses through validators | $0 |
-| T1 | PR labelled `eval:live`, and any PR that touches `prompts/`, `schemas/`, model config | Live D1, D4, D7 | Capped at $2 per run |
+| T0 | Every push | Deterministic: gates, metrics code, D2 ranking with a pinned embedding fixture, dedupe on labelled pairs, replay of recorded LLM responses through validators | $0 |
+| T1 | Run locally before any commit that touches `prompts/`, `schemas/`, model config, and on demand in CI | Live D1, D4, D7 | Capped at $2 per run |
 | T2 | Nightly while developing an AI phase | T1 plus a drift report | Capped at $2 per run |
 | T3 | Phase gate and before any release | Everything, including D3, D5, D6 and the human audit | Capped at $10 per run |
 
@@ -263,7 +263,7 @@ Any non-zero here is a release blocker.
 - The spend cap is enforced by the same ledger as production. The eval job has a
   key limited to its own budget.
 - Recorded responses let T0 prove that a validator still rejects what it rejected.
-- A PR that lowers a metric by more than its noise band fails even if it stays above
+- A change that lowers a metric by more than its noise band fails even if it stays above
   the threshold. The noise band is measured by running T1 three times on the baseline.
 
 ## Bench harness (separate from evals)

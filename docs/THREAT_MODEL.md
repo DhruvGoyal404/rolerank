@@ -196,8 +196,8 @@ and makes success worthless.
 |---|---|---|
 | S | Forged deploy | GitHub OIDC with a role trusting only `main` of this repo; immutable subject |
 | T | Malicious dependency | 14-day rule, exact pins, `npm ci --ignore-scripts` where possible, `govulncheck`, `npm audit`, Actions pinned by SHA, images by digest |
-| I | Secrets in CI logs | gitleaks, masked values, secret-free PR builds, public-repo-safe logs |
-| E | Fork PR steals secrets | No secrets on `pull_request` from forks; no `pull_request_target` |
+| I | Secrets in CI logs | gitleaks, masked values, public-repo-safe logs |
+| E | Fork PR steals secrets | CI runs on push to main only, so fork PRs run nothing. Fork-PR approval stays on for all external contributors as defence; no `pull_request_target` |
 
 ### Backups and up/down scripts
 
