@@ -81,8 +81,17 @@ Grades, per (profile, job):
   every report states `judged@10`, the share of each top 10 that has a grade. A system
   with `judged@10` below 0.7 is regraded before it can be compared.
 - D6 is stratified, because a random 300 would hold almost no India interns: 100
-  India, 100 intern or entry-level, 100 random. Results are reported per stratum and
-  never as one blended number. The shares in SOURCES.md stay the unbiased estimates.
+  India, 100 intern or entry-level, 100 general. Each group mixes a plain random draw,
+  which gives the unbiased score, with hard cases likely to be wrong, which is where
+  labels teach the most. Results are reported per stratum and never as one blended
+  number, so hard cases can't flatter or sink the headline. The shares in SOURCES.md
+  stay the unbiased estimates.
+- D5 draws 300 pairs by what each tests: pairs the system merged (precision), the band
+  around the threshold, near-identical text in two cities, the same employer's text under
+  a different title (recall), aggregator against ATS, and a few easy negatives.
+- Both are labelled blind with `scripts/label.sh`. The system's guess is kept for scoring
+  and never shown. Item text stays in `evals/private/`; `evals/labels/` holds only IDs and
+  answers. Skill labels wait until the skill extractor exists in P3.
 
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RoleRank labels</title>
+<style>
+  :root { color-scheme: light dark; font-family: system-ui, sans-serif; line-height: 1.45; }
+  body { margin: 0; padding: 12px 18px 90px; }
+  header { display: flex; gap: 14px; align-items: center; font-size: 14px; }
+  progress { flex: 1; height: 8px; }
+  main { display: flex; gap: 18px; margin-top: 12px; }
+  section { flex: 1; min-width: 0; }
+  h2 { font-size: 19px; margin: 0; }
+  .meta { font-size: 14px; opacity: .8; margin: 2px 0 8px; }
+  .body { white-space: pre-wrap; font-size: 14px; max-height: calc(100vh - 240px); overflow: auto; }
+  footer { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 18px; background: Canvas; border-top: 1px solid GrayText; }
+  .q { font-weight: 600; font-size: 17px; }
+  .help { font-size: 13px; opacity: .8; }
+  kbd { border: 1px solid GrayText; border-radius: 4px; padding: 0 6px; font-size: 14px; margin-right: 3px; }
+  .keys span { margin-right: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <strong id="set"></strong>
+  <progress id="bar" max="1" value="0"></progress>
+  <span id="count"></span>
+  <span id="eta"></span>
+</header>
+<main id="main"></main>
+<footer>
+  <div class="q" id="q"></div>
+  <div class="help" id="help"></div>
+  <div class="keys" id="keys"></div>
+</footer>
+<script>
+const $ = (id) => document.getElementById(id);
+let busy = false;
+const started = Date.now();
+let startDone = null;
+
+function side(s) {
+  const el = document.createElement("section");
+  const title = document.createElement("h2");
+  title.textContent = s.title;
+  const meta = document.createElement("div");
+  meta.className = "meta";
+  meta.textContent = [s.company, s.location, s.source].filter(Boolean).join("  |  ");
+  const body = document.createElement("div");
+  body.className = "body";
+  body.textContent = s.body;
+  el.append(title, meta, body);
+  return el;
+}
+
+function show(s) {
+  $("set").textContent = s.dataset.toUpperCase();
+  $("bar").value = s.total ? s.done / s.total : 0;
+  $("count").textContent = s.done + " / " + s.total;
+  if (startDone === null) startDone = s.done;
+  const made = s.done - startDone;
+  if (made >= 5) {
+    const each = (Date.now() - started) / made;
+    $("eta").textContent = Math.ceil((each * (s.total - s.done)) / 60000) + " min left";
+  }
+  const main = $("main");
+  main.replaceChildren();
+  if (s.finished) {
+    $("q").textContent = "All done. You can close this page.";
+    $("help").textContent = "";
+    $("keys").textContent = "";
+    return;
+  }
+  main.append(side(s.a));
+  if (s.b) main.append(side(s.b));
+  $("q").textContent = s.question.text;
+  $("help").textContent = s.question.help;
+  const keys = $("keys");
+  keys.replaceChildren();
+  for (const c of s.question.choices) {
+    const item = document.createElement("span");
+    const kbd = document.createElement("kbd");
+    kbd.textContent = c.key;
+    item.append(kbd, c.label);
+    keys.append(item);
+  }
+  const undo = document.createElement("span");
+  const kbd = document.createElement("kbd");
+  kbd.textContent = "u";
+  undo.append(kbd, "undo");
+  keys.append(undo);
+  document.querySelectorAll(".body").forEach((b) => (b.scrollTop = 0));
+}
+
+async function send(path) {
+  busy = true;
+  try {
+    const r = await fetch(path, { method: "POST", headers: { "X-Label": "1" } });
+    if (!r.ok) throw new Error("save failed");
+    show(await r.json());
+  } catch (e) {
+    $("q").textContent = "NOT SAVED: is the tool still running? Press the key again.";
+  }
+  busy = false;
+}
+
+document.addEventListener("keydown", (e) => {
+  if (busy || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+  const key = e.key.toLowerCase();
+  if (key === "u" || key === "backspace") {
+    e.preventDefault();
+    send("/undo");
+  } else if (key.length === 1) {
+    send("/press?key=" + encodeURIComponent(key));
+  }
+});
+
+fetch("/state").then((r) => r.json()).then(show);
+</script>
+</body>
+</html>
