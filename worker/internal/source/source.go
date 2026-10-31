@@ -23,6 +23,7 @@ const (
 
 // Posting is a job as a source described it, before enrichment.
 type Posting struct {
+	Source         string
 	SourceJobID    string
 	GroupID        string // Greenhouse's internal_job_id: posts of one underlying job
 	Title          string

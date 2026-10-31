@@ -13,6 +13,7 @@ daily scheduled run catches a lapse when nothing was pushed.
 | npm | minimatch | 11.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
 | npm | @isaacs/nonrecursive-glob-match | 1.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
 | go-toolchain | go | 1.27.3 | 2026-10-19 | GO-2026-6809 | 2026-10-31 | 2026-11-02 |
+| go | golang.org/x/net | v0.62.0 | 2026-10-27 | GO-2026-6866, GO-2026-6860 | 2026-10-31 | 2026-11-10 |
 
 minimatch comes in through ESLint, which declares `^10`, so it's forced with an npm
 override in `api` and `web`. It's a development dependency only, and
