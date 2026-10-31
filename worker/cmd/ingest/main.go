@@ -3,6 +3,7 @@
 //	ingest boards <source> <file>   register board tokens, one per line
 //	ingest status                   print progress
 //	ingest run                      fetch until stopped; safe to stop at any moment
+//	ingest dedupe                   group duplicate postings; safe to stop and rerun
 //
 // Needs ROLERANK_CORPUS_URL and ROLERANK_VALKEY_URL. HIMALAYAS_API is optional.
 package main
@@ -80,6 +81,10 @@ func run(args []string) error {
 		return addBoards(ctx, store, args[1], args[2])
 	case "status":
 		return status(ctx, pool)
+	case "dedupe":
+		done, merged, err := store.Dedupe(ctx)
+		fmt.Printf("dedupe: %d postings placed, %d merged into an existing job\n", done, merged)
+		return err
 	case "run":
 		return fetchUntilStopped(ctx, store, adapters)
 	}

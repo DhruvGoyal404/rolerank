@@ -575,6 +575,107 @@ func TestStaleWorkerCannotRecordFailure(t *testing.T) {
 	}
 }
 
+func (h *harness) posting(sourceName, board, id, company, title, location, body string) int64 {
+	h.t.Helper()
+	ctx := context.Background()
+	var sourceID int16
+	err := h.pool.QueryRow(ctx, `INSERT INTO sources (name) VALUES ($1)
+		ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id`, sourceName).Scan(&sourceID)
+	if err != nil {
+		h.t.Fatal(err)
+	}
+	var postingID int64
+	err = h.pool.QueryRow(ctx, `
+		INSERT INTO postings (source_id, source_job_id, title, company, location_raw, is_engineering, body, content_hash, url)
+		VALUES ($1, $2, $3, $4, $5, true, $6, '\\x00', 'https://x.example/' || $2) RETURNING id`,
+		sourceID, board+":"+id, title, company, location, body).Scan(&postingID)
+	if err != nil {
+		h.t.Fatal(err)
+	}
+	return postingID
+}
+
+func longText(seed string) string {
+	var b strings.Builder
+	for i := range 80 {
+		fmt.Fprintf(&b, "%s%d ", seed, i)
+	}
+	return b.String()
+}
+
+func TestDedupeGroupsTheSameJobOnly(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	text := longText("w")
+	aggregator := h.posting("himalayas", "feed", "1", "Acme Inc", "Backend Engineer", "India", text)
+	ats := h.posting("greenhouse", "acme", "1", "Acme", "Backend Engineer", "Pune", text)
+	otherCity := h.posting("greenhouse", "acme", "2", "Acme", "Backend Engineer", "London", text)
+	otherText := h.posting("greenhouse", "acme", "3", "Acme", "Backend Engineer", "Pune", longText("x"))
+	short1 := h.posting("greenhouse", "acme", "4", "Acme", "Intern", "Pune", "Apply now")
+	short2 := h.posting("greenhouse", "acme", "5", "Acme", "Intern", "Pune", "Apply now")
+
+	done, merged, err := h.store.Dedupe(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if done != 6 || merged != 1 {
+		t.Fatalf("placed %d, merged %d", done, merged)
+	}
+	cluster := func(id int64) int64 {
+		var c int64
+		if err := h.pool.QueryRow(ctx, `SELECT cluster_id FROM postings WHERE id = $1`, id).Scan(&c); err != nil {
+			t.Fatal(err)
+		}
+		return c
+	}
+	if cluster(aggregator) != cluster(ats) {
+		t.Fatal("an aggregator's copy must join the ATS posting")
+	}
+	for name, id := range map[string]int64{"other city": otherCity, "other text": otherText} {
+		if cluster(id) == cluster(ats) {
+			t.Fatalf("%s must not merge", name)
+		}
+	}
+	if cluster(short1) == cluster(short2) {
+		t.Fatal("text too short to compare must not merge")
+	}
+	var canonical int64
+	if err := h.pool.QueryRow(ctx, `SELECT canonical_posting_id FROM clusters WHERE id = $1`, cluster(ats)).Scan(&canonical); err != nil {
+		t.Fatal(err)
+	}
+	if canonical != ats {
+		t.Fatal("the employer's ATS posting must be canonical")
+	}
+
+	again, _, err := h.store.Dedupe(ctx)
+	if err != nil || again != 0 {
+		t.Fatalf("a rerun redid %d postings, err %v", again, err)
+	}
+}
+
+func TestChangedTextLeavesItsCluster(t *testing.T) {
+	h := newHarness(t)
+	h.server.set("acme", "1")
+	h.board("acme")
+	h.cycle()
+	ctx := context.Background()
+	if _, _, err := h.store.Dedupe(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if got := h.count("cluster_id IS NOT NULL"); got != 1 {
+		t.Fatalf("%d clustered", got)
+	}
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET content_hash = '\\x01'`); err != nil {
+		t.Fatal(err)
+	}
+	h.server.set("acme", "1", "")
+	h.makeDue()
+	h.cycle()
+	if got := h.count("cluster_id IS NULL"); got != 1 {
+		t.Fatalf("changed text must leave its cluster, %d unclustered", got)
+	}
+}
+
 func TestManyWorkersManyBoardsNoDuplicates(t *testing.T) {
 	h := newHarness(t)
 	const boards = 12

@@ -193,6 +193,7 @@ const upsertPosting = `
 	  CASE WHEN $21::timestamptz < now() THEN now() END,
 	  $22,$23,$24,$25,$26)
 	ON CONFLICT (source_id, source_job_id) DO UPDATE SET
+	  cluster_id = CASE WHEN postings.content_hash = EXCLUDED.content_hash THEN postings.cluster_id END,
 	  board_id = EXCLUDED.board_id, group_key = EXCLUDED.group_key, title = EXCLUDED.title,
 	  company = EXCLUDED.company, location_raw = EXCLUDED.location_raw,
 	  countries = EXCLUDED.countries, remote_scope = EXCLUDED.remote_scope,
