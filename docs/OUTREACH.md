@@ -5,8 +5,13 @@ contact: Cloudflare Email Routing only receives, so it can't send, but replies t
 the owner. Replies go into SOURCES.md, with their date. RoleRank proceeds at 1 request per
 second per host while waiting, and stops at once if a provider says no.
 
-Recipient addresses aren't filled in: find each provider's current support or developer
-contact on its own site, rather than trusting one recorded here.
+## Sent
+
+| Provider | Sent to | Date | Reply |
+|---|---|---|---|
+| Greenhouse | partner-support@greenhouse.io | unknown | none yet |
+| Ashby | support@ashbyhq.com | unknown | none yet |
+| Workable | unknown (form or support@workable.com) | unknown | none yet |
 
 ---
 
