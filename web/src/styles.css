@@ -1,0 +1,33 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 42rem;
+  padding: 1rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+input:not([type="checkbox"]) {
+  display: block;
+  font: inherit;
+  padding: 0.25rem;
+  width: 100%;
+  max-width: 20rem;
+}
+
+footer {
+  margin-top: 3rem;
+}
