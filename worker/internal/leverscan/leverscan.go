@@ -116,6 +116,63 @@ func CategoryPages(body []byte) []Company {
 	return out
 }
 
+// ListSource is a Wikipedia list page. IndiaOnly keeps rows with an India cell, for
+// worldwide lists.
+type ListSource struct {
+	Page      string
+	IndiaOnly bool
+}
+
+// Lists are the list pages read alongside the categories.
+var Lists = []ListSource{
+	{"List_of_unicorn_startup_companies", true},
+	{"List_of_Indian_IT_companies", false},
+}
+
+// ListRows reads the company named in each wikitable row: the first linked article.
+func ListRows(body []byte, indiaOnly bool) []Company {
+	doc, err := html.Parse(strings.NewReader(string(body)))
+	if err != nil {
+		return nil
+	}
+	var out []Company
+	walk(doc, func(table *html.Node) {
+		if table.DataAtom != atom.Table || !hasClass(table, "wikitable") {
+			return
+		}
+		walk(table, func(row *html.Node) {
+			if row.DataAtom != atom.Tr {
+				return
+			}
+			var first *Company
+			india := false
+			for cell := row.FirstChild; cell != nil; cell = cell.NextSibling {
+				if cell.DataAtom != atom.Td {
+					continue
+				}
+				if strings.TrimSpace(text(cell)) == "India" {
+					india = true
+				}
+				walk(cell, func(a *html.Node) {
+					title, href := attr(a, "title"), attr(a, "href")
+					if first == nil && a.DataAtom == atom.A && title != "" && strings.Contains(href, "/wiki/") &&
+						!strings.Contains(href, "redlink") && !lists.MatchString(title) {
+						page := href
+						if strings.HasPrefix(page, "/wiki/") {
+							page = wikipedia + page
+						}
+						first = &Company{Name: title, Page: page}
+					}
+				})
+			}
+			if first != nil && (india || !indiaOnly) {
+				out = append(out, *first)
+			}
+		})
+	})
+	return out
+}
+
 // OfficialSite reads the website from an article's infobox.
 func OfficialSite(body []byte) string {
 	doc, err := html.Parse(strings.NewReader(string(body)))
@@ -128,12 +185,14 @@ func OfficialSite(body []byte) string {
 			return
 		}
 		walk(n, func(th *html.Node) {
-			if site != "" || th.DataAtom != atom.Th || !strings.Contains(strings.ToLower(text(th)), "website") {
+			// Exact, because "Website type" sits in the same infobox and links to Wikipedia.
+			label := strings.ToLower(strings.TrimSpace(text(th)))
+			if site != "" || th.DataAtom != atom.Th || (label != "website" && label != "url") {
 				return
 			}
 			for cell := th.NextSibling; cell != nil && site == ""; cell = cell.NextSibling {
 				walk(cell, func(a *html.Node) {
-					if site == "" && a.DataAtom == atom.A {
+					if site == "" && a.DataAtom == atom.A && hasClass(a, "external") {
 						if u, err := url.Parse(attr(a, "href")); err == nil && strings.HasPrefix(u.Scheme, "http") {
 							site = u.Scheme + "://" + u.Host
 						}

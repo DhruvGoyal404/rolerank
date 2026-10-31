@@ -78,6 +78,21 @@ func run(args []string) error {
 			}
 		}
 	}
+	for _, source := range leverscan.Lists {
+		res, err := wiki.Get(ctx, "https://en.wikipedia.org/wiki/"+source.Page, "")
+		if err != nil || res.Status != 200 {
+			fmt.Fprintf(os.Stderr, "%s: unavailable\n", source.Page)
+			continue
+		}
+		list := leverscan.ListRows(res.Body, source.IndiaOnly)
+		fmt.Printf("%s: %d names\n", source.Page, len(list))
+		for _, c := range list {
+			if token := leverscan.Token(c.Name); token != "" && !seen[token] {
+				seen[token] = true
+				companies = append(companies, c)
+			}
+		}
+	}
 	sort.Slice(companies, func(i, j int) bool { return companies[i].Name < companies[j].Name })
 	fmt.Printf("%d distinct names\n", len(companies))
 

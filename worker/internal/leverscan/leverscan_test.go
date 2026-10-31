@@ -51,6 +51,29 @@ func TestOfficialSite(t *testing.T) {
 	}
 }
 
+// Meesho's infobox has "Website type" first, which links to Wikipedia.
+func TestOfficialSiteIgnoresTheWebsiteTypeRow(t *testing.T) {
+	body := `<table class="infobox"><tr><th>Website type</th><td><a href="https://en.wikipedia.org/wiki/Public_company" title="Public company">Public</a></td></tr>
+	<tr><th>Website</th><td class="url"><a class="external text" href="https://meesho.com/">meesho.com</a></td></tr></table>`
+	if got := OfficialSite([]byte(body)); got != "https://meesho.com" {
+		t.Fatalf("got %q", got)
+	}
+}
+
+func TestListRowsFiltersByCountry(t *testing.T) {
+	body := `<table class="wikitable"><tr><th>Company</th><th>Country</th></tr>
+	<tr><td><a href="/wiki/Razorpay" title="Razorpay">Razorpay</a></td><td><a href="/wiki/India" title="India">India</a></td></tr>
+	<tr><td><a href="/wiki/Stripe,_Inc." title="Stripe, Inc.">Stripe</a></td><td>United States</td></tr>
+	<tr><td>No link Ltd</td><td>India</td></tr></table>`
+	india := ListRows([]byte(body), true)
+	if len(india) != 1 || india[0].Name != "Razorpay" || india[0].Page != wikipedia+"/wiki/Razorpay" {
+		t.Fatalf("%+v", india)
+	}
+	if all := ListRows([]byte(body), false); len(all) != 2 {
+		t.Fatalf("%+v", all)
+	}
+}
+
 func TestLinksToNeedsTheExactBoard(t *testing.T) {
 	tests := []struct {
 		body string
