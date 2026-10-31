@@ -187,8 +187,8 @@ host whose robots.txt disallows us.
 - **Stable ID:** `greenhouse:{board_token}:{id}`. Note `id` is the post;
   `internal_job_id` is the underlying job, shared by several posts of the same job.
   That helps dedupe.
-- **Refresh:** list without content every cycle (the stripe board: 39 KB vs 2 MB with
-  content); fetch `/jobs/{id}` only for new IDs or a changed `updated_at`.
+- **Refresh:** `?content=true` once per cycle, conditional. That's one request per board
+  instead of one per job, and an unchanged board returns 304 with no body.
 - **Closed postings:** gone from the list. A single closed job returns **404**
   (tested with a missing ID). `application_deadline` in the past also counts as closed.
   A whole board returning 404 means the board was renamed or dropped.
