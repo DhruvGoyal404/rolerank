@@ -18,7 +18,7 @@ jobs:
           node-version-file: .nvmrc
       - run: node --test "scripts/*.test.mjs"
       - run: node scripts/check-workflows.mjs
-      - run: node scripts/check-deps.mjs api web
+      - run: node scripts/check-deps.mjs api web worker
 
   secrets:
     name: Gitleaks

@@ -1,83 +1,147 @@
 #!/usr/bin/env node
-// Enforces the dependency rules in CLAUDE.md on every lockfile: exact pins for direct
-// dependencies, and every package at least 14 days old unless a current entry in
-// docs/DEPENDENCY_EXCEPTIONS.md covers it.
+// Enforces the dependency rules in CLAUDE.md across every ecosystem we use: exact pins,
+// and every package at least 14 days old unless docs/DEPENDENCY_EXCEPTIONS.md covers it.
+// Any exception past its expiry date fails, whether or not it's still needed.
 //
 //   node scripts/check-deps.mjs [--now 2026-10-31] [--times fixture.json] [--exceptions file] dir...
-import { readFileSync } from "node:fs";
+//
+// A directory with go.mod is checked as Go, one with package-lock.json as npm. Adding an
+// ecosystem means adding it to ECOSYSTEMS and a reader below.
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const DAY_MS = 86_400_000;
 const MIN_AGE_DAYS = 14;
+const ECOSYSTEMS = new Set(["npm", "go", "go-toolchain"]);
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
+/** Reads the table. Anything that looks like a row but can't be read is an error. */
 export function parseExceptions(markdown) {
   const rows = [];
+  const errors = [];
   for (const line of markdown.split("\n")) {
-    const cells = line.split("|").map((cell) => cell.trim());
-    if (cells.length < 8 || !/^\d{4}-\d{2}-\d{2}$/.test(cells[6] ?? "")) continue;
-    rows.push({ name: cells[1], version: cells[2], advisory: cells[4], expires: cells[6] });
+    if (!line.startsWith("|") || /^\|[\s:|-]+\|?$/.test(line) || /^\|\s*Ecosystem\b/.test(line)) continue;
+    const cells = line.split("|").slice(1, -1).map((cell) => cell.trim());
+    const [ecosystem, name, version, , advisory, , expires] = cells;
+    if (cells.length !== 7 || !ECOSYSTEMS.has(ecosystem) || !DATE.test(expires ?? "") || !advisory) {
+      errors.push(`exceptions table: can't read "${line}"`);
+      continue;
+    }
+    rows.push({ ecosystem, name, version, advisory, expires });
   }
-  return rows;
+  return { rows, errors };
 }
 
-export function installed(lock) {
+export function expiredExceptions(rows, now) {
+  const nowDate = new Date(now);
+  return rows
+    .filter((row) => new Date(`${row.expires}T23:59:59Z`) < nowDate)
+    .map(
+      (row) =>
+        `${row.ecosystem} ${row.name}@${row.version}: exception expired on ${row.expires}; remove it or fix the dependency`,
+    );
+}
+
+export function npmItems(lock) {
   const out = [];
   for (const [path, entry] of Object.entries(lock.packages ?? {})) {
     if (path === "" || !entry.version || entry.link) continue;
     const name = entry.name ?? path.slice(path.lastIndexOf("node_modules/") + "node_modules/".length);
-    out.push({ name, version: entry.version });
+    out.push({ ecosystem: "npm", name, version: entry.version });
   }
   return out;
 }
 
-/** Pure, so the fixtures in scripts/check-deps.test.mjs can drive every failure. */
-export function check({ pkg, lock, times, exceptions, now }) {
+export function npmPinErrors(pkg) {
   const errors = [];
   for (const field of ["dependencies", "devDependencies"]) {
     for (const [name, spec] of Object.entries(pkg[field] ?? {})) {
       if (!/^\d+\.\d+\.\d+$/.test(spec)) errors.push(`${name}: ${spec} is not an exact pin`);
     }
   }
-  const nowDate = new Date(now);
+  return errors;
+}
+
+/** The toolchain and every required module, indirect ones included. */
+export function goItems(goMod) {
+  const items = [];
+  let block = false;
+  for (const raw of goMod.split("\n")) {
+    const line = raw.replace(/\/\/.*$/, "").trim();
+    const go = /^go\s+(\d+\.\d+(?:\.\d+)?)$/.exec(line);
+    const toolchain = /^toolchain\s+go(\S+)$/.exec(line);
+    if (go || toolchain) {
+      items.push({ ecosystem: "go-toolchain", name: "go", version: (toolchain ?? go)[1] });
+    } else if (line === "require (") {
+      block = true;
+    } else if (block && line === ")") {
+      block = false;
+    } else {
+      const single = /^require\s+(\S+)\s+(\S+)$/.exec(line);
+      const inBlock = block ? /^(\S+)\s+(\S+)$/.exec(line) : null;
+      const match = single ?? inBlock;
+      if (match) items.push({ ecosystem: "go", name: match[1], version: match[2] });
+    }
+  }
+  return items;
+}
+
+/** Pure, so the fixtures in scripts/check-deps.test.mjs can drive every failure. */
+export function ageErrors({ items, times, exceptions, now }) {
+  const errors = [];
   const used = new Set();
-  for (const { name, version } of installed(lock)) {
+  const nowDate = new Date(now);
+  for (const { ecosystem, name, version } of items) {
     const key = `${name}@${version}`;
-    const published = times[name]?.[version];
+    const published = times[ecosystem]?.[name]?.[version];
     if (!published) {
-      errors.push(`${key}: no publish date found`);
+      errors.push(`${ecosystem} ${key}: no publish date found`);
       continue;
     }
-    const age = (nowDate - new Date(published)) / DAY_MS;
-    if (age >= MIN_AGE_DAYS) continue;
-    const exception = exceptions.find((e) => e.name === name && e.version === version);
-    if (!exception) {
-      errors.push(`${key}: published ${published.slice(0, 10)}, under ${MIN_AGE_DAYS} days old`);
-    } else if (new Date(`${exception.expires}T23:59:59Z`) < nowDate) {
-      errors.push(`${key}: exception expired on ${exception.expires}`);
-    } else {
-      used.add(`${name}@${version}`);
-    }
+    if ((nowDate - new Date(published)) / DAY_MS >= MIN_AGE_DAYS) continue;
+    const exception = exceptions.find(
+      (e) => e.ecosystem === ecosystem && e.name === name && e.version === version,
+    );
+    if (exception) used.add(`${ecosystem} ${key}`);
+    else errors.push(`${ecosystem} ${key}: published ${published.slice(0, 10)}, under ${MIN_AGE_DAYS} days old`);
   }
   return { errors, used: [...used] };
 }
 
-async function fetchTimes(names) {
+async function getJson(url) {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      if (attempt === 3) throw new Error(`${url}: ${error.message}`, { cause: error });
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+}
+
+const escapeModule = (path) => path.replace(/[A-Z]/g, (c) => `!${c.toLowerCase()}`);
+
+async function publishTime({ ecosystem, name, version }) {
+  if (ecosystem === "npm") {
+    return (await getJson(`https://registry.npmjs.org/${name.replace("/", "%2f")}`)).time;
+  }
+  const url =
+    ecosystem === "go"
+      ? `https://proxy.golang.org/${escapeModule(name)}/@v/${version}.info`
+      : `https://proxy.golang.org/golang.org/toolchain/@v/v0.0.1-go${version}.linux-amd64.info`;
+  return { [version]: (await getJson(url)).Time };
+}
+
+async function fetchTimes(items) {
   const times = {};
-  const queue = [...names];
+  const queue = [...items];
   const worker = async () => {
-    for (let name = queue.pop(); name; name = queue.pop()) {
-      const url = `https://registry.npmjs.org/${name.replace("/", "%2f")}`;
-      for (let attempt = 1; ; attempt += 1) {
-        try {
-          const response = await fetch(url);
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          times[name] = (await response.json()).time;
-          break;
-        } catch (error) {
-          if (attempt === 3) throw new Error(`${name}: ${error.message}`, { cause: error });
-          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-        }
-      }
+    for (let item = queue.pop(); item; item = queue.pop()) {
+      const byName = (times[item.ecosystem] ??= {});
+      if (item.ecosystem === "npm" && byName[item.name]) continue;
+      byName[item.name] = { ...byName[item.name], ...(await publishTime(item)) };
     }
   };
   await Promise.all(Array.from({ length: 8 }, worker));
@@ -93,20 +157,26 @@ async function main() {
   const now = option("--now") ?? new Date().toISOString();
   const timesFile = option("--times");
   const exceptionsFile = option("--exceptions") ?? "docs/DEPENDENCY_EXCEPTIONS.md";
-  const exceptions = parseExceptions(readFileSync(exceptionsFile, "utf8"));
 
-  let failed = false;
+  const { rows, errors: tableErrors } = parseExceptions(readFileSync(exceptionsFile, "utf8"));
+  const problems = [...tableErrors, ...expiredExceptions(rows, now)];
+
   for (const dir of args) {
-    const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
-    const lock = JSON.parse(readFileSync(join(dir, "package-lock.json"), "utf8"));
-    const names = new Set(installed(lock).map((entry) => entry.name));
-    const times = timesFile ? JSON.parse(readFileSync(timesFile, "utf8")) : await fetchTimes(names);
-    const { errors, used } = check({ pkg, lock, times, exceptions, now });
-    console.log(`${dir}: ${names.size} packages, exceptions in use: ${used.join(", ") || "none"}`);
-    for (const error of errors) console.error(`  ${error}`);
-    failed ||= errors.length > 0;
+    let items;
+    if (existsSync(join(dir, "go.mod"))) {
+      items = goItems(readFileSync(join(dir, "go.mod"), "utf8"));
+    } else {
+      const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
+      problems.push(...npmPinErrors(pkg));
+      items = npmItems(JSON.parse(readFileSync(join(dir, "package-lock.json"), "utf8")));
+    }
+    const times = timesFile ? JSON.parse(readFileSync(timesFile, "utf8")) : await fetchTimes(items);
+    const { errors, used } = ageErrors({ items, times, exceptions: rows, now });
+    console.log(`${dir}: ${items.length} packages, exceptions in use: ${used.join(", ") || "none"}`);
+    problems.push(...errors);
   }
-  if (failed) process.exit(1);
+  for (const problem of problems) console.error(`  ${problem}`);
+  if (problems.length > 0) process.exit(1);
 }
 
 if (process.argv[1]?.endsWith("check-deps.mjs")) await main();

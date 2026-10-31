@@ -1,17 +1,24 @@
 # Dependency exceptions
 
 Releases younger than 14 days, allowed only because they fix a published security
-advisory (CLAUDE.md, "Dependencies"). Remove an entry once it passes the rule.
-`scripts/check-deps.mjs` reads the table below.
+advisory (CLAUDE.md, "Dependencies"). `scripts/check-deps.mjs` reads the table below.
 
-| Package | Version | Published | Advisory | Recorded | Expires |
-|---|---|---|---|---|---|
-| body-parser | 2.4.0 | 2026-10-22 | GHSA-27r3-jxmh-p828 | 2026-10-31 | 2026-11-05 |
-| minimatch | 11.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
-| @isaacs/nonrecursive-glob-match | 1.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 (required by the fix) | 2026-10-31 | 2026-11-11 |
-| Go toolchain | 1.27.3 | 2026-10-19 | GO-2026-6809 | 2026-10-31 | 2026-11-02 |
+An entry past its expiry date fails CI in any ecosystem, even if the release is now old
+enough, so a stale exception can't linger. A row the script can't read fails too. A
+daily scheduled run catches a lapse when nothing was pushed.
+
+| Ecosystem | Package | Version | Published | Advisory | Recorded | Expires |
+|---|---|---|---|---|---|---|
+| npm | body-parser | 2.4.0 | 2026-10-22 | GHSA-27r3-jxmh-p828 | 2026-10-31 | 2026-11-05 |
+| npm | minimatch | 11.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
+| npm | @isaacs/nonrecursive-glob-match | 1.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
+| go-toolchain | go | 1.27.3 | 2026-10-19 | GO-2026-6809 | 2026-10-31 | 2026-11-02 |
 
 minimatch comes in through ESLint, which declares `^10`, so it's forced with an npm
-override in `api` and `web`. It's a development dependency only. ESLint and
-typescript-eslint were tested with it, including a negative control. When ESLint declares
-a fixed range itself, drop the override.
+override in `api` and `web`. It's a development dependency only, and
+`@isaacs/nonrecursive-glob-match` is required by that fix. ESLint and typescript-eslint
+were tested with it, including a negative control. When ESLint declares a fixed range
+itself, drop the override.
+
+`Ecosystem` is `npm`, `go` (modules) or `go-toolchain`. Adding an ecosystem means adding
+a reader to `scripts/check-deps.mjs`.
