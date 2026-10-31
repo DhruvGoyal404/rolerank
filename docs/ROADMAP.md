@@ -110,6 +110,8 @@ detection, board registry, discovery tool, source health metrics, /sources and
   expected duration before it starts.
 - **In-scope coverage report:** how many India, remote-India, intern and entry-level
   engineering roles we really have. This is the number that matters most.
+- **Per-source share of in-scope roles** in the P2 report, recorded in `coverage_snapshots`
+  and shown on the admin metrics page in P6, so reliance on one source is visible over time.
 
 **Demo:** dashboard of postings per source, lag, 304 rate, a live worker kill.
 

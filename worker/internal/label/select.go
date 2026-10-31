@@ -15,24 +15,28 @@ import (
 const postingColumns = `p.id, s.name, p.source_job_id, p.company, p.title, COALESCE(p.location_raw, ''),
 	left(p.body, 2500), p.url, p.level, p.is_engineering, p.remote_scope, 'IN' = ANY(p.countries)`
 
-// D6Strata sets how the 300 postings are drawn. About 60% of each group is a plain random
-// draw, which gives unbiased scores. The rest targets cases likely to be wrong, which is
-// where labels teach the most, and it's scored separately so it can't flatter or sink the
-// headline number.
+// D6Strata sets how the 300 postings are drawn. Most are plain random draws within a
+// group, which give unbiased scores. The "hard" groups target cases likely to be wrong,
+// which is where labels teach the most, and they're scored separately so they can't
+// flatter or sink the headline number.
 var D6Strata = []struct {
 	Name  string
 	Count int
 	Where string
 }{
-	{"india-random", 60, `'IN' = ANY(p.countries)`},
-	{"india-hard", 40, `'IN' = ANY(p.countries) AND (p.level = 'unknown' OR p.remote_scope = 'unknown'
+	{"india-random", 50, `'IN' = ANY(p.countries)`},
+	{"india-hard", 30, `'IN' = ANY(p.countries) AND (p.level = 'unknown' OR p.remote_scope = 'unknown'
 		OR p.title ~* '(solutions|support|field|customer|sales|implementation|test|analyst)')`},
-	{"early-random", 60, `p.is_engineering AND p.level IN ('intern', 'entry')`},
-	{"early-hard", 40, `p.is_engineering AND p.level IN ('unknown', 'mid')
+	{"early-random", 50, `p.is_engineering AND p.level IN ('intern', 'entry')`},
+	{"early-hard", 30, `p.is_engineering AND p.level IN ('unknown', 'mid')
 		AND (p.body ~* '(fresher|new grad|recent graduate|0[- ]?(to|-)[- ]?[12] years|entry[- ]level)'
 		  OR p.title ~* '(associate|graduate|junior|trainee)')`},
-	{"random", 70, `true`},
-	{"remote-hard", 30, `p.remote_scope IN ('unknown', 'remote_global')`},
+	{"random", 50, `true`},
+	// Random draws, so these two gaps can be sized: how many unknown levels are really
+	// entry roles, and how many bare "remote" roles are open to India.
+	{"level-unknown", 40, `p.is_engineering AND p.level = 'unknown'`},
+	{"bare-remote", 30, `p.is_engineering AND p.remote_scope = 'unknown' AND p.location_raw ~* 'remote'`},
+	{"remote-open", 20, `p.is_engineering AND p.remote_scope = 'remote_global'`},
 }
 
 func sideFrom(row pgx.CollectableRow) (int64, Side, map[string]string, error) {

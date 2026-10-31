@@ -85,7 +85,9 @@ Grades, per (profile, job):
   which gives the unbiased score, with hard cases likely to be wrong, which is where
   labels teach the most. Results are reported per stratum and never as one blended
   number, so hard cases can't flatter or sink the headline. The shares in SOURCES.md
-  stay the unbiased estimates.
+  stay the unbiased estimates. Two gaps get their own random draws, so they can be sized
+  before the classifier changes: 40 roles with an unknown level, and 30 that say only
+  "remote". The classifier is improved after the labels, never before.
 - D5 draws 300 pairs by what each tests: pairs the system merged (precision), the band
   around the threshold, near-identical text in two cities, the same employer's text under
   a different title (recall), aggregator against ATS, and a few easy negatives.

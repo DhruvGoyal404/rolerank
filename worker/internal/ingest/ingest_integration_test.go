@@ -730,6 +730,49 @@ func TestDedupeGroupsTheSameJobOnly(t *testing.T) {
 	}
 }
 
+func TestCoverageCountsAListedTwiceJobOnceAndKeepsHistory(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	text := longText("w")
+	h.posting("himalayas", "feed", "1", "Acme", "Backend Engineer", "India", text)
+	h.posting("greenhouse", "acme", "1", "Acme", "Backend Engineer", "Pune", text)
+	h.posting("himalayas", "feed", "2", "Globex", "Data Engineer", "India", longText("x"))
+	if _, _, err := h.store.Dedupe(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET countries = '{IN}', level = 'entry'`); err != nil {
+		t.Fatal(err)
+	}
+	for range 2 {
+		if _, err := h.store.Coverage(ctx); err != nil {
+			t.Fatal(err)
+		}
+	}
+	list, err := h.store.Coverage(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]SourceCoverage{}
+	for _, c := range list {
+		got[c.Source] = c
+	}
+	if got["greenhouse"].IndiaEarly != 1 || got["himalayas"].IndiaEarly != 1 {
+		t.Fatalf("the shared job must count once, for the ATS: %+v", got)
+	}
+	var snapshots int
+	if err := h.pool.QueryRow(ctx, `SELECT count(DISTINCT taken_at) FROM coverage_snapshots`).Scan(&snapshots); err != nil {
+		t.Fatal(err)
+	}
+	if snapshots != 3 {
+		t.Fatalf("%d snapshots, want 3: history must accumulate", snapshots)
+	}
+	var out strings.Builder
+	WriteCoverage(&out, list)
+	if !strings.Contains(out.String(), "1 (50%)") {
+		t.Fatalf("shares missing: %s", out.String())
+	}
+}
+
 func TestChangedTextLeavesItsCluster(t *testing.T) {
 	h := newHarness(t)
 	h.server.set("acme", "1")

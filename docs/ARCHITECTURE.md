@@ -285,7 +285,8 @@ version are stored on every row, so a switch is a re-embed, not a migration.
 | `skills` | `id`, `name`, `aliases text[]`, `category` | Our curated taxonomy |
 | `robots_cache` | `host`, `body`, `status`, `fetched_at` | |
 | `search_postings` | `posting_id`, `level`, `remote_scope`, `countries`, `employment_type`, `skills_required`, `embedding halfvec(384)` | Narrow copy of active, in-scope rows, kept in step by the enrich worker |
-| `fetch_log` | `host`, `status`, `bytes`, `ms`, `at` | Partitioned by day, 14 days |
+| `fetch_log` | `host`, `board_id`, `status`, `bytes`, `ms`, `not_modified`, `at` | Retention to be set in P8 |
+| `coverage_snapshots` | `taken_at`, `source`, in-scope counts per source | Dated, so reliance on one source shows as a trend. The admin metrics page reads it |
 
 Indexes on `search_postings`: B-tree on `(level, remote_scope)`; GIN on `countries` and
 `skills_required`; HNSW on `embedding halfvec_cosine_ops (m = 16, ef_construction = 64)`

@@ -4,6 +4,7 @@
 //	ingest status                   print progress
 //	ingest run                      fetch until stopped; safe to stop at any moment
 //	ingest dedupe                   group duplicate postings; safe to stop and rerun
+//	ingest coverage                 print and record in-scope coverage per source
 //
 // Needs ROLERANK_CORPUS_URL and ROLERANK_VALKEY_URL. HIMALAYAS_API is optional.
 package main
@@ -85,6 +86,13 @@ func run(args []string) error {
 		done, merged, err := store.Dedupe(ctx)
 		fmt.Printf("dedupe: %d postings placed, %d merged into an existing job\n", done, merged)
 		return err
+	case "coverage":
+		list, err := store.Coverage(ctx)
+		if err != nil {
+			return err
+		}
+		ingest.WriteCoverage(os.Stdout, list)
+		return nil
 	case "run":
 		return fetchUntilStopped(ctx, store, adapters)
 	}
