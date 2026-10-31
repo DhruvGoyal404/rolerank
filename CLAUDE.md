@@ -209,7 +209,7 @@ The site runs only when needed. Standing rules:
 
 ## Environment
 
-Windows 11, Docker Desktop (shared with other work: never change its settings, and
+Windows 11, Node through nvm-windows (`.nvmrc`), Docker Desktop (shared with other work: never change its settings, and
 never touch containers, images or volumes this project didn't create; ours carry the
 label `rolerank.managed=true`). System Go is 1.22.5; modules pin their toolchain in
 `go.mod`. Browser origin in dev is `http://localhost:5173`, never 127.0.0.1.

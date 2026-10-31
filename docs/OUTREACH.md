@@ -1,7 +1,8 @@
 # Provider outreach
 
-Drafts for the owner to send from `bot@dhruvgoyal.tech`, once Cloudflare Email Routing
-works. Replies go into SOURCES.md, with their date. RoleRank proceeds at 1 request per
+Drafts for the owner to send from their own mailbox. `bot@dhruvgoyal.tech` is the public
+contact: Cloudflare Email Routing only receives, so it can't send, but replies to it reach
+the owner. Replies go into SOURCES.md, with their date. RoleRank proceeds at 1 request per
 second per host while waiting, and stops at once if a provider says no.
 
 Recipient addresses aren't filled in: find each provider's current support or developer
@@ -26,7 +27,7 @@ API, so I'd rather ask than assume.
 
 What I plan to do:
 
-- Identify as `RoleRankBot`, with this email address as the contact.
+- Identify as `RoleRankBot`, with bot@dhruvgoyal.tech as the public contact.
 - Make at most 1 request per second across all boards.
 - Refresh each board about every 6 hours, using `If-None-Match`.
 - Show a short excerpt and link to the original posting for applying.
@@ -38,6 +39,8 @@ Could you tell me:
 1. Is this use acceptable?
 2. Is there a rate limit, or a rate you'd prefer?
 3. Are there terms for this API that I should follow?
+
+Replies to this address or to bot@dhruvgoyal.tech both reach me.
 
 Thank you,
 Dhruv Goyal
@@ -60,7 +63,7 @@ limit or terms of use, so I'd rather ask than assume.
 
 What I plan to do:
 
-- Identify as `RoleRankBot`, with this email address as the contact.
+- Identify as `RoleRankBot`, with bot@dhruvgoyal.tech as the public contact.
 - Make at most 1 request per second across all boards.
 - Refresh each board about every 6 hours, using `If-None-Match`, and never more often
   than your `max-age` of 60 seconds.
@@ -74,6 +77,8 @@ Could you tell me:
 1. Is this use acceptable?
 2. Is there a rate limit, or a rate you'd prefer?
 3. Are there terms for this API that I should follow?
+
+Replies to this address or to bot@dhruvgoyal.tech both reach me.
 
 Thank you,
 Dhruv Goyal
@@ -99,7 +104,7 @@ second on 2026-10-31.
 
 If permitted, I would:
 
-- Identify as `RoleRankBot`, with this email address as the contact.
+- Identify as `RoleRankBot`, with bot@dhruvgoyal.tech as the public contact.
 - Make at most 1 request per second across all accounts.
 - Refresh each account about every 6 hours.
 - Show a short excerpt and link to the original posting for applying.
@@ -111,6 +116,8 @@ Could you tell me:
 1. May I use this endpoint for this purpose?
 2. If not, is there a public feed you'd prefer I use?
 3. Is there a rate limit I should follow?
+
+Replies to this address or to bot@dhruvgoyal.tech both reach me.
 
 Thank you,
 Dhruv Goyal
