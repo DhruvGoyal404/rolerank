@@ -1,0 +1,205 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: Policy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - run: node --test "scripts/*.test.mjs"
+      - run: node scripts/check-workflows.mjs
+      - run: node scripts/check-deps.mjs api web
+
+  secrets:
+    name: Gitleaks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - run: >-
+          docker run --rm -v "$PWD:/repo:ro"
+          zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git /repo --no-banner --redact
+
+  api:
+    name: API
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npm audit
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Start Postgres and Valkey
+        working-directory: .
+        run: |
+          bash scripts/gen-env.sh
+          docker compose up -d --wait
+      - name: Migrate with dbmate
+        working-directory: .
+        run: |
+          docker compose run --rm migrate-app up
+          docker compose run --rm migrate-corpus up
+      - name: Integration tests
+        run: |
+          . ../scripts/test-env.sh
+          npm run test:int
+
+  web:
+    name: Web
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm audit
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+
+  worker:
+    name: Worker
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: worker/go.mod
+          cache-dependency-path: worker/go.mod
+      - run: test -z "$(gofmt -l .)"
+      - run: go vet ./...
+      - run: go test ./...
+      - run: go build ./...
+      - run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+
+  arm64:
+    name: arm64 and gVisor
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: worker/go.mod
+          cache-dependency-path: worker/go.mod
+      - name: Install gVisor for arm64
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y zstd
+          release=20261012.0
+          sum=3459ca3e496465e5b6a1318563ede4bb079bdf11ae93f4bb8d71df3cd2f19bfa6db7c1035d2f9e97b4f4e57c298a4f18b42af7297c048ec7e14ec819223684e4
+          curl -fsSL -o gvisor.tar.zstd "https://storage.googleapis.com/gvisor/releases/release/${release}/aarch64/gvisor.tar.zstd"
+          echo "${sum}  gvisor.tar.zstd" | sha512sum -c --quiet
+          mkdir gvisor && tar --zstd -xf gvisor.tar.zstd -C gvisor
+          sudo install -m 0755 "$(find gvisor -type f -name runsc -print -quit)" /usr/local/bin/runsc
+          sudo install -m 0755 "$(find gvisor -type f -name containerd-shim-runsc-v1 -print -quit)" /usr/local/bin/containerd-shim-runsc-v1
+          sudo runsc install -- --oci-seccomp
+          sudo systemctl reload docker
+          runsc --version
+      - name: Prove the sandbox on arm64
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = aarch64
+          pg=$(grep -E 'image: pgvector' compose.yaml | awk '{print $2}')
+          valkey=$(grep -E 'image: valkey' compose.yaml | awk '{print $2}')
+          dbmate=$(grep -m1 -E 'image: amacneil' compose.yaml | awk '{print $2}')
+
+          # Creates, proves the runtime from outside, then runs. Never trusts the guest alone.
+          sandbox() {
+            local name=$1 runtime=$2
+            shift 2
+            docker create -q --name "$name" --runtime="$runtime" --network none --read-only \
+              --cap-drop ALL --security-opt no-new-privileges --memory 256m --pids-limit 64 \
+              --user 65534:65534 "$@" >/dev/null
+            test "$(docker inspect --format '{{.HostConfig.Runtime}}' "$name")" = "$runtime"
+            docker start -a "$name"
+            docker rm "$name" >/dev/null
+          }
+
+          for image in "$pg" "$valkey" "$dbmate"; do
+            docker pull -q "$image" >/dev/null
+            test "$(docker image inspect "$image" --format '{{.Architecture}}')" = arm64
+          done
+          sandbox rr-pg runsc "$pg" postgres --version
+          sandbox rr-valkey runsc "$valkey" valkey-server --version
+          sandbox rr-dbmate runsc "$dbmate" --version
+
+          probe='echo "RELEASE=$(uname -r)"
+            echo "PROC=$(cat /proc/version)"
+            echo "UID=$(id -u)"
+            if touch /probe 2>/dev/null; then echo ROOTFS_WRITABLE; else echo ROOTFS_READONLY; fi
+            if wget -q -T 3 -O /dev/null http://1.1.1.1 2>/dev/null; then echo NET_OPEN; else echo NET_BLOCKED; fi'
+
+          # gVisor documents dmesg as spoofable, and non-root can't read it here. The release
+          # string is defaultRelease in pkg/sentry/kernel/version at the pinned gVisor tag.
+          inside=$(sandbox rr-probe runsc --entrypoint sh "$valkey" -c "$probe")
+          echo "$inside"
+          echo "$inside" | grep -qx 'RELEASE=4.19.0-gvisor'
+          echo "$inside" | grep -q '^PROC=Linux version 4.19.0-gvisor'
+          echo "$inside" | grep -qx 'UID=65534'
+          echo "$inside" | grep -qx ROOTFS_READONLY
+          echo "$inside" | grep -qx NET_BLOCKED
+
+          # Control: the same probe under runc must not look like gVisor.
+          control=$(sandbox rr-control runc --entrypoint sh "$valkey" -c "$probe")
+          echo "$control"
+          ! echo "$control" | grep -q gvisor
+      - name: Start services
+        run: |
+          bash scripts/gen-env.sh
+          docker compose up -d --wait
+          docker compose run --rm migrate-app up
+          docker compose run --rm migrate-corpus up
+      - name: API tests on arm64
+        working-directory: api
+        run: |
+          npm ci
+          npm run build
+          . ../scripts/test-env.sh
+          npm run test:int
+      - name: Web build on arm64
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+      - name: Worker on arm64
+        working-directory: worker
+        run: |
+          go test ./...
+          go build ./...
