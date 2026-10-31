@@ -24,7 +24,7 @@ import (
 // Limits. MaxBody covers both the wire size and the decompressed size.
 const (
 	MaxBody        = 25 << 20
-	Timeout        = 45 * time.Second
+	Timeout        = 120 * time.Second // large boards are slow to send; this isn't a rate
 	RobotsTTL      = 24 * time.Hour
 	robotsRetry    = 5 * time.Minute
 	DefaultSpacing = time.Second

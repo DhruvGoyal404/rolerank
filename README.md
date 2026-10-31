@@ -28,6 +28,18 @@ Use `localhost`, not 127.0.0.1: cookies are per host.
 | Google | `http://localhost:5173/api/auth/google/callback` | `openid email` |
 | GitHub | `http://localhost:5173/api/auth/github/callback` | `read:user` |
 
+## Running ingestion
+
+```sh
+bash scripts/ingest.sh boards greenhouse data/greenhouse.txt   # once per source
+bash scripts/ingest.sh run                                     # Ctrl-C any time
+bash scripts/ingest.sh status
+bash scripts/ingest.sh dedupe
+```
+
+`run` is safe to stop and rerun at any moment. Board lists come from `go run ./cmd/discover
+../data` in `worker/`. A run stopped hard continues its in-flight board after 5 minutes.
+
 ## Bot
 
 RoleRank's crawler identifies itself as `RoleRankBot`, obeys robots.txt and makes at

@@ -130,6 +130,10 @@ No ATS publishes a list of its customers. These methods stay within the rules:
 4. **User and employer submissions.** "Add a company" form, reviewed by hand.
 5. **Re-validation.** A board that returns 404 three cycles in a row is retired.
 
+Measured on 2026-10-31 from the two newest indexes: 4,900 Greenhouse, 2,984 Ashby and 284
+Lever boards. **Lever is badly undercounted.** `jobs.lever.co`'s robots.txt blocks Common
+Crawl's bot, so the index barely sees it. Lever needs methods 2 to 4.
+
 Not used: search engine scraping, guessing at scale beyond one try per name, or any
 host whose robots.txt disallows us.
 
@@ -149,7 +153,7 @@ host whose robots.txt disallows us.
   after repeated 5xx.
 - Conditional GET: store the `ETag`; send `If-None-Match`. **All three ATS APIs returned
   `304` with an empty body** (Greenhouse list and content, Lever, Ashby).
-- Response size cap of 25 MB, gzip ratio cap, 45 s timeout.
+- Response size cap of 25 MB, gzip ratio cap, 120 s timeout.
 - We store the text we need for search and show an excerpt plus a link to the
   original. Job pages are `noindex` and emit no `JobPosting` structured data. That
   keeps us from republishing the postings, and it's an explicit condition of
