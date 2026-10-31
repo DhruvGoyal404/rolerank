@@ -115,6 +115,8 @@ showcase.
 
 - **S** Opt in to an email digest of new strong matches, at a chosen frequency, with
   one-click unsubscribe. Depends on Q1: while the site is down, nothing is sent.
+  Sign-in with GitHub asks only for `read:user`, which gives no email address. A GitHub
+  user is asked for `user:email` at the moment they turn alerts on, and not before.
 
 ### Trust and operations
 

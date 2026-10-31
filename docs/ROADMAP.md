@@ -33,6 +33,8 @@ Risks to these dates:
   second per host regardless.
 - The first full ingestion cycle runs at polite rates, so it can't be rushed. Common
   Crawl's index server was also unreliable in Phase 0.
+- **Quality comes before these dates.** If a date slips, it moves, with the reason written
+  here. A gate is never skipped and the request rate is never raised to hold one.
 - A new dependency release needs 14 days before it can be adopted, so a version bug
   found now can't always be fixed by upgrading.
 
@@ -101,6 +103,11 @@ detection, board registry, discovery tool, source health metrics, /sources and
 - Dedupe eval D5 passes. Classifier eval D6 passes.
 - The bot obeys a local robots.txt that disallows it (test).
 - Attribution data stored for every posting (test per source).
+- **Bytes per cycle reported**, split into 200 and 304 responses, to confirm unchanged
+  boards cost almost nothing with Greenhouse's `content=true`.
+- **The first full run is resumable:** it can be stopped and restarted at any point with
+  no duplicates and no lost progress, proved by killing it mid-run. The owner gets its
+  expected duration before it starts.
 - **In-scope coverage report:** how many India, remote-India, intern and entry-level
   engineering roles we really have. This is the number that matters most.
 
@@ -210,7 +217,8 @@ tailoring view, settings, /privacy. Design pass and a real accessibility pass.
 ## P7: alerts and tracker
 
 Tracker states and persistence past posting closure. Email digests through SES:
-opt-in, unsubscribe, bounces, complaints. Sent only while the site is up (Q1).
+opt-in, unsubscribe, bounces, complaints. Sent only while the site is up (Q1). GitHub users
+grant `user:email` incrementally, only when they turn alerts on; sign-in stays `read:user`.
 
 **Exit criteria**
 

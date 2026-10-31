@@ -79,6 +79,10 @@ changing anything:
   send the hostile request.
 - gitleaks runs in CI on the full history. CodeQL and Dependabot alerts stay on.
 - Evals are part of the gate: see docs/EVALS.md for which run on which trigger.
+- `.github/workflows/exceptions.yml` runs the dependency check daily, because exceptions
+  lapse with the calendar. GitHub disables scheduled workflows in a public repo after 60
+  days with no repository activity. After a quiet spell, check it's still enabled:
+  `gh workflow list`, then `gh workflow enable "Dependency policy"`.
 
 ## Database
 
