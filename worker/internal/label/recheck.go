@@ -101,6 +101,47 @@ func Compare(root, dataset, recheck string) ([]Agreement, error) {
 	return out, nil
 }
 
+// AuditScore compares the human's audit answers with the model's, per question: the first
+// value of each pair is the model's. Like Compare it waits for a finished pass. A question
+// counts only where both answered it, so the level question drops out of out-of-scope items.
+func AuditScore(root, dataset string) ([]Agreement, error) {
+	questions, ok := Questions[dataset]
+	if !ok {
+		return nil, fmt.Errorf("unknown dataset %q", dataset)
+	}
+	path, labels := Paths(root, dataset)
+	items, err := loadItems(path)
+	if err != nil {
+		return nil, fmt.Errorf("load items: %w", err)
+	}
+	human, err := finals(labels)
+	if err != nil {
+		return nil, err
+	}
+	state := &Session{questions: questions, answers: human}
+	for _, item := range items {
+		if state.pending(item) != nil {
+			return nil, fmt.Errorf("%s isn't finished", dataset)
+		}
+	}
+	var out []Agreement
+	for _, q := range questions {
+		if q.ID == seen.ID {
+			continue
+		}
+		var pairs [][2]string
+		for _, item := range items {
+			model, byModel := item.Model[q.ID]
+			answer, byHuman := human[key{item.ID, q.ID}]
+			if byModel && byHuman {
+				pairs = append(pairs, [2]string{model, answer})
+			}
+		}
+		out = append(out, agreementOn(q.ID, pairs))
+	}
+	return out, nil
+}
+
 func agreementOn(question string, pairs [][2]string) Agreement {
 	out := Agreement{Question: question, Pairs: len(pairs), Kappa: kappa(pairs), Table: map[[2]string]int{}}
 	for _, p := range pairs {

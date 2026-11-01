@@ -11,6 +11,8 @@
 #   bash scripts/label.sh d5-redo            label it, after the recheck
 #   bash scripts/label.sh redo d5 evals/labels/d5-redo-2-ids.txt <seed> redo-2   the other pairs
 #   bash scripts/label.sh d5-redo-2          label them
+#   bash scripts/label.sh d5-audit           audit the model's labels: answer, then see the model's
+#   bash scripts/label.sh audit d5-audit     score the finished audit against the model
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
@@ -26,5 +28,6 @@ case "$1" in
   recheck) exec go run ./cmd/label recheck "$win" "$2" "$win/$3" "$4" ${5:+"$5"} ;;
   redo) exec go run ./cmd/label redo "$win" "$2" "$win/$3" "$4" ${5:+"$5"} ;;
   agree) exec go run ./cmd/label agree "$win" "$2" ;;
+  audit) exec go run ./cmd/label audit "$win" "$2" ;;
 esac
 exec go run ./cmd/label serve "$win" "$1"

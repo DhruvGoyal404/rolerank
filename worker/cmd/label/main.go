@@ -5,6 +5,7 @@
 //	label recheck <root> <dataset> <ids file> <seed> [full]   draw a blind second pass
 //	label redo <root> <dataset> <ids file> <seed> [name]   draw a blind redo, with full text
 //	label agree <root> <dataset>   score a finished second pass
+//	label audit <root> <dataset>   score a finished audit against the model's answers
 package main
 
 import (
@@ -51,11 +52,17 @@ func run(args []string) error {
 		return draw(args[1], args[2], args[5], args[3], args[4], true)
 	}
 	if len(args) == 3 && args[0] == "agree" {
-		return agree(args[1], args[2])
+		results, err := label.Compare(args[1], args[2], args[2]+"-recheck")
+		return show(results, err, "first", "second")
+	}
+	if len(args) == 3 && args[0] == "audit" {
+		results, err := label.AuditScore(args[1], args[2])
+		return show(results, err, "model", "human")
 	}
 	return fmt.Errorf("usage: label select <root> <seed> | label serve <root> <dataset> | " +
 		"label recheck <root> <dataset> <ids file> <seed> [full] | " +
-		"label redo <root> <dataset> <ids file> <seed> [name] | label agree <root> <dataset>")
+		"label redo <root> <dataset> <ids file> <seed> [name] | label agree <root> <dataset> | " +
+		"label audit <root> <dataset>")
 }
 
 func draw(root, dataset, pass, idsFile, seed string, full bool) error {
@@ -81,8 +88,7 @@ func draw(root, dataset, pass, idsFile, seed string, full bool) error {
 	return nil
 }
 
-func agree(root, dataset string) error {
-	results, err := label.Compare(root, dataset, dataset+"-recheck")
+func show(results []label.Agreement, err error, left, right string) error {
 	if err != nil {
 		return err
 	}

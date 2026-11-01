@@ -204,15 +204,69 @@ func TestApplyBodiesRefusesAMissingPosting(t *testing.T) {
 	}
 }
 
-// The rule sits in the question, so every pass over the pairs shows it, and D6 shows none.
-func TestPairPagesCarryTheRule(t *testing.T) {
-	for _, dataset := range []string{"d5", "d5-recheck", "d5-redo", "d5-redo-2"} {
+// The rule sits in the question, so every pass shows it: the job rule on pairs, the four
+// scope rules on every D6 question.
+func TestPagesCarryTheRules(t *testing.T) {
+	for _, dataset := range []string{"d5", "d5-recheck", "d5-redo", "d5-redo-2", "d5-audit"} {
 		q := Questions[dataset][0]
 		if !strings.Contains(q.Rule, "same location") || !strings.Contains(q.Rule, "different city") {
 			t.Errorf("%s: %q", dataset, q.Rule)
 		}
 	}
-	if Questions["d6"][0].Rule != "" {
-		t.Error("D6 has no rule line")
+	for _, dataset := range []string{"d6", "d6-recheck", "d6-audit"} {
+		for _, q := range Questions[dataset] {
+			if q.ID != seen.ID && (!strings.Contains(q.Rule, "VLSI") || !strings.Contains(q.Rule, "region not stated")) {
+				t.Errorf("%s %s: %q", dataset, q.ID, q.Rule)
+			}
+		}
+	}
+}
+
+func auditItems() []Item {
+	items := pairItems("p1", "p2", "p3", "p4")
+	for i, same := range []string{"yes", "yes", "no", "no"} {
+		items[i].Model = map[string]string{"same": same, "reason": "MODEL-REASON", "conf": "high"}
+	}
+	return items
+}
+
+// The model's answer stays off the page until the human has answered the item.
+func TestAuditRevealsTheModelOnlyAfterTheAnswer(t *testing.T) {
+	root := t.TempDir()
+	if err := WriteItems(root, "d5-audit", auditItems()); err != nil {
+		t.Fatal(err)
+	}
+	s := open(t, root, "d5-audit")
+	if screen := s.Current(); screen.Model != nil || screen.Question.ID != "same" {
+		t.Fatalf("before answering: %+v", screen)
+	}
+	press(t, s, "n")
+	screen := s.Current()
+	if screen.Question.ID != seen.ID || screen.Model["reason"] != "MODEL-REASON" || screen.A.ID != "p1a" {
+		t.Fatalf("after answering: %+v", screen)
+	}
+	press(t, s, "c")
+	if screen := s.Current(); screen.Model != nil || screen.A.ID != "p2a" {
+		t.Fatalf("next item: %+v", screen)
+	}
+}
+
+func TestAuditScoreComparesHumanWithModel(t *testing.T) {
+	root := t.TempDir()
+	if err := WriteItems(root, "d5-audit", auditItems()); err != nil {
+		t.Fatal(err)
+	}
+	answer(t, root, "d5-audit", "y", "c", "n", "c", "n")
+	if _, err := AuditScore(root, "d5-audit"); err == nil {
+		t.Fatal("scored an unfinished audit")
+	}
+	answer(t, root, "d5-audit", "c", "n", "c")
+	got, err := AuditScore(root, "d5-audit")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0].Question != "same" || got[0].Pairs != 4 || got[0].Same != 3 ||
+		got[0].Table[[2]string{"yes", "no"}] != 1 {
+		t.Fatalf("%+v", got)
 	}
 }

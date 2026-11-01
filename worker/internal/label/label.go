@@ -32,6 +32,9 @@ type Item struct {
 	A       Side              `json:"a"`
 	B       *Side             `json:"b,omitempty"`
 	System  map[string]string `json:"system,omitempty"` // for scoring, never sent to the page
+	// Model holds the model's answers, reason and confidence in an audit. The page gets it
+	// only after every real question for the item is answered.
+	Model map[string]string `json:"model,omitempty"`
 }
 
 // Choice is one key and what it means.
@@ -64,10 +67,17 @@ var d5Questions = []Question{{
 	},
 }}
 
+// d6Rules are the owner's scope rules of 2026-11-01, shown at the top of every D6 page.
+const d6Rules = "1. Data analyst: in only if mainly SQL or code. " +
+	"2. Solutions, sales, customer roles: out if quota or pre-sales; in if hands-on engineering or technical support. " +
+	"3. Embedded, firmware and other mainly-software roles are in; chip design, VLSI, FPGA/RTL, electrical, aerospace and other hardware are out. " +
+	"4. Remote with no region: answer \"region not stated\". Yes needs text saying worldwide or India."
+
 var d6Questions = []Question{
 	{
 		ID:   "engineering",
 		Text: "Is this a software or engineering role in our scope?",
+		Rule: d6Rules,
 		Help: "Yes for software, data, ML, QA, DevOps and security engineering. No for sales engineers, recruiters, and civil or mechanical engineering.",
 		Choices: []Choice{
 			{"y", "yes", "in scope"}, {"n", "no", "out of scope"}, unsure,
@@ -76,6 +86,7 @@ var d6Questions = []Question{
 	{
 		ID:       "level",
 		Text:     "What level is this role?",
+		Rule:     d6Rules,
 		Help:     "Entry means open to freshers or up to about 1 year. Judge by what the posting asks for, not only the title.",
 		OnlyIf:   "engineering",
 		SkipWhen: "no",
@@ -87,11 +98,24 @@ var d6Questions = []Question{
 	{
 		ID:   "india",
 		Text: "Can someone living in India take this job?",
-		Help: "Yes if it's based in India, or remote and genuinely open to India. A remote role limited to another region is no.",
+		Rule: d6Rules,
+		Help: "Yes if it's based in India, or remote and the text says worldwide or India. A remote role limited to another region is no.",
 		Choices: []Choice{
-			{"y", "yes", "yes"}, {"n", "no", "no"}, unsure,
+			{"y", "yes", "yes"}, {"n", "no", "no"}, {"r", "not_stated", "remote, region not stated"}, unsure,
 		},
 	},
+}
+
+// seen ends each audit item: the page shows the model's answer and reason, and any key
+// moves on. Only after this does the human see what the model said.
+var seen = Question{
+	ID:      "seen",
+	Text:    "Model's answer is shown above. Press c to continue.",
+	Choices: []Choice{{"c", "seen", "continue"}},
+}
+
+func audit(questions []Question) []Question {
+	return append(append([]Question{}, questions...), seen)
 }
 
 // Questions lists what each dataset asks. A recheck or redo asks what its dataset asked.
@@ -100,8 +124,10 @@ var Questions = map[string][]Question{
 	"d5-recheck": d5Questions,
 	"d5-redo":    d5Questions,
 	"d5-redo-2":  d5Questions,
+	"d5-audit":   audit(d5Questions),
 	"d6":         d6Questions,
 	"d6-recheck": d6Questions,
+	"d6-audit":   audit(d6Questions),
 }
 
 // Answer is one line of the label log. Undo appends a line too: the log is never rewritten,
@@ -271,15 +297,17 @@ func (s *Session) pending(item Item) *Question {
 	return nil
 }
 
-// Screen is what the page shows. It never carries the system's guess.
+// Screen is what the page shows. It never carries the system's guess, and carries the
+// model's answer only on an audit item's last step.
 type Screen struct {
-	Dataset  string    `json:"dataset"`
-	Done     int       `json:"done"`
-	Total    int       `json:"total"`
-	Finished bool      `json:"finished"`
-	A        *Side     `json:"a,omitempty"`
-	B        *Side     `json:"b,omitempty"`
-	Question *Question `json:"question,omitempty"`
+	Dataset  string            `json:"dataset"`
+	Done     int               `json:"done"`
+	Total    int               `json:"total"`
+	Finished bool              `json:"finished"`
+	A        *Side             `json:"a,omitempty"`
+	B        *Side             `json:"b,omitempty"`
+	Question *Question         `json:"question,omitempty"`
+	Model    map[string]string `json:"model,omitempty"`
 }
 
 // Current returns the first unanswered question.
@@ -297,6 +325,9 @@ func (s *Session) Current() Screen {
 			found = true
 			a := item.A
 			screen.A, screen.B, screen.Question, screen.Finished = &a, item.B, q, false
+			if q.ID == seen.ID {
+				screen.Model = item.Model
+			}
 		}
 	}
 	return screen

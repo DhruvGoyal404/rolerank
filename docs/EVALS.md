@@ -33,8 +33,8 @@ All datasets are versioned. Each case has a stable ID, so one regression can be 
 | D2 | Matching, synthetic | 60 profiles x 400 JDs, 3,000 graded pairs | Graded by rule, audited by hand | repo |
 | D3 | Matching, real | 20 profiles x real snapshot, 500 graded pairs | Pooled, graded by the owner | private |
 | D4 | Tailoring | 100 (resume, JD) pairs | Resumes from D1, JDs from D2 | repo |
-| D5 | Dedupe | 300 labelled posting pairs | Labelled by hand from real boards | private, labels in repo |
-| D6 | Classifiers | 300 postings, stratified | Hand-labelled level, eligibility, skills | private, labels in repo |
+| D5 | Dedupe | 300 labelled posting pairs | Model-labelled, human-audited, from real boards | private, labels in repo |
+| D6 | Classifiers | 300 postings, stratified | Model-labelled, human-audited: scope, level, India | private, labels in repo |
 | D7 | Injection and abuse | 80 adversarial resumes and JDs | Hand-written | repo |
 
 ### D1: resume parsing
@@ -91,59 +91,70 @@ Grades, per (profile, job):
 - D5 draws 300 pairs by what each tests: pairs the system merged (precision), the band
   around the threshold, near-identical text in two cities, the same employer's text under
   a different title (recall), aggregator against ATS, and a few easy negatives.
-- Both are labelled blind with `scripts/label.sh`. The system's guess is kept for scoring
-  and never shown. Item text stays in `evals/private/`; `evals/labels/` holds only IDs and
-  answers. Skill labels wait until the skill extractor exists in P3.
-- **Labels are checked before they're used.** For D5: 30 pairs, mostly hard and fast-answered
-  ones, are labelled again at least a day later through `d5-recheck`, which never shows
-  the first answers. `scripts/label.sh agree d5` scores them only once the pass is finished,
-  as three-value Cohen's kappa with a bootstrap interval. Below 0.8, the hard pairs are
-  redone slowly. Kappa measures consistency, not correctness, so a consistent
-  misreading of the rule passes it: labels also have to match the written rule.
-
-**D5 status (2026-11-01): labels not accepted.** First pass: 300 pairs in 12.1 minutes, 262
-yes, 28 no, 10 unsure, median 1 s per pair. 91 yes answers are on pairs in different
-places, which the rule calls different jobs, including 31 of 31 such pairs in the
-other-city band. Timestamps were whole seconds, so answers under 1.5 s can't be counted
-exactly; they're sub-second from now on. Item text and the band similarity cover only
-the first 2,500 characters of each posting, while dedupe compares the whole text. Until a
-second pass clears this, no dedupe score from D5 counts toward the P2 exit.
-
-**D5 recheck (2026-11-01): kappa 0.171, interval 0.040 to 0.344, 13 of 30 agreed.** Below
-0.8, so the hard pairs are redone. Every change went to no: 12 of 17 first-pass yes answers
-and all 5 unsure. The second pass ran at a mean of 8.4 s and came 1.7 hours after the
-first, not the day this method asks for, so memory could only have raised agreement. It
-followed the report of the first pass and showed the written rule, so this is mostly a
-changed reading of the rule, not random noise. The 30 pairs were chosen as suspect, so 12 of
-17 isn't an error rate for the whole set. `d5-redo-2` holds the other 162 pairs, so
-every D5 label ends up under one rule with full text.
-
-The rule now sits at the top of the page for every D5 pass: same employer + same role +
-same location (or same remote scope) = same job; a different city is a different job.
-The recheck uses the same excerpts as the first pass. Then `d5-redo` covers 138 pairs, the 91
-different-place yes answers and the 60 reworded-title pairs (13 are in both), with full
-text. Redo answers replace first answers for those pairs.
-
-**D6 status (2026-11-01): labels not accepted.** First pass: 300 postings in 52.3 minutes,
-mean 10.5 s, no runs of fast answers. Engineering 210 yes, 90 no. India 109 yes, 190 no,
-1 unsure. Level 86 senior, 52 mid, 51 entry, 16 intern, 4 unknown, 1 unsure. A spot-check
-against the full text found real errors, so they aren't accepted yet:
-- 8 of 23 intern titles were answered entry, and 17 of 99 postings with stated years clash
-  with the level answer. The years in 11 of those 17 sat past the 2,500-character excerpt.
-- In a seeded sample of 24, 6 are clear errors on one reader's judgement (0.25, interval
-  0.12 to 0.45). That reader was the assistant, so it's a screen, not a score.
-- Help-text gaps made scope answers inconsistent: data analysts 5 of 15 yes, solutions and
-  customer roles 19 of 32 yes, hardware and similar 13 of 19 yes. The text rules on none
-  of these. It's also silent on a remote role that names no region.
-- One company is 10 of the 30 bare-remote items. The India yes rate there is 10 of 30, or
-  1 of 20 without it, so that stratum doesn't size the gap it was drawn to size. Strata
-  need a per-company cap, as D5 has.
-
-`d6-recheck` is 30 items with full text, scored per question at the same 0.8 threshold. No
-classifier score from D6 counts toward the P2 exit until it clears.
+- **D5 and D6 are model-labelled and human-audited** (method changed 2026-11-01). The
+  owner's two hand passes proved unreliable under unclear rules and cut text (below), so
+  the model labels all 300 items of each, and the owner audits a sample. Item text stays in
+  `evals/private/`; `evals/labels/` holds only IDs and answers. Skill labels wait until the
+  skill extractor exists in P3.
+- **How the model labels.** Blind batches of 25 in a seeded shuffled order, under neutral
+  IDs, with full text and the written rules. A D5 pair shows A's text and every word where B
+  differs. The system's dedupe decision, similarity and band, and the classifier's guesses,
+  are never shown. Each item gets an answer, a one-line reason quoting the deciding phrase,
+  and a confidence, high or low. Reasons quote posting text, so they stay in
+  `evals/private/model/`. `evals/labels/d5-model.jsonl` and `d6-model.jsonl` hold the
+  answers and confidence.
+- **Rules.** D5: same employer + same role + same location (or same remote scope) = same
+  job; a different city is a different job. D6, set by the owner on 2026-11-01: a data
+  analyst is in scope only if the role is mainly SQL or code. Solutions, sales and customer
+  roles are out if quota or pre-sales, in if hands-on engineering or technical support.
+  Embedded, firmware and other mainly-software roles are in; chip design, VLSI, FPGA/RTL,
+  electrical, aerospace and other hardware roles are out. A remote role naming no region
+  answers "region not stated", its own value. India yes needs text saying worldwide or
+  India. Both rule sets sit at the top of every page of the label tool.
+- **Model labels (2026-11-02).** D5: 70 yes, 230 no; 33 low confidence. D6: engineering 160
+  yes, 140 no. Level, of the 160: 59 senior, 21 mid, 24 entry, 18 intern, 38 unknown. India:
+  97 yes, 193 no, 10 region not stated. 71 low confidence. Judgement calls the model made,
+  which the audit should test: "Remote, Latin America" listings naming different countries
+  count as one remote scope (yes, low); separate requisitions with near-identical text but
+  a level, team, shift, language or season in the title are different jobs; a listing whose
+  body names a different city from its location field follows the body.
+- **The audit.** `d5-audit` and `d6-audit`, 30 items each: 20 drawn at random round-robin
+  across the strata, plus 10 of the low-confidence items, shuffled together with seed
+  `audit-2026-11-02`. IDs are in `evals/labels/d5-audit-ids.txt` and `d6-audit-ids.txt`.
+  The page shows the full text and the rules, without the model's answer. The owner
+  answers, and only then does the page show the model's answer and reason.
+  `scripts/label.sh audit d5-audit` scores a finished audit per question as three-value
+  Cohen's kappa with a bootstrap interval.
+- **Acceptance.** Kappa at least 0.8 on a question: the model labels are the gold for it,
+  and every audited disagreement is corrected by the owner's answer. Below 0.8: we look at
+  where we disagree before deciding anything.
+- **Audit result: pending.** Kappa and intervals go here when the audit is finished. Until
+  then, no dedupe or classifier score from D5 or D6 counts toward the P2 exit.
+- **Risk: shared blind spots.** The audit measures agreement between the model and one
+  person. A misreading both make passes it. Thirty items per dataset give wide intervals:
+  a kappa near 0.8 on 30 items has an interval roughly 0.2 wide. The level question is
+  scored only on items both call in scope, about half the sample. The low-confidence
+  oversample makes the audit harder than the full set, so the audit kappa understates
+  agreement on the high-confidence items. The model had read the reports of the earlier
+  passes, as summaries without per-item answers, before labelling.
+- **Earlier hand passes: record only.** They're kept in `evals/labels/` as history and
+  aren't gold. In summary:
+  - D5 first pass: 300 pairs in 12.1 minutes, 262 yes, 91 of them on pairs in different
+    places. Recheck of 30 suspect pairs: kappa 0.171 (interval 0.040 to 0.344), 13 of 30.
+  - D6 first pass: 300 postings in 52.3 minutes, excerpts of 2,500 characters, help text
+    silent on analysts, solutions roles, hardware and bare remote. Recheck with full text:
+    engineering 0.233, level -0.271 (0 of 15), India 0.585.
+  - The full numbers are in git history of this file, at commit ed8a5e2.
+- **Open: per-company cap.** One company is 10 of the 30 D6 bare-remote items, so that
+  stratum doesn't size the gap it was drawn to size. The next D6 draw caps items per
+  company, as D5 does.
 
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.
+
+**D3 stays human-graded**, as planned. To keep the owner's grading short, the model
+pre-sorts each profile's pooled postings into likely grades first, and the owner grades
+in that order, blind to the model's grade. The grade that counts is the owner's.
 
 ### D4: tailoring
 

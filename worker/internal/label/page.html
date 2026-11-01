@@ -79,6 +79,11 @@ function show(s) {
   if (s.b) main.append(side(s.b));
   $("q").textContent = s.question.text;
   $("help").textContent = s.question.help;
+  if (s.model) {
+    const said = Object.keys(s.model).filter((k) => k !== "reason" && k !== "conf")
+      .map((k) => k + ": " + s.model[k]).join(",  ");
+    $("help").textContent = "MODEL SAID  " + said + "  (" + s.model.conf + " confidence)  because: " + s.model.reason;
+  }
   const keys = $("keys");
   keys.replaceChildren();
   for (const c of s.question.choices) {
