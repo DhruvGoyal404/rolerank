@@ -13,6 +13,7 @@
 #   bash scripts/label.sh d5-redo-2          label them
 #   bash scripts/label.sh d5-audit           audit the model's labels: answer, then see the model's
 #   bash scripts/label.sh audit d5-audit     score the finished audit against the model
+#   bash scripts/label.sh d5-merged-audit    the 10-item audit of the merged-pair top-up
 set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"

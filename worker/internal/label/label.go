@@ -120,14 +120,15 @@ func audit(questions []Question) []Question {
 
 // Questions lists what each dataset asks. A recheck or redo asks what its dataset asked.
 var Questions = map[string][]Question{
-	"d5":         d5Questions,
-	"d5-recheck": d5Questions,
-	"d5-redo":    d5Questions,
-	"d5-redo-2":  d5Questions,
-	"d5-audit":   audit(d5Questions),
-	"d6":         d6Questions,
-	"d6-recheck": d6Questions,
-	"d6-audit":   audit(d6Questions),
+	"d5":              d5Questions,
+	"d5-recheck":      d5Questions,
+	"d5-redo":         d5Questions,
+	"d5-redo-2":       d5Questions,
+	"d5-audit":        audit(d5Questions),
+	"d5-merged-audit": audit(d5Questions),
+	"d6":              d6Questions,
+	"d6-recheck":      d6Questions,
+	"d6-audit":        audit(d6Questions),
 }
 
 // Answer is one line of the label log. Undo appends a line too: the log is never rewritten,

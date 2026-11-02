@@ -101,7 +101,7 @@ func show(results []label.Agreement, err error, left, right string) error {
 		}
 		sort.Slice(keys, func(i, j int) bool { return keys[i][0]+keys[i][1] < keys[j][0]+keys[j][1] })
 		for _, k := range keys {
-			fmt.Printf("  first %s, second %s: %d\n", k[0], k[1], got.Table[k])
+			fmt.Printf("  %s %s, %s %s: %d\n", left, k[0], right, k[1], got.Table[k])
 		}
 	}
 	return nil
