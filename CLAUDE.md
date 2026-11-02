@@ -113,7 +113,8 @@ changing anything:
 - Conditional GET (`If-None-Match`) on every board that sends an ETag.
 - Follow each source's attribution rule in the UI. Apply links go exactly where
   that source requires.
-- We show an excerpt and a link, not a copy of the posting. Job pages are
+- We show a link, and an excerpt only where SOURCES.md allows one: Greenhouse and Lever postings
+  are link only, with their text kept server-side and out of pages and exports. Job pages are
   `noindex` and emit no `JobPosting` structured data.
 - Ingested postings are never used to train or fine-tune any model.
 - Any employer can ask to be removed. The board goes on a denylist within 7 days.
