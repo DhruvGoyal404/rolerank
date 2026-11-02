@@ -170,11 +170,16 @@ host whose robots.txt disallows us.
 - Conditional GET: store the `ETag`; send `If-None-Match`. **Greenhouse and Lever return
   `304` with an empty body** (Greenhouse list and content).
 - Response size cap of 25 MB, gzip ratio cap, 120 s timeout.
-- We store the text we need for search and show an excerpt plus a link to the
-  original. Job pages are `noindex` and emit no `JobPosting` structured data. That
-  keeps us from republishing the postings, and it's an explicit condition of
-  Himalayas and Remotive.
-- Removal: an employer can ask to be removed; the board is denylisted within 7 days.
+- **Link only for Greenhouse and Lever:** pages show the title, company, location, our derived
+  skill tags and fit, and a link to the original posting. No posting text or excerpt, and the
+  worker stores no excerpt for them. Description text stays server-side for feature extraction
+  and matching, and never reaches a public page or an export.
+- Himalayas and RemoteOK: an excerpt plus a link to the original.
+- Job pages are `noindex` and emit no `JobPosting` structured data. That keeps us from
+  republishing the postings, and it's an explicit condition of Himalayas and Remotive.
+- Removal: the `/sources` page and bot@dhruvgoyal.tech offer employers an opt-out, honoured
+  within 7 days with `ingest deny <source> <token>`: the board is denylisted and its postings
+  deleted.
 
 ---
 
@@ -190,11 +195,17 @@ host whose robots.txt disallows us.
 - **Auth:** none for GET. The docs say: "Job Board data is publicly available, so
   authentication is not required for any GET endpoints." POST (applications) needs a
   customer key; we never POST.
-- **Rate limits:** not stated in the docs. **Unknown.** We use 1 request per second.
+- **Provider reply (2026-11-02):** in paraphrase, GET endpoints are public and no rate limit is
+  published, though that can change. Greenhouse doesn't own the postings: its customers are the
+  data controllers, so permission to collect, store and use them is between us and each
+  employer. Not a refusal. We keep Greenhouse, link only, with the employer opt-out, at 1
+  request per second with conditional GET. No employer has given us permission so far: this
+  rests on the opt-out.
+- **Rate limits:** none published. We use 1 request per second.
 - **Caching:** responses carry `ETag` and `cache-control: max-age=0, private,
   must-revalidate`. `If-None-Match` returned 304 (tested).
 - **Terms:** the docs state no terms for the public API, and the Greenhouse legal page
-  lists customer agreements, not API or website terms. **Unknown.** robots.txt on
+  lists customer agreements, not API or website terms. robots.txt on
   `boards-api.greenhouse.io` and `boards.greenhouse.io` disallows only `/embed/`;
   `job-boards.greenhouse.io` disallows nothing.
 - **Attribution:** none required. We link to `absolute_url` (the employer's posting)
@@ -232,7 +243,7 @@ host whose robots.txt disallows us.
   customers and bar Lever's direct competitors; they say nothing on scraping.
   `jobs.lever.co` robots.txt sets `Content-Signal: search=yes, ai-train=no,
   use=reference` and blocks named AI training crawlers. We never train on postings.
-- **Attribution:** none required. Link to `hostedUrl`.
+- **Attribution:** none required. Link to `hostedUrl`. Link only, as for Greenhouse.
 - **Fields (verified live):** `id`, `text` (title), `categories` (`location`,
   `commitment`, `team`, `department`, `allLocations`), `country` (ISO alpha-2),
   `workplaceType`, `createdAt` (epoch ms), `opening[Plain]`, `description[Plain]`,

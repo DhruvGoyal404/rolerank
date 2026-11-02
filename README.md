@@ -35,6 +35,8 @@ bash scripts/ingest.sh boards greenhouse data/greenhouse.txt   # once per source
 bash scripts/ingest.sh run                                     # Ctrl-C any time
 bash scripts/ingest.sh status
 bash scripts/ingest.sh dedupe
+bash scripts/ingest.sh deny greenhouse <token>                # employer opt-out, within 7 days
+bash scripts/ingest.sh purge <source> <host>                  # after its adapter is removed
 ```
 
 `run` is safe to stop and rerun at any moment. Board lists come from `go run ./cmd/discover

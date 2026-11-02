@@ -2,6 +2,7 @@ import { Link, Route, Routes } from "react-router";
 import { AboutBot } from "./pages/AboutBot";
 import { Home } from "./pages/Home";
 import { SignIn } from "./pages/SignIn";
+import { Sources } from "./pages/Sources";
 
 export function App() {
   return (
@@ -17,11 +18,12 @@ export function App() {
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/about/bot" element={<AboutBot />} />
+          <Route path="/sources" element={<Sources />} />
           <Route path="*" element={<h1>Page not found</h1>} />
         </Routes>
       </main>
       <footer>
-        <Link to="/about/bot">About our bot</Link>
+        <Link to="/sources">Sources and opt-out</Link> <Link to="/about/bot">About our bot</Link>
       </footer>
     </>
   );

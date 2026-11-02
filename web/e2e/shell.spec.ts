@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const pages = ["/", "/signin", "/signin?error=state", "/about/bot", "/no-such-page"];
+const pages = ["/", "/signin", "/signin?error=state", "/about/bot", "/sources", "/no-such-page"];
 
 for (const path of pages) {
   test(`${path} has no accessibility, console or CSP problems`, async ({ page }) => {

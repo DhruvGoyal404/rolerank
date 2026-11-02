@@ -280,7 +280,7 @@ version are stored on every row, so a switch is a re-embed, not a migration.
 |---|---|---|
 | `sources` | `id`, `name`, `attribution jsonb`, `enabled` | Attribution rules drive the UI |
 | `boards` | `id`, `source_id`, `token`, `company_name`, `status`, `etag`, `last_status`, `last_checked_at`, `next_due_at`, `fail_count`, `denylisted` | |
-| `postings` | `id`, `source_id`, `board_id`, `source_job_id`, unique `(source_id, source_job_id)`, `cluster_id`, `title`, `company`, `location_raw`, `countries text[]`, `remote_scope`, `level`, `employment_type`, `is_engineering`, `language`, `text` (cleaned, capped at 20 KB), `excerpt`, `content_hash`, `url`, `apply_url`, `posted_at`, `source_updated_at`, `first_seen_at`, `last_seen_at`, `closed_at`, `salary_*`, `skills_required text[]`, `skills_nice text[]`, `tsv tsvector`, `embed_model` | All roles; embeddings live in `search_postings` |
+| `postings` | `id`, `source_id`, `board_id`, `source_job_id`, unique `(source_id, source_job_id)`, `cluster_id`, `title`, `company`, `location_raw`, `countries text[]`, `remote_scope`, `level`, `employment_type`, `is_engineering`, `language`, `text` (cleaned, capped at 20 KB, server-side only for Greenhouse and Lever), `excerpt` (empty for link-only sources), `content_hash`, `url`, `apply_url`, `posted_at`, `source_updated_at`, `first_seen_at`, `last_seen_at`, `closed_at`, `salary_*`, `skills_required text[]`, `skills_nice text[]`, `tsv tsvector`, `embed_model` | All roles; embeddings live in `search_postings` |
 | `clusters` | `id`, `canonical_posting_id`, `minhash bytea` | |
 | `skills` | `id`, `name`, `aliases text[]`, `category` | Our curated taxonomy |
 | `robots_cache` | `host`, `body`, `status`, `fetched_at` | |

@@ -16,7 +16,7 @@ export function AboutBot() {
         <li>It obeys robots.txt, including Crawl-delay.</li>
         <li>It makes at most 1 request per second per host, and backs off on errors.</li>
         <li>It checks for changes first, so an unchanged board costs almost nothing.</li>
-        <li>It shows a short excerpt and links to the original posting.</li>
+        <li>It links to the original posting, and shows no text from Greenhouse or Lever postings.</li>
         <li>Postings are never used to train models.</li>
       </ul>
       <h2>Contact</h2>

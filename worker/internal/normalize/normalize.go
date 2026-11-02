@@ -115,7 +115,14 @@ func clip(s string, max int) string {
 	return s[:cut]
 }
 
-func excerpt(body string) string {
+// linkOnly sources are shown as a title and a link, never their text (docs/SOURCES.md). No
+// excerpt is made for them, so none can reach a page.
+var linkOnly = map[string]bool{"greenhouse": true, "lever": true}
+
+func excerpt(sourceName, body string) string {
+	if linkOnly[sourceName] {
+		return ""
+	}
 	flat := strings.ReplaceAll(body, "\n", " ")
 	if len(flat) <= MaxExcerpt {
 		return flat
@@ -254,7 +261,7 @@ func Apply(p source.Posting) Fields {
 	}
 	return Fields{
 		Body:          body,
-		Excerpt:       excerpt(body),
+		Excerpt:       excerpt(p.Source, body),
 		Level:         Level(p.Title, body, p.EmploymentType, p.Seniority),
 		RemoteScope:   scope,
 		Countries:     countries,

@@ -123,6 +123,15 @@ func TestBodyIsClippedOnARuneBoundary(t *testing.T) {
 	}
 }
 
+func TestLinkOnlySourcesGetNoExcerpt(t *testing.T) {
+	for name, want := range map[string]bool{"greenhouse": false, "lever": false, "himalayas": true, "remoteok": true} {
+		f := Apply(source.Posting{Source: name, Title: "T", Body: "Build things"})
+		if (f.Excerpt != "") != want || f.Body == "" {
+			t.Errorf("%s: excerpt %q, body %q", name, f.Excerpt, f.Body)
+		}
+	}
+}
+
 func TestHashChangesWithContentOnly(t *testing.T) {
 	base := source.Posting{Title: "T", Company: "C", URL: "https://x.example/1", Body: "<p>one</p>", BodyIsHTML: true}
 	same := base
