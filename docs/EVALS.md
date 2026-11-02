@@ -97,8 +97,9 @@ Grades, per (profile, job):
   `evals/private/`; `evals/labels/` holds only IDs and answers. Skill labels wait until the
   skill extractor exists in P3.
 - **How the model labels.** Blind batches of 25 in a seeded shuffled order, under neutral
-  IDs, with full text and the written rules. A D5 pair shows A's text and every word where B
-  differs. The system's dedupe decision, similarity and band, and the classifier's guesses,
+  IDs, with the written rules. A D6 posting is shown in full. A D5 pair shows the first 1,500
+  characters of A (500 if the two are identical) and a full word diff of B against A, so every
+  word that differs is seen, but text common to both past the cap isn't. The system's dedupe decision, similarity and band, and the classifier's guesses,
   are never shown. Each item gets an answer, a one-line reason quoting the deciding phrase,
   and a confidence, high or low. Reasons quote posting text, so they stay in
   `evals/private/model/`. `evals/labels/d5-model.jsonl` and `d6-model.jsonl` hold the
@@ -131,12 +132,16 @@ Grades, per (profile, job):
 - **Audit result: pending.** Kappa and intervals go here when the audit is finished. Until
   then, no dedupe or classifier score from D5 or D6 counts toward the P2 exit.
 - **Risk: shared blind spots.** The audit measures agreement between the model and one
-  person. A misreading both make passes it. Thirty items per dataset give wide intervals:
-  a kappa near 0.8 on 30 items has an interval roughly 0.2 wide. The level question is
-  scored only on items both call in scope, about half the sample. The low-confidence
-  oversample makes the audit harder than the full set, so the audit kappa understates
-  agreement on the high-confidence items. The model had read the reports of the earlier
-  passes, as summaries without per-item answers, before labelling.
+  person. A misreading both make passes it. Thirty items give wide intervals, measured by
+  bootstrap on a balanced yes/no sample: kappa 0.87 has interval 0.66 to 1.00, and 0.73 has
+  0.46 to 0.93. A point estimate of 0.8 therefore doesn't show the true value is 0.8. The
+  level question is scored only on items both call in scope, about half the sample, where 15
+  items give an interval about 0.7 wide. The audit is 12 of 30 low confidence for D5 and 15
+  of 30 for D6, so it is harder than the full set and isn't an unbiased agreement rate.
+- **Risk: the model isn't a clean-room labeller.** The batches hid the system's output, the
+  strata and the hand answers, but the same assistant had built the selection, analysed the
+  hand passes and spot-checked 24 D6 postings against the first answers before labelling.
+  Memory of that work can't be ruled out.
 - **Earlier hand passes: record only.** They're kept in `evals/labels/` as history and
   aren't gold. In summary:
   - D5 first pass: 300 pairs in 12.1 minutes, 262 yes, 91 of them on pairs in different
