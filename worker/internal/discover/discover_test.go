@@ -19,7 +19,7 @@ func TestToken(t *testing.T) {
 		{"https://boards.greenhouse.io/acme", "boards.greenhouse.io", "acme"},
 		{"https://boards.greenhouse.io/acme/jobs/123", "boards.greenhouse.io", "acme"},
 		{"https://jobs.lever.co/Acme-Inc/uuid?lever-source=x", "jobs.lever.co", "Acme-Inc"},
-		{"https://jobs.ashbyhq.com/acme.io/uuid", "jobs.ashbyhq.com", "acme.io"},
+		{"https://jobs.lever.co/acme.io/uuid", "jobs.lever.co", "acme.io"},
 		{"https://boards.greenhouse.io/embed/job_board?for=acme", "boards.greenhouse.io", ""},
 		{"https://boards.greenhouse.io/", "boards.greenhouse.io", ""},
 		{"https://boards.greenhouse.io/robots.txt", "boards.greenhouse.io", ""},
@@ -99,9 +99,9 @@ func TestRunWritesBoardsAndResumes(t *testing.T) {
 	if err != nil || undone != 0 {
 		t.Fatalf("undone %d, err %v", undone, err)
 	}
-	// Four page counts, plus only the one page that hadn't finished.
-	if got := hits.Load(); got != 5 {
-		t.Fatalf("second run made %d requests, want 5: finished pages must not repeat", got)
+	// Three page counts, plus only the one page that hadn't finished.
+	if got := hits.Load(); got != 4 {
+		t.Fatalf("second run made %d requests, want 4: finished pages must not repeat", got)
 	}
 	greenhouse := lines(t, filepath.Join(dir, "greenhouse.txt"))
 	if strings.Join(greenhouse, ",") != "board0,board1,shared" {
@@ -112,13 +112,13 @@ func TestRunWritesBoardsAndResumes(t *testing.T) {
 func TestTokensAreDedupedIgnoringCase(t *testing.T) {
 	dir := t.TempDir()
 	r := runner(t, "", dir)
-	if err := r.addTokens("ashby", map[string]bool{"Acme": true}); err != nil {
+	if err := r.addTokens("lever", map[string]bool{"Acme": true}); err != nil {
 		t.Fatal(err)
 	}
-	if err := r.addTokens("ashby", map[string]bool{"acme": true, "beta": true}); err != nil {
+	if err := r.addTokens("lever", map[string]bool{"acme": true, "beta": true}); err != nil {
 		t.Fatal(err)
 	}
-	got := lines(t, filepath.Join(dir, "ashby.txt"))
+	got := lines(t, filepath.Join(dir, "lever.txt"))
 	if strings.Join(got, ",") != "Acme,beta" {
 		t.Fatalf("%v", got)
 	}

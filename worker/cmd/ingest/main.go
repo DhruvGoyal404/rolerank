@@ -93,6 +93,25 @@ func run(args []string) error {
 		}
 		ingest.WriteCoverage(os.Stdout, list)
 		return nil
+	case "deny":
+		if len(args) != 3 {
+			return fmt.Errorf("usage: ingest deny <source> <token>")
+		}
+		removed, err := store.Deny(ctx, args[1], args[2])
+		fmt.Printf("denied %s/%s: %d postings removed\n", args[1], args[2], removed)
+		return err
+	case "purge":
+		if len(args) != 3 {
+			return fmt.Errorf("usage: ingest purge <source> <host>")
+		}
+		for _, a := range adapters {
+			if a.Name() == args[1] {
+				return fmt.Errorf("%s still has an adapter; remove it first", args[1])
+			}
+		}
+		removed, err := store.Purge(ctx, args[1], args[2])
+		fmt.Printf("purged %s: %d postings removed\n", args[1], removed)
+		return err
 	case "run":
 		return fetchUntilStopped(ctx, store, adapters)
 	}

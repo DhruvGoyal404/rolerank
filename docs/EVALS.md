@@ -33,8 +33,8 @@ All datasets are versioned. Each case has a stable ID, so one regression can be 
 | D2 | Matching, synthetic | 60 profiles x 400 JDs, 3,000 graded pairs | Graded by rule, audited by hand | repo |
 | D3 | Matching, real | 20 profiles x real snapshot, 500 graded pairs | Pooled, graded by the owner | private |
 | D4 | Tailoring | 100 (resume, JD) pairs | Resumes from D1, JDs from D2 | repo |
-| D5 | Dedupe | 300 labelled posting pairs | Model-labelled, human-audited, from real boards | private, labels in repo |
-| D6 | Classifiers | 300 postings, stratified | Model-labelled, human-audited: scope, level, India | private, labels in repo |
+| D5 | Dedupe | 216 labelled posting pairs | Model-labelled, human-audited, from real boards | private, labels in repo |
+| D6 | Classifiers | 232 postings, stratified | Model-labelled, human-audited: scope, level, India | private, labels in repo |
 | D7 | Injection and abuse | 80 adversarial resumes and JDs | Hand-written | repo |
 
 ### D1: resume parsing
@@ -112,16 +112,21 @@ Grades, per (profile, job):
   electrical, aerospace and other hardware roles are out. A remote role naming no region
   answers "region not stated", its own value. India yes needs text saying worldwide or
   India. Both rule sets sit at the top of every page of the label tool.
-- **Model labels (2026-11-02).** D5: 70 yes, 230 no; 33 low confidence. D6: engineering 160
-  yes, 140 no. Level, of the 160: 59 senior, 21 mid, 24 entry, 18 intern, 38 unknown. India:
-  97 yes, 193 no, 10 region not stated. 71 low confidence. Judgement calls the model made,
+- **Ashby's exclusion cut both sets (2026-11-02).** Every item touching an Ashby posting was
+  deleted: D5 went from 300 pairs to 216, D6 from 300 postings to 232. They aren't topped up
+  yet, so the strata are uneven. D5 now holds 53 true duplicates, not the ~150 the size table
+  below assumes, so 53 of 53 would only show precision of about 0.93 or better. The hand
+  logs still list the deleted IDs, as record only.
+- **Model labels (2026-11-02), after that cut.** D5: 53 yes, 163 no; 24 low confidence. D6:
+  engineering 119 yes, 113 no. Level, of the 119: 56 senior, 14 mid, 15 entry, 12 intern, 22
+  unknown. India: 82 yes, 140 no, 10 region not stated. 53 low confidence. Judgement calls the model made,
   which the audit should test: "Remote, Latin America" listings naming different countries
   count as one remote scope (yes, low); separate requisitions with near-identical text but
   a level, team, shift, language or season in the title are different jobs; a listing whose
   body names a different city from its location field follows the body.
 - **The audit.** `d5-audit` and `d6-audit`, 30 items each: 20 drawn at random round-robin
   across the strata, plus 10 of the low-confidence items, shuffled together with seed
-  `audit-2026-11-02`. IDs are in `evals/labels/d5-audit-ids.txt` and `d6-audit-ids.txt`.
+  `audit-2026-11-02-no-ashby`. IDs are in `evals/labels/d5-audit-ids.txt` and `d6-audit-ids.txt`.
   The page shows the full text and the rules, without the model's answer. The owner
   answers, and only then does the page show the model's answer and reason.
   `scripts/label.sh audit d5-audit` scores a finished audit per question as three-value
@@ -136,7 +141,7 @@ Grades, per (profile, job):
   bootstrap on a balanced yes/no sample: kappa 0.87 has interval 0.66 to 1.00, and 0.73 has
   0.46 to 0.93. A point estimate of 0.8 therefore doesn't show the true value is 0.8. The
   level question is scored only on items both call in scope, about half the sample, where 15
-  items give an interval about 0.7 wide. The audit is 12 of 30 low confidence for D5 and 15
+  items give an interval about 0.7 wide. The audit is 13 of 30 low confidence for D5 and 15
   of 30 for D6, so it is harder than the full set and isn't an unbiased agreement rate.
 - **Risk: the model isn't a clean-room labeller.** The batches hid the system's output, the
   strata and the hand answers, but the same assistant had built the selection, analysed the

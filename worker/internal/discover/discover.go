@@ -38,7 +38,6 @@ var Targets = []Target{
 	{"greenhouse", "boards.greenhouse.io/*", "boards.greenhouse.io"},
 	{"greenhouse", "job-boards.greenhouse.io/*", "job-boards.greenhouse.io"},
 	{"lever", "jobs.lever.co/*", "jobs.lever.co"},
-	{"ashby", "jobs.ashbyhq.com/*", "jobs.ashbyhq.com"},
 }
 
 var tokenShape = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$`)

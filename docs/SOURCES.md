@@ -17,11 +17,11 @@ for its public endpoint, this document says **unknown** rather than guessing.
 |---|---|---|---|---|
 | Greenhouse job board API | **Approved** | None for GET | Large; ~0.9% India engineering | No published API terms; be gentle |
 | Lever postings API | **Approved** | None for GET | Large; ~1.4% India engineering | `Crawl-delay: 1` on the API host |
-| Ashby posting API | **Approved** | None | Medium; ~1.2% India engineering | Skip `isListed: false` jobs |
 | Himalayas API | **Approved** | Optional free key | **Best for India-eligible remote** | Attribution, `applicationLink`, no redistribution |
 | RemoteOK API | **Approved, small** | None | ~100 jobs per snapshot, ~1 India | Followable link back, name credit, no logo |
 | Workable public widget | **Not in v1 (Q7)** | None | Medium; ~3% India | Endpoint not officially documented |
 | Remotive, Jobicy | **Not in v1 (Q7)** | None | Small, remote only | Strict rate and link rules |
+| Ashby posting API | **Excluded** | | | Ashby declined, 2026-11-02; partner feed is a Later item |
 | SmartRecruiters | **Excluded** | | | robots.txt on the API host disallows us |
 | Internshala | **Excluded** | | | Terms forbid automated access |
 | LinkedIn, Naukri, Indeed | **Excluded** | | | Owner's rule; terms forbid it |
@@ -31,6 +31,9 @@ for its public endpoint, this document says **unknown** rather than guessing.
 | HN "Who is hiring", community GitHub lists | **Excluded** | | | Personal posts or no licence found |
 
 ## Measured coverage
+
+Phase 0 figures, kept as measured. Ashby has been excluded since; current coverage is in
+"Scale" and PHASE2.md.
 
 Random boards per ATS, taken from board names seen in Common Crawl (see
 "Discovery"). Classification used simple title and location patterns, so treat the
@@ -98,14 +101,15 @@ Common Crawl reads (the index server returned many 504s, so these counts are flo
 |---|---|---|---|---|
 | Greenhouse | 2,578 | 80% | 46 | ~95,000 |
 | Lever | 285 (index read mostly failed) | 80% | 140 (skewed by large boards) | ~32,000 |
-| Ashby | 1,868 | 87% | 17 | ~28,000 |
 | Workable (if Q7 = yes) | 3,474 | 97% of 60 tried | 18 | ~60,000 |
 | Himalayas | | | | 6,249 India-eligible; full feed size unknown |
 | RemoteOK | | | | ~100 |
-| **Total** | | | | **~1.6 lakh without Workable, ~2.2 lakh with it** |
+| **Total** | | | | **~1.3 lakh without Workable, ~1.9 lakh with it** |
 
-So **2 lakh active postings is reachable**; 5 lakh needs much better discovery, and
-nothing measured yet shows it. Of those 2 lakh, roughly 25 to 30% are engineering roles,
+These projections are from Phase 0 and ran low: **measured on 2026-11-02, without Ashby, the
+corpus holds 186,131 active canonical postings and 37,538 in scope**. That is short of the 2
+lakh and 50,000 targets, and Workable, the only named way to close the gap, is out of v1. 5
+lakh needs much better discovery, and nothing measured yet shows it. Of those 2 lakh, roughly 25 to 30% are engineering roles,
 and roughly 2 to 5% are India or open-remote engineering roles: about 4,000 to 10,000.
 The target is proposed in SPEC.md: ingest at least 2 lakh, search 50,000 to 1.25 lakh
 in-scope postings, and benchmark latency on a 5 lakh corpus so the claim holds at the top.
@@ -115,8 +119,7 @@ in-scope postings, and benchmark latency on a 5 lakh corpus so the claim holds a
 No ATS publishes a list of its customers. These methods stay within the rules:
 
 1. **Common Crawl URL index.** Query the CDX index for `boards.greenhouse.io/*`,
-   `job-boards.greenhouse.io/*`, `jobs.lever.co/*`, `jobs.ashbyhq.com/*` and
-   `apply.workable.com/*`, and keep only the first path segment, the board name. We
+   `job-boards.greenhouse.io/*`, `jobs.lever.co/*` and `apply.workable.com/*`, and keep only the first path segment, the board name. We
    read URLs from the index, not page content.
    Common Crawl's [terms of use](https://commoncrawl.org/terms-of-use) grant a limited
    licence and ask users to respect third-party rights. Its index server timed out
@@ -164,8 +167,8 @@ host whose robots.txt disallows us.
 - Default limit: **1 request per second per host**, shared by every worker, with
   `Retry-After` honoured on 429 and 503, exponential backoff, and a circuit breaker
   after repeated 5xx.
-- Conditional GET: store the `ETag`; send `If-None-Match`. **All three ATS APIs returned
-  `304` with an empty body** (Greenhouse list and content, Lever, Ashby).
+- Conditional GET: store the `ETag`; send `If-None-Match`. **Greenhouse and Lever return
+  `304` with an empty body** (Greenhouse list and content).
 - Response size cap of 25 MB, gzip ratio cap, 120 s timeout.
 - We store the text we need for search and show an excerpt plus a link to the
   original. Job pages are `noindex` and emit no `JobPosting` structured data. That
@@ -241,31 +244,20 @@ host whose robots.txt disallows us.
 - **Closed postings:** gone from the list; a single closed posting returns **404**
   (tested).
 
-## Ashby public job posting API
+## Ashby: excluded on 2026-11-02
 
-- **Docs:** https://developers.ashbyhq.com/docs/public-job-posting-api
-- **Endpoint:** `GET https://api.ashbyhq.com/posting-api/job-board/{JOB_BOARD_NAME}`,
-  `?includeCompensation=true` for pay data.
-- **Auth:** none stated; works without any (tested).
-- **Rate limits:** not stated. **Unknown.** 1 request per second.
-- **Caching:** `cache-control: public, max-age=60, stale-while-revalidate=60` and
-  `ETag`; 304 tested. Never poll a board more than once a minute.
-- **robots.txt:** `api.ashbyhq.com/robots.txt` returns **401**. Under RFC 9309 a 4xx
-  means no restrictions. `jobs.ashbyhq.com` disallows `/api/` on that host, which we
-  don't use.
-- **Terms:** none for this API. Ashby's [terms](https://www.ashbyhq.com/terms)
-  (updated 2025-09-29) are customer terms; 5.1(g) bars use that could "overburden"
-  the service. **Unknown** beyond that.
-- **Attribution:** none required. Link to `jobUrl`.
-- **Fields (verified live):** `id`, `title`, `department`, `team`, `location`,
-  `secondaryLocations`, `address`, `isListed`, `isRemote`, `workplaceType`,
-  `employmentType` (includes `Intern`), `descriptionHtml`, `descriptionPlain`,
-  `publishedAt`, `jobUrl`, `applyUrl`, `compensation`,
-  `shouldDisplayCompensationOnJobPostings`.
-- **Rule:** jobs with `isListed: false` are "available only by direct link". We skip
-  them, because the employer chose not to list them.
-- **Stable ID:** `ashby:{board}:{id}`.
-- **Closed postings:** gone from the board response.
+Ashby replied on 2026-11-02 to our email of 2026-10-31. In paraphrase: it doesn't support or
+endorse third-party tools that aggregate postings across customer boards through the public
+Job Postings API, even when non-commercial, and it offers no rate limit. The supported route
+is its opt-in Dedicated Partner Job Feed. Under our rule that's a no.
+
+Done on 2026-11-02: the adapter and discovery target are removed from the code, and
+`ingest purge ashby api.ashbyhq.com` deleted 55,295 postings with their search rows, 2,984
+boards, 18,054 clusters and 6,284 fetch log rows; 23 clusters shared with another source
+passed to a surviving posting. `VACUUM FULL` followed. Counts afterwards: 0 sources, 0
+postings by source or by `ashbyhq` URL, 0 boards, 0 fetch log rows, 0 Valkey keys, and no
+dangling search row or cluster. `data/ashby.txt`, its discovery state and every Ashby item in
+`evals/private/` are gone too. Dated totals in `coverage_snapshots` stay: they're counts.
 
 ## Himalayas
 
@@ -383,9 +375,8 @@ now check robots.txt first.
 
 ## Open items
 
-- Rate limits for Greenhouse and Ashby GETs are **unknown**. Drafts to both providers,
-  and to Workable about its widget, are in OUTREACH.md for the owner to send. Replies are
-  recorded here. Until then, 1 request per second per host.
-- Greenhouse's website terms for the public API: **unknown**. Same email.
+- Workable hasn't replied (OUTREACH.md). It stays out of v1.
+- Later: Ashby's Dedicated Partner Job Feed. Employers opt in and it needs an application, so
+  it isn't a v1 route.
 - Re-check every source's terms and robots.txt quarterly; a CI job diffs each robots.txt
   weekly while the project is active and opens an issue on change.

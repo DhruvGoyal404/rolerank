@@ -9,8 +9,8 @@ second per host while waiting, and stops at once if a provider says no.
 
 | Provider | Sent to | Date | Reply |
 |---|---|---|---|
-| Greenhouse | partner-support@greenhouse.io | 2026-10-31 | none yet |
-| Ashby | support@ashbyhq.com | 2026-10-31 | none yet |
+| Greenhouse | partner-support@greenhouse.io | 2026-10-31 | 2026-11-02, in SOURCES.md |
+| Ashby | support@ashbyhq.com | 2026-10-31 | 2026-11-02: declined, in SOURCES.md |
 | Workable | support@workable.com | 2026-10-31 | none yet |
 
 ---

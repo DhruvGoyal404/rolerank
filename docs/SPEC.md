@@ -28,7 +28,7 @@ every claim is traceable, and every number is measured.**
 ## What we learned before writing this
 
 Phase 0 measured the sources on 2026-10-31 ([SOURCES.md](SOURCES.md)). Three findings
-shape the product:
+shape the product. Ashby has been excluded since, on 2026-11-02; these are the Phase 0 figures:
 
 1. **The legal ATS APIs barely reach Indian fresher roles.** In a random sample of
    36,397 Greenhouse, Lever and Ashby postings: 440 (1.2%) were India engineering
@@ -178,10 +178,10 @@ Reasoning and measurements are in SOURCES.md, "Scale". Summary:
 
 | Target | Number | Status |
 |---|---|---|
-| Postings ingested and deduplicated (all roles) | **>= 2 lakh active** as the v1 goal, 5 lakh as a stretch that depends on discovery | Boards found so far project to ~1.6 lakh, ~2.2 lakh with Workable |
-| In-scope postings embedded and searched | **50,000 to 1.25 lakh** | 20 to 34% of ingested postings are engineering roles |
+| Postings ingested and deduplicated (all roles) | **>= 2 lakh active** as the v1 goal, 5 lakh as a stretch that depends on discovery | **Missed so far:** 1.86 lakh measured on 2026-11-02, without Ashby. No named source closes the gap in v1 |
+| In-scope postings embedded and searched | **50,000 to 1.25 lakh** | **Below the floor:** 37,538 measured on 2026-11-02 (20% of active postings). 55,571 before Ashby was removed |
 | Bench corpus for latency claims | **5 lakh** synthetic rows | Measured so the claim holds at the top of the range |
-| Refresh | Every 6 h while up, with conditional GET | 304 confirmed on all three main ATS APIs |
+| Refresh | Every 6 h while up, with conditional GET | 304 confirmed on Greenhouse and Lever |
 
 The original target, 2 to 5 lakh postings, is kept as an ingestion and engineering
 goal. It isn't a measure of value: at the measured shares, 5 lakh ATS postings would

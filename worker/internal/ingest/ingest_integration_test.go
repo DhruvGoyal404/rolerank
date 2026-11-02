@@ -835,3 +835,70 @@ func TestManyWorkersManyBoardsNoDuplicates(t *testing.T) {
 		t.Fatalf("%d distinct IDs", distinct)
 	}
 }
+
+func TestPurgeRemovesASourceAndRepairsSharedClusters(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	text := longText("p")
+	ats := h.posting("gone", "acme", "1", "Acme", "Backend Engineer", "Pune", text)
+	listed := h.posting("himalayas", "feed", "1", "Acme", "Backend Engineer", "India", text)
+	alone := h.posting("gone", "beta", "1", "Beta", "Data Engineer", "Pune", longText("q"))
+	if _, err := h.pool.Exec(ctx, `INSERT INTO search_postings (posting_id, level, remote_scope) VALUES ($1, 'mid', 'onsite')`, alone); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := h.store.Dedupe(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := h.pool.Exec(ctx, `INSERT INTO fetch_log (host) VALUES ('gone.example'), ('kept.example')`); err != nil {
+		t.Fatal(err)
+	}
+	removed, err := h.store.Purge(ctx, "gone", "gone.example")
+	if err != nil || removed != 2 {
+		t.Fatalf("removed %d: %v", removed, err)
+	}
+	if n := h.count(fmt.Sprintf("id IN (%d, %d)", ats, alone)); n != 0 {
+		t.Fatalf("%d postings left", n)
+	}
+	var canonical int64
+	err = h.pool.QueryRow(ctx, `SELECT c.canonical_posting_id FROM clusters c JOIN postings p ON p.cluster_id = c.id WHERE p.id = $1`, listed).Scan(&canonical)
+	if err != nil || canonical != listed {
+		t.Fatalf("canonical %d: %v", canonical, err)
+	}
+	var left int
+	err = h.pool.QueryRow(ctx, `SELECT
+		(SELECT count(*) FROM sources WHERE name = 'gone') + (SELECT count(*) FROM search_postings) +
+		(SELECT count(*) FROM clusters WHERE canonical_posting_id NOT IN (SELECT id FROM postings)) +
+		(SELECT count(*) FROM fetch_log WHERE host = 'gone.example')`).Scan(&left)
+	if err != nil || left != 0 {
+		t.Fatalf("%d rows left: %v", left, err)
+	}
+	if h.pool.QueryRow(ctx, `SELECT 1 FROM fetch_log WHERE host = 'kept.example'`).Scan(new(int)) != nil {
+		t.Fatal("another host's history went too")
+	}
+}
+
+func TestDenyRemovesPostingsAndStaysDenied(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	h.server.set("acme", "1,2")
+	h.server.set("beta", "3")
+	h.board("acme")
+	h.board("beta")
+	h.cycle()
+	removed, err := h.store.Deny(ctx, h.adapter.Name(), "acme")
+	if err != nil || removed != 2 {
+		t.Fatalf("removed %d: %v", removed, err)
+	}
+	if h.count("source_job_id LIKE 'acme:%'") != 0 || h.count("source_job_id LIKE 'beta:%'") != 1 {
+		t.Fatal("the wrong postings went")
+	}
+	h.board("acme") // discovery finds it again
+	h.makeDue()
+	h.cycle()
+	if h.count("source_job_id LIKE 'acme:%'") != 0 {
+		t.Fatal("a denied board came back")
+	}
+	if _, err := h.store.Deny(ctx, h.adapter.Name(), "nobody"); err == nil {
+		t.Fatal("denied a board that doesn't exist")
+	}
+}

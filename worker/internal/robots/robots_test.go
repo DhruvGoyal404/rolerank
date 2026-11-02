@@ -140,7 +140,7 @@ func TestStatusHandling(t *testing.T) {
 		allowed bool
 	}{
 		{200, false}, // the body applies
-		{401, true},  // Ashby's API host answers this
+		{401, true},  // some API hosts answer this
 		{404, true},
 		{500, false},
 		{503, false},

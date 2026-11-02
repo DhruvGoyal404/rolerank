@@ -78,34 +78,6 @@ func TestLever(t *testing.T) {
 	}
 }
 
-func TestAshby(t *testing.T) {
-	page := parse(t, Ashby{}, "acme", `{"jobs":[
-	 {"id":"a1","title":"SDE","location":"Pune","isListed":true,"isRemote":null,"workplaceType":null,
-	  "employmentType":"FullTime","descriptionPlain":"Work","publishedAt":"2026-10-01T00:00:00.000+00:00",
-	  "jobUrl":"https://jobs.ashbyhq.com/acme/a1","applyUrl":"https://jobs.ashbyhq.com/acme/a1/application",
-	  "address":{"postalAddress":{"addressCountry":"India"}},
-	  "secondaryLocations":[{"location":"Remote","address":{"postalAddress":{"addressCountry":"Canada"}}}],
-	  "compensation":{"summaryComponents":[
-	    {"compensationType":"Bonus","interval":"1 YEAR","currencyCode":"INR","minValue":1,"maxValue":2},
-	    {"compensationType":"Salary","interval":"1 YEAR","currencyCode":"INR","minValue":10,"maxValue":20}]}},
-	 {"id":"a2","title":"Hidden","isListed":false,"jobUrl":"https://jobs.ashbyhq.com/acme/a2"},
-	 {"id":"a3","title":"Remote one","isListed":true,"workplaceType":"Remote","descriptionHtml":"<p>x</p>",
-	  "jobUrl":"https://jobs.ashbyhq.com/acme/a3","compensation":{"summaryComponents":[
-	    {"compensationType":"Salary","minValue":null,"maxValue":null}]}}
-	]}`)
-	if len(page.Postings) != 2 || page.Skipped != 1 {
-		t.Fatalf("unlisted jobs must be skipped: %+v", page)
-	}
-	p := page.Postings[0]
-	if p.Location != "Pune | Remote" || p.Remote != RemoteUnknown || p.SalaryMin != 10 || len(p.Countries) != 2 {
-		t.Fatalf("%+v", p)
-	}
-	second := page.Postings[1]
-	if second.Remote != RemoteYes || !second.BodyIsHTML || second.SalaryMax != 0 {
-		t.Fatalf("%+v", second)
-	}
-}
-
 func TestHimalayas(t *testing.T) {
 	page := parse(t, Himalayas{}, "", `{"nextCursor":"ab c=","jobs":[{
 	  "guid":"https://himalayas.app/companies/acme/jobs/sde","title":"SDE","companyName":"Acme",
@@ -175,7 +147,6 @@ func TestMalformedResponsesAreErrorsNeverEmptyLists(t *testing.T) {
 	cases := map[string][]string{
 		"greenhouse": {`<html>`, `{}`, `{"jobs":null}`, ``},
 		"lever":      {`<html>`, `null`, `{"ok":false}`, ``},
-		"ashby":      {`<html>`, `{}`, `{"jobs":null}`},
 		"himalayas":  {`<html>`, `{}`},
 		"remoteok":   {`<html>`, `[]`, `[{},"x"]`},
 	}
@@ -190,7 +161,7 @@ func TestMalformedResponsesAreErrorsNeverEmptyLists(t *testing.T) {
 
 func TestEmptyBoardsAreNotErrors(t *testing.T) {
 	bodies := map[string]string{
-		"greenhouse": `{"jobs":[]}`, "lever": `[]`, "ashby": `{"jobs":[]}`,
+		"greenhouse": `{"jobs":[]}`, "lever": `[]`,
 		"himalayas": `{"jobs":[]}`, "remoteok": `[{"legal":"x"}]`,
 	}
 	for _, a := range All() {
@@ -222,7 +193,7 @@ func TestBadApplyURLIsCleared(t *testing.T) {
 }
 
 func TestBoardTokensAreEscaped(t *testing.T) {
-	for _, a := range []Adapter{Greenhouse{}, Lever{}, Ashby{}} {
+	for _, a := range []Adapter{Greenhouse{}, Lever{}} {
 		if got := a.FirstURL("../../evil?x=1"); strings.Contains(got, "../") || strings.Contains(got, "evil?") {
 			t.Errorf("%s built %q", a.Name(), got)
 		}

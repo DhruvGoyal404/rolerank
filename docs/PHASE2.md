@@ -44,6 +44,22 @@ classifiers D6 hasn't validated yet.
 | RemoteOK | 98 | 25 (0%) | 0 | 0 | 0 | 0 |
 | Total | 241,138 | 55,571 | 4,305 | 103 | 27 | 2,386 |
 
-**Concentration risk:** India early-career hangs on Himalayas at 65% and remote-open at 82%.
+### Without Ashby (2026-11-02)
+
+Ashby declined, and its data was deleted the same day (SOURCES.md). `bash scripts/ingest.sh
+coverage`, run after the purge, no new fetch:
+
+| Source | Postings | In scope | India eng | India early | Interns | Remote open |
+|---|---:|---:|---:|---:|---:|---:|
+| Greenhouse | 157,985 | 31,968 (85%) | 1,769 (47%) | 25 (26%) | 4 | 213 (9%) |
+| Lever | 22,134 | 3,563 (9%) | 255 (6%) | 4 (4%) | 0 | 41 (1%) |
+| Himalayas | 5,913 | 1,981 (5%) | 1,737 (46%) | 67 (69%) | 23 | 1,981 (88%) |
+| RemoteOK | 99 | 26 (0%) | 0 | 0 | 0 | 0 |
+| Total | 186,131 | 37,538 | 3,761 | 96 | 27 | 2,235 |
+
+Against the table above: in scope down 32%, India engineering down 13%, India early-career
+down 7%, interns unchanged, remote-open down 6%. The table above stays as measured.
+
+**Concentration risk (figures before Ashby's removal):** India early-career hangs on Himalayas at 65% and remote-open at 82%.
 The recovered boards added about 4,300 in-scope postings but only 24 in India and no India
 early-career posting. Five of them hold no engineering role at all.

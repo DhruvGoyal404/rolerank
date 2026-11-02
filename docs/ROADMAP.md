@@ -83,7 +83,7 @@ dbmate on both databases. CI from the first commit.
 ## P2: ingestion
 
 Go workers: scheduler, fetcher, normaliser, deduper. Source adapters for Greenhouse,
-Lever, Ashby, Himalayas and RemoteOK, each behind a contract test recorded from the
+Lever, Himalayas and RemoteOK, each behind a contract test recorded from the
 real API. robots.txt handling, shared per-host limiter, ETag cache, closed-posting
 detection, board registry, discovery tool, source health metrics, /sources and
 /about/bot pages.
@@ -91,7 +91,8 @@ detection, board registry, discovery tool, source health metrics, /sources and
 **Exit criteria**
 
 - At least 1.5 lakh active postings ingested from real sources, on the local machine
-  or a temporary worker. The count is reported per source.
+  or a temporary worker. The count is reported per source. Met without Ashby: 186,131
+  canonical postings on 2026-11-02.
 - A full refresh cycle finishes inside 6 h at the configured rates. 304 rate reported.
 - **Never above the configured rate:** a load test against a local fake source with 4
   workers proves the limiter holds across workers.
@@ -112,6 +113,11 @@ detection, board registry, discovery tool, source health metrics, /sources and
   engineering roles we really have. This is the number that matters most.
 - **Per-source share of in-scope roles** in the P2 report, recorded in `coverage_snapshots`
   and shown on the admin metrics page in P6, so reliance on one source is visible over time.
+
+**Coverage after Ashby's exclusion (2026-11-02):** 37,538 in scope, 3,761 India engineering,
+96 India early-career, 27 India interns, 2,235 remote-open. Greenhouse is 85% of in scope;
+Himalayas is 69% of India early-career and 88% of remote-open. SPEC's targets of 2 lakh
+postings and 50,000 in scope are unmet, and stay as written.
 
 **Demo:** dashboard of postings per source, lag, 304 rate, a live worker kill.
 
@@ -264,5 +270,6 @@ CDK: persistent stack and host stack. GitHub OIDC, deploy by digest, SSM, auto-r
   down (Q1, option B).
 - First-party career pages (Q4), if P2's coverage report shows the gap remains.
 - More ATS sources: Recruitee, Teamtailor, Workable (Q7).
+- Ashby's Dedicated Partner Job Feed: employer opt-in, needs an application.
 - Rerankers, if evals show room above the deterministic ranker.
 - Hindi or other language postings.

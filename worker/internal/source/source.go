@@ -76,7 +76,7 @@ type Adapter interface {
 
 // All lists the sources approved in docs/SOURCES.md.
 func All() []Adapter {
-	return []Adapter{Greenhouse{}, Lever{}, Ashby{}, Himalayas{}, RemoteOK{}}
+	return []Adapter{Greenhouse{}, Lever{}, Himalayas{}, RemoteOK{}}
 }
 
 func validURL(raw string) bool {

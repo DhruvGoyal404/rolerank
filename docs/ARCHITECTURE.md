@@ -31,7 +31,7 @@ young, the table names both.
      ^                                           +---------------------------+
      |                                                 | [TB5] 1 req/s/host
      |   +-----------------------------+               v
-     +---| aiworker (Node, TS)          |      Greenhouse, Lever, Ashby,
+     +---| aiworker (Node, TS)          |      Greenhouse, Lever,
          | parse, explain, tailor       |      Himalayas, RemoteOK
          | LLM gateway + spend ledger   |
          +-----------------------------+
