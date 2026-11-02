@@ -1,7 +1,6 @@
 # Phase 2: ingestion
 
-Status: in progress. This file gathers the measured results as they arrive, and closes when
-the exit criteria in ROADMAP.md are met.
+Status: **exit criteria not met** (2026-11-03). See "Exit report" below.
 
 ## Second cycle (2026-11-01, 01:41 to 03:52 IST)
 
@@ -63,3 +62,45 @@ down 7%, interns unchanged, remote-open down 6%. The table above stays as measur
 **Concentration risk (figures before Ashby's removal):** India early-career hangs on Himalayas at 65% and remote-open at 82%.
 The recovered boards added about 4,300 in-scope postings but only 24 in India and no India
 early-career posting. Five of them hold no engineering role at all.
+
+## Exit report (2026-11-03)
+
+**P2 hasn't passed.** The ingestion machinery works, and most criteria are met. Dedupe merges
+different jobs far too often, two classifier thresholds aren't met, and closed-posting accuracy
+was never measured. Numbers and method for the evals are in EVALS.md.
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| 1.5 lakh active postings, per source | Met | 186,131 canonical postings without Ashby, table above |
+| Full cycle inside 6 h, 304 rate reported | Met | 131 minutes, 98.1% 304. Measured with Ashby, not re-run since |
+| Never above the rate, 4 workers | Met | `TestWorkersNeverExceedTheRate`, 4 workers |
+| 429, 5xx, huge bodies, gzip bombs | Met | `fetch` tests |
+| Slow responses handled | Not shown | No test by that name was found; a 120 s timeout is configured |
+| Kill mid-batch loses nothing | Met by test | `TestStopAtEveryPageResumesWithoutLossOrDuplicates`, `TestRedeliveryAfterCommitDoesNoWork` |
+| Closed postings leave within a cycle, error under 1% | **Not measured** | Tests prove the behaviour; the comparison with a fresh fetch was never run |
+| Dedupe eval D5 passes | **Fails** | Precision 0.763 against 0.99. Recall 0.83 against 0.90, not shown |
+| Classifier eval D6 passes | **Fails** | Remote-open 9 of 17; entry level too few to size; India passes unproven |
+| Bot obeys a disallowing robots.txt | Met | `TestRobotsIsObeyedBeforeTheRequest` |
+| Attribution stored per posting, tested per source | Partly | Stored per source, and `TestEveryAdapterDeclaresHostsAndCredit` covers each adapter; not per posting |
+| Bytes per cycle, split into 200 and 304 | Partly | Requests are split; bytes are only totalled, 540 MB |
+| First run resumable, proved by killing it | Met by test | The same stop tests. No live kill is on record |
+| In-scope coverage report | Met, overstated | 37,538 in scope; classifier precision makes this a ceiling |
+| Per-source share recorded | Met | `coverage_snapshots`. The admin page is P6 |
+| /sources and /about/bot pages | Met | Pages and tests, 2026-11-02 |
+
+**Demo:** `ingest status` and `ingest coverage` exist. The dashboard with lag and 304 rate, and the
+live worker kill, haven't been built or run.
+
+**Against SPEC's targets:** 186,131 active against 2 lakh, and 37,538 in scope against 50,000.
+Both are missed and stay as written.
+
+**To reach the exit, in order:**
+
+1. The owner reviews the D5 and level disagreements and rules on the precedents in EVALS.md.
+2. Fix the dedupe key and the text comparison, then re-run dedupe and score on fresh pairs.
+3. Tighten remote-open and the engineering classifier to the owner's scope rules, then re-score.
+4. Measure closed-posting accuracy with a fresh fetch.
+5. Split bytes by status, add the slow-response test, and add per-posting attribution or change
+   that criterion with a written reason.
+
+No exit criterion or threshold was changed for this report.

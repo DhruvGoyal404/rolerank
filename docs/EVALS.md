@@ -33,7 +33,7 @@ All datasets are versioned. Each case has a stable ID, so one regression can be 
 | D2 | Matching, synthetic | 60 profiles x 400 JDs, 3,000 graded pairs | Graded by rule, audited by hand | repo |
 | D3 | Matching, real | 20 profiles x real snapshot, 500 graded pairs | Pooled, graded by the owner | private |
 | D4 | Tailoring | 100 (resume, JD) pairs | Resumes from D1, JDs from D2 | repo |
-| D5 | Dedupe | 216 labelled posting pairs | Model-labelled, human-audited, from real boards | private, labels in repo |
+| D5 | Dedupe | 216 labelled pairs, plus 242 merged pairs (300 merged in total) | Model-labelled, human-audited, from real boards | private, labels in repo |
 | D6 | Classifiers | 232 postings, stratified | Model-labelled, human-audited: scope, level, India | private, labels in repo |
 | D7 | Injection and abuse | 80 adversarial resumes and JDs | Hand-written | repo |
 
@@ -134,8 +134,58 @@ Grades, per (profile, job):
 - **Acceptance.** Kappa at least 0.8 on a question: the model labels are the gold for it,
   and every audited disagreement is corrected by the owner's answer. Below 0.8: we look at
   where we disagree before deciding anything.
-- **Audit result: pending.** Kappa and intervals go here when the audit is finished. Until
-  then, no dedupe or classifier score from D5 or D6 counts toward the P2 exit.
+- **Audit result (2026-11-03).** `bash scripts/label.sh audit d5-audit` and `d6-audit`, 30 items
+  each. D5 took 5.5 minutes, median 7.5 s an item; D6 took 6.9 minutes, median 11.9 s.
+
+  | Question | Agreed | Kappa | 95% interval | Status |
+  |---|---:|---:|---|---|
+  | D5 same job | 25 of 30 | 0.556 | 0.172 to 0.889 | **Below 0.8, not gold** |
+  | D6 engineering | 29 of 30 | 0.918 | 0.714 to 1.000 | Gold, 1 item corrected by the owner's answer |
+  | D6 level | 17 of 21 | 0.733 | 0.483 to 0.934 | **Below 0.8, not gold** |
+  | D6 India | 30 of 30 | 1.000 | 1.000 to 1.000 | Gold |
+
+  All 5 D5 disagreements are low-confidence items; high-confidence items agreed 17 of 17. Two
+  are "Latin America" remote listings naming different countries, which the model called the
+  same job and the owner didn't. Level disagreements are mostly `unknown` against a guess.
+  Under the rule above, D5 and level wait for a review with the owner. The answers shown after
+  each item can teach the rater the model's habits, so later agreement may be flattered.
+- **D5 top-up (2026-11-03): `d5-merged`.** The owner asked for about 300 system-merged pairs. 242
+  random merged pairs joined the 58 already labelled; the pool held 873. They were labelled in
+  batches of 40 under neutral IDs, shuffled among 60 unmerged lookalikes (same company and title)
+  so that a batch didn't reveal the system's decision. Identical pairs show 200 characters of A,
+  others 800 plus the full word diff. The owner's audit answers served as precedent, an
+  addition to the written rule that the owner hasn't yet confirmed. `d5-merged-audit` holds 10
+  of them for the owner, 5 low and 5 high confidence. A clean 298 of 298 would be needed to show
+  0.99 at one-sided 95%, so 300 pairs can show it only with almost no false merge.
+- **Scores, all provisional for D5 and level.** Per stratum where it matters; never blended.
+
+  | Metric | Threshold | Measured | Verdict |
+  |---|---:|---|---|
+  | Dedupe precision | 0.99 | **229 of 300, 0.763** (0.712 to 0.808) | **Fails** |
+  | Dedupe recall | 0.90 | 44 of 53, 0.83 (0.71 to 0.91), stratified sample | Not shown |
+  | Level F1, intern | 0.90 | early-random: 0.96, 13 gold items | Pass on a small, provisional set |
+  | Level F1, entry | 0.90 | early-random: 0.50, 2 gold items | **Fails**, set too small to size it |
+  | India precision | 0.97 | india-random: 43 of 43 (0.918 to 1.000); all strata 73 of 73 (0.950 to 1.000) | Pass, not proven at 0.97 |
+  | Remote-open precision | 0.90 | remote-open: 9 of 17 (0.31 to 0.74) | **Fails** |
+  | Skill extraction precision | 0.90 | Not built until P3 | Not due |
+
+  The precision failure doesn't depend on the D5 dispute. Reading every low-confidence false
+  merge as a true duplicate still gives 256 of 300, 0.853. Taking the owner's audit answer on
+  the one merged pair they disputed gives 228 of 300.
+  The engineering classifier has no threshold, but its precision against gold is 114 of 158
+  across the strata (random stratum 7 of 8, early-random 18 of 34): it counts by title, while
+  the owner's rules put hardware and customer roles out. In-scope totals in PHASE2.md are
+  therefore overstated by an amount these strata can't size.
+- **Why dedupe fails.** Of the 57 false merges in the top-up, 31 differ only in title text inside
+  brackets, which `dedupe.Key` deletes: `(C#)` against `(Python)`, `(Spring 2027)` against
+  `(Summer 2027)`, `(Active Clearance)`. The other 26 have identical titles and differ in the
+  body, where 0.9 similarity lets years, pay, or a city in the text pass. Fixing this means
+  re-scoring on pairs the fix wasn't tuned on.
+- **Open for the owner.** Whether the audit's precedents become written rules: listed countries
+  on a regional remote role are different jobs; one role offering "either office" is the same
+  job; a different title on identical text is the same job; a different requirement, pay band or
+  shift is a different job. The first would change 4 of the 216 older D5 labels. The older
+  labels haven't been redone under the others.
 - **Risk: shared blind spots.** The audit measures agreement between the model and one
   person. A misreading both make passes it. Thirty items give wide intervals, measured by
   bootstrap on a balanced yes/no sample: kappa 0.87 has interval 0.66 to 1.00, and 0.73 has

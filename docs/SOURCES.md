@@ -384,9 +384,18 @@ Himalayas' robots.txt disallows. They were sent by hand, outside the fetcher. Th
 enforces robots.txt and later refused the same URL on its own. One-off research requests
 now check robots.txt first.
 
+## Known local residue
+
+The session transcripts of the owner's coding assistant, on the owner's machine outside this
+repo, hold Ashby posting text read during D5 and D6 labelling on 2026-11-01 and 2026-11-02.
+The owner decided on 2026-11-03 to leave them: they aren't part of the product or the repo,
+and nothing reads them.
+
 ## Open items
 
 - Workable hasn't replied (OUTREACH.md). It stays out of v1.
+- Lever step 2, bulk token guessing: decided no on 2026-11-03. Step 1 found 2 verified boards
+  from 299 names and no India early-career role.
 - Later: Ashby's Dedicated Partner Job Feed. Employers opt in and it needs an application, so
   it isn't a v1 route.
 - Re-check every source's terms and robots.txt quarterly; a CI job diffs each robots.txt

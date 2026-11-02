@@ -114,6 +114,8 @@ detection, board registry, discovery tool, source health metrics, /sources and
 - **Per-source share of in-scope roles** in the P2 report, recorded in `coverage_snapshots`
   and shown on the admin metrics page in P6, so reliance on one source is visible over time.
 
+**Exit status (2026-11-03): not met.** See PHASE2.md, "Exit report".
+
 **Coverage after Ashby's exclusion (2026-11-02):** 37,538 in scope, 3,761 India engineering,
 96 India early-career, 27 India interns, 2,235 remote-open. Greenhouse is 85% of in scope;
 Himalayas is 69% of India early-career and 88% of remote-open. SPEC's targets of 2 lakh
