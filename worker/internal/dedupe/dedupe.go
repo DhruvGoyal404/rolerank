@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"hash/fnv"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -16,14 +17,19 @@ const (
 	// MinWords is the shortest text worth comparing. Below it, similarity means little.
 	MinWords = 30
 	// Threshold is the estimated Jaccard similarity needed to merge.
-	Threshold = 0.9
+	Threshold = 0.95
 )
 
 var (
 	nonWord  = regexp.MustCompile(`[^\pL\pN]+`)
 	suffixes = regexp.MustCompile(`\b(inc|llc|ltd|limited|pvt|private|corp|corporation|co|company|gmbh|technologies|technology|labs|hq)\b`)
 	noise    = regexp.MustCompile(`\b(remote|hybrid|onsite|on site|urgent|hiring|immediate joiner)\b`)
-	bracket  = regexp.MustCompile(`[(\[].*?[)\]]`)
+	// Places a title may carry as a suffix. A place never makes a different job.
+	places = regexp.MustCompile(`\b(india|usa|us|uk|united states|united kingdom|canada|mexico|brazil|argentina|colombia|chile|peru|germany|france|spain|portugal|poland|ireland|netherlands|singapore|japan|australia|europe|emea|apac|latam|latin america|north america|americas|bengaluru|bangalore|hyderabad|pune|mumbai|gurgaon|gurugram|noida|chennai|delhi|kochi|ahmedabad|london|berlin|new york|san francisco|seattle|austin|boston|atlanta|chicago|toronto|dublin|amsterdam|paris|tokyo|sydney|georgia)\b`)
+	// A trailing " - City, Region" and requisition numbers are cosmetic too.
+	placeTail   = regexp.MustCompile(`\s+[-–]\s+[^-–,]+,[^-–]+$`)
+	requisition = regexp.MustCompile(`^r?\d{3,}$`)
+	cosmetic    = strings.NewReplacer("back end", "backend", "front end", "frontend", "full stack", "fullstack", "sr ", "senior ", "jr ", "junior ")
 )
 
 func normal(s string) string {
@@ -31,10 +37,22 @@ func normal(s string) string {
 }
 
 // Key groups postings that could be the same job: one company, one title.
-func Key(company, title string) string {
+func Key(company, title, location string) string {
 	c := normal(suffixes.ReplaceAllString(normal(company), " "))
-	t := normal(noise.ReplaceAllString(normal(bracket.ReplaceAllString(title, " ")), " "))
-	return c + "|" + t
+	t := cosmetic.Replace(normal(placeTail.ReplaceAllString(title, "")) + " ")
+	t = noise.ReplaceAllString(places.ReplaceAllString(t, " "), " ")
+	here := map[string]bool{}
+	for _, w := range strings.Fields(normal(location)) {
+		here[w] = true
+	}
+	var words []string
+	for _, w := range strings.Fields(t) {
+		if !here[w] && !requisition.MatchString(w) {
+			words = append(words, w)
+		}
+	}
+	sort.Strings(words) // word order is cosmetic
+	return c + "|" + strings.Join(words, " ")
 }
 
 // Location is compared as text. An aggregator's location list won't match an ATS's city,
@@ -102,12 +120,55 @@ func IsAggregator(source string) bool {
 	return source == "himalayas" || source == "remoteok"
 }
 
-// SameJob decides a merge. The same role in two cities stays two jobs, because a fresher
-// in Pune mustn't lose a Pune posting to a London one. An aggregator states regions, not
-// cities, so it can match any location.
-func SameJob(aLocation string, aAggregator bool, aSig []byte, bLocation string, bAggregator bool, bSig []byte) bool {
-	if !aAggregator && !bAggregator && aLocation != bLocation {
+var (
+	years     = regexp.MustCompile(`(?i)\b\d{1,2}\s*(?:\+|-|–|to)?\s*\d{0,2}\s*\+?\s*(?:years|yrs)\b`)
+	pay       = regexp.MustCompile(`[$€£₹]\s?\d[\d,.]*[kK]?`)
+	shift     = regexp.MustCompile(`(?i)\b(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*(?:-|–|to|through)\s*(?:mon|tues|wednes|thurs|fri|satur|sun)day\b|\b\d{1,2}(?::\d\d)?\s*[ap]\.?m\.?\s*(?:-|–|to)\s*\d{1,2}(?::\d\d)?\s*[ap]\.?m\b`)
+	clearance = regexp.MustCompile(`(?i)\b(?:active|current|obtain|not required)\b[^.\n]{0,40}\bclearance\b|\bclearance\b[^.\n]{0,40}\bnot required\b|\bts/sci\b|\bpolygraph\b|\bpoly\b|\bcitizenship\b`)
+	language  = regexp.MustCompile(`(?i)\b(?:mandarin|cantonese|japanese|korean|german|french|spanish|portuguese|italian|dutch|hebrew|arabic|hindi|turkish|polish|russian|nordic|swedish|danish|norwegian|finnish)\b`)
+)
+
+func set(re *regexp.Regexp, body string) string {
+	found := map[string]bool{}
+	for _, m := range re.FindAllString(body, -1) {
+		found[strings.Join(strings.Fields(strings.ToLower(m)), " ")] = true
+	}
+	list := make([]string, 0, len(found))
+	for m := range found {
+		list = append(list, m)
+	}
+	sort.Strings(list)
+	return strings.Join(list, ";")
+}
+
+// Facts are the things a posting can state that make it a different job even when the
+// text is otherwise the same.
+type Facts struct{ Years, Pay, Shift, Clearance, Language string }
+
+// Read extracts a posting's facts.
+func Read(body string) Facts {
+	return Facts{set(years, body), set(pay, body), set(shift, body), set(clearance, body), set(language, body)}
+}
+
+// Posting is what a merge decision looks at.
+type Posting struct {
+	Location  string
+	Signature []byte
+	Facts     Facts
+}
+
+// SameJob decides a merge: same text, and no stated difference in years, shift, clearance,
+// language or pay. A place never splits a job, because the cluster keeps every member's
+// location. Pay is compared only within one location, as pay bands vary by metro and
+// currency. A fact one side leaves out doesn't count, except clearance and language.
+func SameJob(a, b Posting) bool {
+	stated := func(x, y string) bool { return x != "" && y != "" && x != y }
+	if stated(a.Facts.Years, b.Facts.Years) || stated(a.Facts.Shift, b.Facts.Shift) ||
+		a.Facts.Clearance != b.Facts.Clearance || a.Facts.Language != b.Facts.Language {
 		return false
 	}
-	return Similarity(aSig, bSig) >= Threshold
+	if a.Location == b.Location && stated(a.Facts.Pay, b.Facts.Pay) {
+		return false
+	}
+	return Similarity(a.Signature, b.Signature) >= Threshold
 }

@@ -136,7 +136,7 @@ func excerpt(sourceName, body string) string {
 
 var (
 	engineering = regexp.MustCompile(`(?i)\b(engineer|engineering|developer|programmer|sde|sdet|sre|devops|devsecops|data scientist|data analyst|machine learning|ml engineer|full[- ]?stack|back[- ]?end|front[- ]?end|software|android|ios developer|qa automation|mlops)\b`)
-	notEngineer = regexp.MustCompile(`(?i)\b(sales engineer|account (executive|manager)|recruiter|talent acquisition|civil engineer|mechanical engineer|chemical engineer|electrical engineer|field service engineer|sales development)\b`)
+	notEngineer = regexp.MustCompile(`(?i)\b(sales engineer|solutions? engineer|solutions? engineering|solutions? architect|account (executive|manager)|recruiter|talent acquisition|business developer|product manager|civil|mechanical|chemical|electrical|structural|geotechnical|environmental|manufacturing|process engineer|production|tooling|harness|avionics|pcb|photonics?|rf|fpga|rtl|vlsi|asic|chip|hardware|propulsion|combustion|thermal|launch|broadcast|usability|field (service|inspector|process)|project engineer|plan check|sales development)\b`)
 	intern      = regexp.MustCompile(`(?i)\b(intern|internship|interns|apprentice|apprenticeship|trainee|co-?op)\b`)
 	entry       = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|grad|fresher|freshers|entry[- ]level|early career|junior|jr\.?|campus|associate (software|engineer|developer)|engineer i|developer i|sde[- ]?1|sde[- ]?i|software engineer 1)\b`)
 	senior      = regexp.MustCompile(`(?i)\b(senior|sr\.?|staff|principal|lead|manager|director|head of|vice president|vp|architect|distinguished|fellow|engineer iii|engineer iv|sde[- ]?3|sde[- ]?iii)\b`)
@@ -186,16 +186,41 @@ func Level(title, body, employment string, seniority []string) string {
 	return LevelUnknown
 }
 
-// IsEngineering reports whether the title is in scope.
-func IsEngineering(title string) bool {
-	return engineering.MatchString(title) && !notEngineer.MatchString(title)
+// softwareTitle names software work outright. A title with only the bare word "engineer"
+// says nothing, so its text decides: hardware and field roles rarely list a software stack.
+var (
+	softwareTitle = regexp.MustCompile(`(?i)\b(software|developer|programmer|sde|sdet|sre|site reliability|devops|devsecops|data engineer|analytics engineer|data scientist|machine learning|ml|ai|mlops|full[- ]?stack|back[- ]?end|front[- ]?end|android|ios|qa|embedded|firmware|platform engineer|cloud|security engineer|infrastructure|technical support|support engineer)\b`)
+	stackWord     = regexp.MustCompile(`(?i)\b(python|java|javascript|typescript|golang|kubernetes|docker|aws|azure|gcp|sql|linux|rest apis?|microservices|terraform|ci/cd|git)\b`)
+	sqlWord       = regexp.MustCompile(`(?i)\bsql\b`)
+	codeWord      = regexp.MustCompile(`(?i)\b(python|r programming)\b`)
+	analyst       = regexp.MustCompile(`(?i)\bdata analyst\b`)
+)
+
+// IsEngineering applies the owner's scope rules to a title and its text.
+func IsEngineering(title, body string) bool {
+	if !engineering.MatchString(title) || notEngineer.MatchString(title) {
+		return false
+	}
+	if analyst.MatchString(title) {
+		return sqlWord.MatchString(body) && codeWord.MatchString(body)
+	}
+	if softwareTitle.MatchString(title) {
+		return true
+	}
+	distinct := map[string]bool{}
+	for _, m := range stackWord.FindAllString(body, -1) {
+		distinct[strings.ToLower(m)] = true
+	}
+	return len(distinct) >= 3
 }
 
 var (
 	indiaPlace = regexp.MustCompile(`(?i)\b(india|bengaluru|bangalore|hyderabad|pune|mumbai|gurgaon|gurugram|noida|chennai|delhi|new delhi|kolkata|ahmedabad|kochi|jaipur|chandigarh|mohali|indore|coimbatore|thiruvananthapuram|trivandrum|visakhapatnam|nagpur|lucknow|bhubaneswar|mysuru|mysore)\b`)
 	remoteWord = regexp.MustCompile(`(?i)\b(remote|work from home|wfh|anywhere|worldwide|distributed)\b`)
 	global     = regexp.MustCompile(`(?i)\b(anywhere|worldwide|global|globally)\b`)
-	region     = regexp.MustCompile(`(?i)\b(us|usa|u\.s\.|united states|canada|uk|united kingdom|europe|eu|emea|germany|france|spain|poland|portugal|ireland|netherlands|latam|brazil|mexico|americas|australia|japan|nyc|new york|california)\b`)
+	// A blank location isn't proof of anything: open to the world needs words saying so.
+	openWorld = regexp.MustCompile(`(?i)\b(worldwide|anywhere in the world|work from anywhere|remote[- ]first,? globally|from anywhere|globally remote|open to (candidates )?(in |from )?india|based in india|remote[ ,(-]+india)\b`)
+	region    = regexp.MustCompile(`(?i)\b(us|usa|u\.s\.|united states|canada|uk|united kingdom|europe|eu|emea|germany|france|spain|poland|portugal|ireland|netherlands|latam|brazil|mexico|americas|australia|japan|nyc|new york|california)\b`)
 )
 
 // Geography sets where a posting is open. A remote job with a named region elsewhere is
@@ -226,7 +251,10 @@ func Geography(p source.Posting) (string, []string) {
 	case p.Remote == source.RemoteHybrid:
 		return ScopeHybrid, countries
 	case remote && p.Source == "himalayas" && len(p.Countries) == 0:
-		return ScopeGlobal, countries
+		if openWorld.MatchString(p.Body) {
+			return ScopeGlobal, countries
+		}
+		return ScopeUnknown, countries
 	case remote && seen["IN"]:
 		return ScopeRestricted, countries
 	case remote && global.MatchString(p.Location) && !region.MatchString(p.Location):
@@ -265,7 +293,7 @@ func Apply(p source.Posting) Fields {
 		Level:         Level(p.Title, body, p.EmploymentType, p.Seniority),
 		RemoteScope:   scope,
 		Countries:     countries,
-		IsEngineering: IsEngineering(p.Title),
+		IsEngineering: IsEngineering(p.Title, body),
 		ContentHash:   hash.Sum(nil),
 	}
 }

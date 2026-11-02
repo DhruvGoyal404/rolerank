@@ -209,7 +209,7 @@ func TestApplyBodiesRefusesAMissingPosting(t *testing.T) {
 func TestPagesCarryTheRules(t *testing.T) {
 	for _, dataset := range []string{"d5", "d5-recheck", "d5-redo", "d5-redo-2", "d5-audit", "d5-merged-audit"} {
 		q := Questions[dataset][0]
-		if !strings.Contains(q.Rule, "same location") || !strings.Contains(q.Rule, "different city") {
+		if !strings.Contains(q.Rule, "same level") || !strings.Contains(q.Rule, "Location never") {
 			t.Errorf("%s: %q", dataset, q.Rule)
 		}
 	}

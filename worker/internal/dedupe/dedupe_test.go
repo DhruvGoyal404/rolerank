@@ -20,16 +20,29 @@ func TestKey(t *testing.T) {
 		{{"Acme Technologies Pvt Ltd", "SDE-1"}, {"acme", "SDE 1"}},
 		{{"Acme", "Backend Engineer (Remote)"}, {"Acme", "Backend Engineer"}},
 		{{"Acme", "Backend Engineer - Remote"}, {"Acme", "Backend Engineer"}},
+		{{"Acme", "Node Engineer - Latin America, Remote"}, {"Acme", "Node Engineer - Remote, Latin America"}},
+		{{"Acme", "Sr. Back-end Engineer"}, {"Acme", "Senior Backend Engineer"}},
+		{{"Acme", "Data Engineer - India"}, {"Acme", "Data Engineer"}},
+		{{"Acme", "Data Engineer - Kochi"}, {"Acme", "Data Engineer"}}, // Kochi is the location below
 	}
 	for _, pair := range same {
-		if Key(pair[0][0], pair[0][1]) != Key(pair[1][0], pair[1][1]) {
+		if Key(pair[0][0], pair[0][1], "Kochi") != Key(pair[1][0], pair[1][1], "Kochi") {
 			t.Errorf("%v should share a key", pair)
 		}
 	}
-	if Key("Acme", "Backend Engineer") == Key("Acme", "Frontend Engineer") {
-		t.Error("different titles must differ")
+	different := [][2]string{
+		{"Backend Engineer", "Frontend Engineer"},
+		{"Software Developer in Test (C#)", "Software Developer in Test (Python)"},
+		{"CAD Intern (Spring 2027)", "CAD Intern (Summer 2027)"},
+		{"Senior Engineer", "Junior Engineer"},
+		{"Engineer", "Engineer (Active Clearance)"},
 	}
-	if Key("Acme", "Engineer") == Key("Globex", "Engineer") {
+	for _, pair := range different {
+		if Key("Acme", pair[0], "") == Key("Acme", pair[1], "") {
+			t.Errorf("%v must differ", pair)
+		}
+	}
+	if Key("Acme", "Engineer", "") == Key("Globex", "Engineer", "") {
 		t.Error("different companies must differ")
 	}
 }
@@ -78,24 +91,29 @@ func TestShortTextNeverMerges(t *testing.T) {
 func TestSameJob(t *testing.T) {
 	sig := Signature(text("w", 200))
 	other := Signature(text("x", 200))
+	job := func(location, body string, signature []byte) Posting {
+		return Posting{Location: location, Signature: signature, Facts: Read(body)}
+	}
 	tests := []struct {
 		name string
-		aLoc string
-		aAgg bool
-		bLoc string
-		bAgg bool
-		a, b []byte
+		a, b Posting
 		want bool
 	}{
-		{"same city", "pune", false, "pune", false, sig, sig, true},
-		{"same text, two cities stays two jobs", "pune", false, "london", false, sig, sig, false},
-		{"an aggregator matches an ATS city", "india", true, "pune", false, sig, sig, true},
-		{"same city, different text", "pune", false, "pune", false, sig, other, false},
-		{"no text", "pune", false, "pune", false, nil, nil, false},
+		{"same text, same city", job("pune", "", sig), job("pune", "", sig), true},
+		{"a place never splits a job", job("pune", "", sig), job("london", "", sig), true},
+		{"different text", job("pune", "", sig), job("pune", "", other), false},
+		{"no text", job("pune", "", nil), job("pune", "", nil), false},
+		{"years", job("x", "5+ years of Go", sig), job("x", "8+ years of Go", sig), false},
+		{"years left out of one", job("x", "5+ years of Go", sig), job("x", "Go", sig), true},
+		{"shift", job("x", "Sunday - Thursday", sig), job("x", "Tuesday - Saturday", sig), false},
+		{"clearance", job("x", "Active Secret clearance", sig), job("x", "", sig), false},
+		{"language", job("x", "fluent Japanese", sig), job("x", "", sig), false},
+		{"pay in one city", job("x", "$100,000", sig), job("x", "$120,000", sig), false},
+		{"pay across cities", job("x", "$100,000", sig), job("y", "$120,000", sig), true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := SameJob(tt.aLoc, tt.aAgg, tt.a, tt.bLoc, tt.bAgg, tt.b); got != tt.want {
+			if got := SameJob(tt.a, tt.b); got != tt.want {
 				t.Fatalf("got %v", got)
 			}
 		})

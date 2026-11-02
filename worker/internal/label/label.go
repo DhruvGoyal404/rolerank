@@ -60,8 +60,8 @@ var unsure = Choice{"s", "unsure", "skip / unsure"}
 var d5Questions = []Question{{
 	ID:   "same",
 	Text: "Are these the same job?",
-	Rule: "Same employer + same role + same location (or same remote scope) = same job. A different city is a different job.",
-	Help: "A re-listing of one posting on another site is the same job.",
+	Rule: "Same employer + same role + same level + same requirements, pay band and shift = same job. Location never makes a different job. Cosmetic title changes are the same; specialization, level or term changes are different.",
+	Help: "A role listed in several places is one job. Pay or legal text localised to a place counts as location.",
 	Choices: []Choice{
 		{"y", "yes", "same job"}, {"n", "no", "different"}, unsure,
 	},

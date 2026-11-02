@@ -55,10 +55,11 @@ func (s *Store) Dedupe(ctx context.Context) (done, merged int, err error) {
 
 // place puts one posting in a matching cluster or starts its own. It returns true on a merge.
 func (s *Store) place(ctx context.Context, u undeduped) (bool, error) {
-	key := dedupe.Key(u.company, u.title)
+	key := dedupe.Key(u.company, u.title, u.location)
 	location := dedupe.Location(u.location)
 	aggregator := dedupe.IsAggregator(u.source)
 	signature := dedupe.Signature(u.body)
+	me := dedupe.Posting{Location: location, Signature: signature, Facts: dedupe.Read(u.body)}
 
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
@@ -67,7 +68,7 @@ func (s *Store) place(ctx context.Context, u undeduped) (bool, error) {
 	defer tx.Rollback(ctx)
 
 	rows, err := tx.Query(ctx, `
-		SELECT c.id, c.location_key, c.minhash, src.name
+		SELECT c.id, c.location_key, c.minhash, src.name, p.body
 		FROM clusters c
 		JOIN postings p ON p.id = c.canonical_posting_id
 		JOIN sources src ON src.id = p.source_id
@@ -80,10 +81,11 @@ func (s *Store) place(ctx context.Context, u undeduped) (bool, error) {
 		location  string
 		signature []byte
 		source    string
+		body      string
 	}
 	clusters, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (cluster, error) {
 		var c cluster
-		err := row.Scan(&c.id, &c.location, &c.signature, &c.source)
+		err := row.Scan(&c.id, &c.location, &c.signature, &c.source, &c.body)
 		return c, err
 	})
 	if err != nil {
@@ -92,7 +94,7 @@ func (s *Store) place(ctx context.Context, u undeduped) (bool, error) {
 
 	for _, c := range clusters {
 		clusterAggregator := dedupe.IsAggregator(c.source)
-		if !dedupe.SameJob(location, aggregator, signature, c.location, clusterAggregator, c.signature) {
+		if !dedupe.SameJob(me, dedupe.Posting{Location: c.location, Signature: c.signature, Facts: dedupe.Read(c.body)}) {
 			continue
 		}
 		if _, err := tx.Exec(ctx, `UPDATE postings SET cluster_id = $2 WHERE id = $1`, u.id, c.id); err != nil {

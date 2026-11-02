@@ -26,19 +26,23 @@ type SourceCoverage struct {
 func (s *Store) Coverage(ctx context.Context) ([]SourceCoverage, error) {
 	rows, err := s.pool.Query(ctx, `
 		WITH visible AS (
-		  SELECT p.*, 'IN' = ANY(p.countries) AS india
+		  SELECT DISTINCT ON (COALESCE(p.cluster_id, -p.id)) p.*,
+		    'IN' = ANY(COALESCE(r.countries, p.countries)) AS india,
+		    COALESCE(r.remote_scopes, ARRAY[p.remote_scope]) AS scopes
 		  FROM postings p
+		  LEFT JOIN clusters c ON c.id = p.cluster_id
+		  LEFT JOIN cluster_reach r ON r.cluster_id = p.cluster_id
 		  WHERE p.closed_at IS NULL
-		    AND (p.cluster_id IS NULL OR EXISTS (
-		      SELECT 1 FROM clusters c WHERE c.id = p.cluster_id AND c.canonical_posting_id = p.id))
+		  -- a closed canonical mustn't hide a member that's still open
+		  ORDER BY COALESCE(p.cluster_id, -p.id), c.canonical_posting_id = p.id DESC NULLS LAST, p.id
 		), counted AS (
 		  SELECT s.name, count(v.id) AS postings,
 		    count(v.id) FILTER (WHERE v.is_engineering) AS in_scope,
 		    count(v.id) FILTER (WHERE v.is_engineering AND v.india) AS india_engineering,
 		    count(v.id) FILTER (WHERE v.is_engineering AND v.india AND v.level IN ('intern', 'entry')) AS india_early,
 		    count(v.id) FILTER (WHERE v.is_engineering AND v.india AND v.level = 'intern') AS india_intern,
-		    count(v.id) FILTER (WHERE v.is_engineering AND (v.remote_scope = 'remote_global'
-		      OR (v.remote_scope = 'remote_restricted' AND v.india))) AS remote_open,
+		    count(v.id) FILTER (WHERE v.is_engineering AND ('remote_global' = ANY(v.scopes)
+		      OR ('remote_restricted' = ANY(v.scopes) AND v.india))) AS remote_open,
 		    count(v.id) FILTER (WHERE v.is_engineering AND v.level = 'unknown') AS level_unknown,
 		    count(v.id) FILTER (WHERE v.is_engineering AND v.remote_scope = 'unknown'
 		      AND v.location_raw ~* 'remote') AS bare_remote

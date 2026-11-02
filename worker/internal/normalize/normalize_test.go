@@ -63,17 +63,34 @@ func TestLevel(t *testing.T) {
 }
 
 func TestIsEngineering(t *testing.T) {
-	yes := []string{"Software Engineer", "Backend Developer", "SDE-2", "Data Scientist", "DevOps Engineer", "ML Engineer", "Full-Stack Developer"}
-	no := []string{"Account Executive", "Sales Engineer", "Recruiter", "Civil Engineer", "Marketing Manager", "Mechanical Engineer"}
+	yes := []string{"Software Engineer", "Backend Developer", "SDE-2", "Data Scientist", "DevOps Engineer", "ML Engineer", "Full-Stack Developer", "Embedded Firmware Engineer"}
+	no := []string{"Account Executive", "Sales Engineer", "Recruiter", "Civil Engineer", "Marketing Manager", "Mechanical Engineer", "PCB Layout Engineer", "Solutions Engineer", "FPGA Engineer"}
 	for _, title := range yes {
-		if !IsEngineering(title) {
+		if !IsEngineering(title, "") {
 			t.Errorf("%q should be in scope", title)
 		}
 	}
 	for _, title := range no {
-		if IsEngineering(title) {
+		if IsEngineering(title, "Python, Java, AWS, Linux and SQL") {
 			t.Errorf("%q should be out of scope", title)
 		}
+	}
+	if IsEngineering("Test Engineer", "Test robotic hardware") || !IsEngineering("Test Engineer", "Python, Linux, AWS") {
+		t.Error("a bare engineer title must go by its text")
+	}
+	if IsEngineering("Data Analyst", "Power BI dashboards, some SQL") || !IsEngineering("Data Analyst", "SQL and Python daily") {
+		t.Error("a data analyst is in only if the role is mainly SQL or code")
+	}
+}
+
+func TestBlankHimalayasLocationNeedsWordsSayingOpen(t *testing.T) {
+	blank := source.Posting{Source: "himalayas", Remote: source.RemoteYes, Body: "Remote (CET)"}
+	if scope, _ := Geography(blank); scope != ScopeUnknown {
+		t.Fatalf("got %s", scope)
+	}
+	blank.Body = "Work from anywhere in the world."
+	if scope, _ := Geography(blank); scope != ScopeGlobal {
+		t.Fatalf("got %s", scope)
 	}
 }
 
@@ -93,7 +110,7 @@ func TestGeography(t *testing.T) {
 		{"hybrid", source.Posting{Location: "Pune", Remote: source.RemoteHybrid}, ScopeHybrid, true},
 		{"country code", source.Posting{Countries: []string{"IN"}, Remote: source.RemoteYes}, ScopeRestricted, true},
 		{"Lever lower case country", source.Posting{Countries: []string{"India"}, Location: "Hyderabad"}, ScopeOnsite, true},
-		{"Himalayas no restriction", source.Posting{Source: "himalayas", Remote: source.RemoteYes}, ScopeGlobal, false},
+		{"Himalayas no restriction", source.Posting{Source: "himalayas", Remote: source.RemoteYes, Body: "Hire from anywhere in the world"}, ScopeGlobal, false},
 		{"Himalayas India list", source.Posting{Source: "himalayas", Remote: source.RemoteYes, Countries: []string{"India", "Canada"}}, ScopeRestricted, true},
 		{"nothing stated", source.Posting{}, ScopeUnknown, false},
 		{"Indiana is not India", source.Posting{Location: "Indianapolis, Indiana"}, ScopeOnsite, false},

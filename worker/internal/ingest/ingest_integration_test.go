@@ -695,7 +695,7 @@ func TestDedupeGroupsTheSameJobOnly(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if done != 6 || merged != 1 {
+	if done != 6 || merged != 2 {
 		t.Fatalf("placed %d, merged %d", done, merged)
 	}
 	cluster := func(id int64) int64 {
@@ -708,10 +708,11 @@ func TestDedupeGroupsTheSameJobOnly(t *testing.T) {
 	if cluster(aggregator) != cluster(ats) {
 		t.Fatal("an aggregator's copy must join the ATS posting")
 	}
-	for name, id := range map[string]int64{"other city": otherCity, "other text": otherText} {
-		if cluster(id) == cluster(ats) {
-			t.Fatalf("%s must not merge", name)
-		}
+	if cluster(otherCity) != cluster(ats) {
+		t.Fatal("a place must not split a job")
+	}
+	if cluster(otherText) == cluster(ats) {
+		t.Fatal("other text must not merge")
 	}
 	if cluster(short1) == cluster(short2) {
 		t.Fatal("text too short to compare must not merge")
@@ -833,6 +834,49 @@ func TestManyWorkersManyBoardsNoDuplicates(t *testing.T) {
 	}
 	if distinct != boards*5 {
 		t.Fatalf("%d distinct IDs", distinct)
+	}
+}
+
+func TestAnIndiaMemberPutsTheClusterInAnIndiaFilter(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	text := longText("u")
+	london := h.posting("greenhouse", "acme", "1", "Acme", "Backend Engineer", "London", text)
+	pune := h.posting("greenhouse", "acme", "2", "Acme", "Backend Engineer", "Pune", text)
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET countries = '{GB}' WHERE id = $1`, london); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET countries = '{IN}' WHERE id = $1`, pune); err != nil {
+		t.Fatal(err)
+	}
+	if _, merged, err := h.store.Dedupe(ctx); err != nil || merged != 1 {
+		t.Fatalf("merged %d: %v", merged, err)
+	}
+	var hits int
+	err := h.pool.QueryRow(ctx, `SELECT count(*) FROM cluster_reach WHERE 'IN' = ANY(countries)`).Scan(&hits)
+	if err != nil || hits != 1 {
+		t.Fatalf("%d clusters match India: %v", hits, err)
+	}
+	list, err := h.store.Coverage(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range list {
+		if c.Source == "greenhouse" && (c.InScope != 1 || c.IndiaEngineering != 1) {
+			t.Fatalf("one job in India expected: %+v", c)
+		}
+	}
+	// The India member survives the canonical closing, and so does the match.
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET closed_at = now() WHERE id = $1`, london); err != nil {
+		t.Fatal(err)
+	}
+	if list, err = h.store.Coverage(ctx); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range list {
+		if c.Source == "greenhouse" && c.IndiaEngineering != 1 {
+			t.Fatalf("a closed canonical hid the job: %+v", c)
+		}
 	}
 }
 

@@ -146,7 +146,7 @@ func SelectD5(ctx context.Context, pool *pgxpool.Pool, seed string) ([]Item, map
 			return nil, nil, err
 		}
 		c.side.Source, c.side.ID = source, source+":"+jobID
-		c.key = dedupe.Key(c.side.Company, c.side.Title)
+		c.key = dedupe.Key(c.side.Company, c.side.Title, c.side.Location)
 		c.location = dedupe.Location(c.side.Location)
 		company, _, _ := cutKey(c.key)
 		companies[company] = append(companies[company], c)
@@ -217,7 +217,7 @@ func SelectD5(ctx context.Context, pool *pgxpool.Pool, seed string) ([]Item, map
 			if counts[band.Name] == band.Count {
 				break
 			}
-			company := dedupe.Key(item.A.Company, "")
+			company := dedupe.Key(item.A.Company, "", "")
 			if perCompany[company] >= 4 {
 				continue
 			}

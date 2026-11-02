@@ -93,6 +93,10 @@ func run(args []string) error {
 		}
 		ingest.WriteCoverage(os.Stdout, list)
 		return nil
+	case "reclassify":
+		changed, err := store.Reclassify(ctx)
+		fmt.Printf("reclassified: %d postings changed\n", changed)
+		return err
 	case "deny":
 		if len(args) != 3 {
 			return fmt.Errorf("usage: ingest deny <source> <token>")
