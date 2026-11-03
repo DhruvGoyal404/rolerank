@@ -25,6 +25,7 @@ func TestKey(t *testing.T) {
 		{{"Acme", "Data Engineer - India"}, {"Acme", "Data Engineer"}},
 		{{"Acme", "Data Engineer - Kochi"}, {"Acme", "Data Engineer"}}, // Kochi is the location below
 		{{"Acme", "Java Developer"}, {"Acme", "Java Engineer"}},
+		{{"Acme", "Mobile Engineer (LATAM, All Levels)"}, {"Acme", "Mobile Engineer (Turkey, All Levels)"}},
 		{{"Acme", "AI Systems Engineer (f/m/d)"}, {"Acme", "AI Systems Engineer"}},
 		{{"Acme", "Director of Engineering"}, {"Acme", "Director Engineering"}},
 	}

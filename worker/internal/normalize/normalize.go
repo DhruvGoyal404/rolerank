@@ -142,7 +142,7 @@ var (
 	entry       = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|grad|fresher|freshers|entry[- ]level|early career|junior|jr\.?|campus|associate (software|engineer|developer)|engineer i|developer i|sde[- ]?1|sde[- ]?i|software engineer 1)\b`)
 	senior      = regexp.MustCompile(`(?i)\b(senior|sr\.?|staff|principal|lead|manager|director|head of|vice president|vp|architect|distinguished|fellow|engineer iii|engineer iv|sde[- ]?3|sde[- ]?iii)\b`)
 	mid         = regexp.MustCompile(`(?i)\b(mid[- ]?level|engineer ii|developer ii|sde[- ]?2|sde[- ]?ii)\b`)
-	years       = regexp.MustCompile(`(?i)\b(\d{1,2})\s*(?:\+|[-–]\s*(\d{1,2})|to\s*(\d{1,2}))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,24}\b(?:experience|exp)\b`)
+	years       = regexp.MustCompile(`(?i)\b(\d{1,2})\s*(?:\+|[-–]\s*(\d{1,2})|to\s*(\d{1,2}))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,60}\b(?:experience|exp)\b`)
 )
 
 // Level reads the title first, because titles are what employers set deliberately. A
