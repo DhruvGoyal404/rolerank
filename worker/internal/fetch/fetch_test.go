@@ -84,6 +84,21 @@ func client(s *source, limiter Limiter) *Client {
 	})
 }
 
+func TestSlowResponseTimesOut(t *testing.T) {
+	s := newSource(t, openRobots, func(_ http.ResponseWriter, r *http.Request) {
+		<-r.Context().Done()
+	})
+	c := client(s, &fakeLimiter{})
+	c.http.Timeout = 100 * time.Millisecond
+	started := time.Now()
+	if _, err := c.Get(context.Background(), s.server.URL+"/jobs", ""); err == nil {
+		t.Fatal("a stalled server must fail")
+	}
+	if took := time.Since(started); took > 5*time.Second {
+		t.Fatalf("took %v", took)
+	}
+}
+
 func TestSendsHonestUserAgentAndReturnsBody(t *testing.T) {
 	s := newSource(t, openRobots, func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("ETag", `W/"abc"`)

@@ -837,6 +837,19 @@ func TestManyWorkersManyBoardsNoDuplicates(t *testing.T) {
 	}
 }
 
+func TestEveryPostingReachesItsSourcesAttribution(t *testing.T) {
+	h := newHarness(t)
+	h.server.set("acme", "1,2")
+	h.board("acme")
+	h.cycle()
+	var credited int
+	err := h.pool.QueryRow(context.Background(), `SELECT count(*) FROM postings p JOIN sources s ON s.id = p.source_id
+		WHERE s.attribution->>'credit' = 'Fake'`).Scan(&credited)
+	if err != nil || credited != 2 || h.count("true") != 2 {
+		t.Fatalf("%d credited: %v", credited, err)
+	}
+}
+
 func TestAnIndiaMemberPutsTheClusterInAnIndiaFilter(t *testing.T) {
 	h := newHarness(t)
 	ctx := context.Background()

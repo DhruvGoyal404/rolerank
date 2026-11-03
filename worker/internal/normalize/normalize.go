@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"html"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -141,7 +142,7 @@ var (
 	entry       = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|grad|fresher|freshers|entry[- ]level|early career|junior|jr\.?|campus|associate (software|engineer|developer)|engineer i|developer i|sde[- ]?1|sde[- ]?i|software engineer 1)\b`)
 	senior      = regexp.MustCompile(`(?i)\b(senior|sr\.?|staff|principal|lead|manager|director|head of|vice president|vp|architect|distinguished|fellow|engineer iii|engineer iv|sde[- ]?3|sde[- ]?iii)\b`)
 	mid         = regexp.MustCompile(`(?i)\b(mid[- ]?level|engineer ii|developer ii|sde[- ]?2|sde[- ]?ii)\b`)
-	years       = regexp.MustCompile(`(?i)\b(\d{1,2})\s*(?:\+|-\s*\d{1,2}|to\s*\d{1,2})?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,24}\b(?:experience|exp)\b`)
+	years       = regexp.MustCompile(`(?i)\b(\d{1,2})\s*(?:\+|[-–]\s*(\d{1,2})|to\s*(\d{1,2}))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,24}\b(?:experience|exp)\b`)
 )
 
 // Level reads the title first, because titles are what employers set deliberately. A
@@ -151,9 +152,14 @@ func Level(title, body, employment string, seniority []string) string {
 	if intern.MatchString(title) || strings.EqualFold(employment, "intern") {
 		return LevelIntern
 	}
-	switch {
-	case senior.MatchString(title):
+	if senior.MatchString(title) {
 		return LevelSenior
+	}
+	// Stated years beat a "Junior", "I" or "II" title: the rule judges what the posting asks.
+	if level := fromYears(body); level != "" {
+		return level
+	}
+	switch {
 	case entry.MatchString(title):
 		return LevelEntry
 	case mid.MatchString(title):
@@ -169,21 +175,30 @@ func Level(title, body, employment string, seniority []string) string {
 			return LevelSenior
 		}
 	}
-	if m := years.FindStringSubmatch(body); m != nil {
-		n := 0
-		for _, c := range m[1] {
-			n = n*10 + int(c-'0')
-		}
-		switch {
-		case n <= 1:
-			return LevelEntry
-		case n <= 4:
-			return LevelMid
-		default:
-			return LevelSenior
+	return LevelUnknown
+}
+
+// fromYears reads the first stated experience; a range counts by its middle, so "1-3 years"
+// is mid and "0-1 years" is entry.
+func fromYears(body string) string {
+	m := years.FindStringSubmatch(body)
+	if m == nil {
+		return ""
+	}
+	low, _ := strconv.Atoi(m[1])
+	n := float64(low)
+	for _, upper := range m[2:] {
+		if high, err := strconv.Atoi(upper); err == nil && high >= low {
+			n = float64(low+high) / 2
 		}
 	}
-	return LevelUnknown
+	switch {
+	case n <= 1:
+		return LevelEntry
+	case n <= 4:
+		return LevelMid
+	}
+	return LevelSenior
 }
 
 // softwareTitle names software work outright. A title with only the bare word "engineer"

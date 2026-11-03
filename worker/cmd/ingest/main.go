@@ -156,21 +156,25 @@ func status(ctx context.Context, pool *pgxpool.Pool) error {
 		  count(b.id) FILTER (WHERE b.status = 'active' AND b.last_checked_at IS NOT NULL),
 		  count(b.id) FILTER (WHERE b.status = 'active' AND b.next_due_at <= now()),
 		  count(b.id) FILTER (WHERE b.status = 'retired'),
-		  (SELECT count(*) FROM postings p WHERE p.source_id = s.id AND p.closed_at IS NULL)
+		  (SELECT count(*) FROM postings p WHERE p.source_id = s.id AND p.closed_at IS NULL),
+		  COALESCE(EXTRACT(EPOCH FROM now() - min(b.last_checked_at) FILTER (WHERE b.status = 'active')) / 3600, 0),
+		  COALESCE(100.0 * count(b.id) FILTER (WHERE b.status = 'active' AND b.last_status = 304)
+		    / NULLIF(count(b.id) FILTER (WHERE b.status = 'active'), 0), 0)
 		FROM sources s LEFT JOIN boards b ON b.source_id = s.id
 		GROUP BY s.id, s.name ORDER BY s.name`)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
-	fmt.Printf("%-12s %8s %8s %8s %8s %10s\n", "source", "boards", "checked", "due", "retired", "active")
+	fmt.Printf("%-12s %8s %8s %8s %8s %10s %8s %6s\n", "source", "boards", "checked", "due", "retired", "active", "lag h", "304%")
 	for rows.Next() {
 		var name string
 		var boards, checked, due, retired, active int
-		if err := rows.Scan(&name, &boards, &checked, &due, &retired, &active); err != nil {
+		var lag, notModified float64
+		if err := rows.Scan(&name, &boards, &checked, &due, &retired, &active, &lag, &notModified); err != nil {
 			return err
 		}
-		fmt.Printf("%-12s %8d %8d %8d %8d %10d\n", name, boards, checked, due, retired, active)
+		fmt.Printf("%-12s %8d %8d %8d %8d %10d %8.1f %6.1f\n", name, boards, checked, due, retired, active, lag, notModified)
 	}
 	return rows.Err()
 }

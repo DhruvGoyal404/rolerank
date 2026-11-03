@@ -29,7 +29,8 @@ var (
 	// A trailing " - City, Region" and requisition numbers are cosmetic too.
 	placeTail   = regexp.MustCompile(`\s+[-–]\s+[^-–,]+,[^-–]+$`)
 	requisition = regexp.MustCompile(`^r?\d{3,}$`)
-	cosmetic    = strings.NewReplacer("back end", "backend", "front end", "frontend", "full stack", "fullstack", "sr ", "senior ", "jr ", "junior ")
+	cosmetic    = strings.NewReplacer("back end", "backend", "front end", "frontend", "full stack", "fullstack", "sr ", "senior ", "jr ", "junior ",
+		"developer ", "engineer ", " of ", " ", " f m d ", " ", " m f d ", " ", " w m d ", " ", " m w d ", " ", " gn ", " ", " all genders ", " ", " all gender ", " ")
 )
 
 func normal(s string) string {
@@ -61,10 +62,20 @@ func Location(raw string) string {
 	return normal(raw)
 }
 
-// Signature is a MinHash of the text's 5-word shingles, or nil if the text is too short
-// to compare.
+// boilerplate lines vary with the place a posting is localised to, so they don't count
+// toward similarity. Pay itself is still compared, as a fact.
+var boilerplate = regexp.MustCompile(`(?i)[$€£₹]|\b(salary|compensation|pay range|benefits?|insurance|pension|401\(?k\)?|paid time off|pto|holidays?|leave|equal (employment )?opportunity|eeo|visa|privacy|disabilit(y|ies)|veteran|accommodation|relocation|wellness|stipend|allowance)\b`)
+
+// Signature is a MinHash of the text's 5-word shingles, leaving out boilerplate lines, or nil
+// if the text is too short to compare.
 func Signature(body string) []byte {
-	words := strings.Fields(normal(body))
+	var kept []string
+	for _, line := range strings.Split(body, "\n") {
+		if !boilerplate.MatchString(line) {
+			kept = append(kept, line)
+		}
+	}
+	words := strings.Fields(normal(strings.Join(kept, "\n")))
 	if len(words) < MinWords {
 		return nil
 	}

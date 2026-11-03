@@ -24,6 +24,9 @@ func TestKey(t *testing.T) {
 		{{"Acme", "Sr. Back-end Engineer"}, {"Acme", "Senior Backend Engineer"}},
 		{{"Acme", "Data Engineer - India"}, {"Acme", "Data Engineer"}},
 		{{"Acme", "Data Engineer - Kochi"}, {"Acme", "Data Engineer"}}, // Kochi is the location below
+		{{"Acme", "Java Developer"}, {"Acme", "Java Engineer"}},
+		{{"Acme", "AI Systems Engineer (f/m/d)"}, {"Acme", "AI Systems Engineer"}},
+		{{"Acme", "Director of Engineering"}, {"Acme", "Director Engineering"}},
 	}
 	for _, pair := range same {
 		if Key(pair[0][0], pair[0][1], "Kochi") != Key(pair[1][0], pair[1][1], "Kochi") {
