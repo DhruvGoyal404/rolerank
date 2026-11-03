@@ -126,9 +126,11 @@ var Questions = map[string][]Question{
 	"d5-redo-2":       d5Questions,
 	"d5-audit":        audit(d5Questions),
 	"d5-merged-audit": audit(d5Questions),
+	"d5-final-audit":  audit(d5Questions),
 	"d6":              d6Questions,
 	"d6-recheck":      d6Questions,
 	"d6-audit":        audit(d6Questions),
+	"d6-final-audit":  audit(d6Questions),
 }
 
 // Answer is one line of the label log. Undo appends a line too: the log is never rewritten,

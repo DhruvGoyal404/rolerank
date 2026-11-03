@@ -134,8 +134,8 @@ func IsAggregator(source string) bool {
 var (
 	years     = regexp.MustCompile(`(?i)\b\d{1,2}\s*(?:\+|-|–|to)?\s*\d{0,2}\s*\+?\s*(?:years|yrs)\b`)
 	pay       = regexp.MustCompile(`[$€£₹]\s?\d[\d,.]*[kK]?`)
-	shift     = regexp.MustCompile(`(?i)\b(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*(?:-|–|to|through)\s*(?:mon|tues|wednes|thurs|fri|satur|sun)day\b|\b\d{1,2}(?::\d\d)?\s*[ap]\.?m\.?\s*(?:-|–|to)\s*\d{1,2}(?::\d\d)?\s*[ap]\.?m\b`)
-	clearance = regexp.MustCompile(`(?i)\b(?:active|current|obtain|not required)\b[^.\n]{0,40}\bclearance\b|\bclearance\b[^.\n]{0,40}\bnot required\b|\bts/sci\b|\bpolygraph\b|\bpoly\b|\bcitizenship\b`)
+	shift     = regexp.MustCompile(`(?i)\b(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*(?:-|–|to|through)\s*(?:mon|tues|wednes|thurs|fri|satur|sun)day\b|\b\d{1,2}(?::\d\d)?\s*[ap]\.?m\.?\s*(?:-|–|to)\s*\d{1,2}(?::\d\d)?\s*[ap]\.?m\b|\b(?:apac|emea|us|uk|est|pst|cst|ist|cet|gmt|utc)\s+(?:business\s+)?(?:hours|time\s?zones?)\b|\b\d(?:\s*-\s*\d)?\s*days?\s+(?:a|per)\s+week\b`)
+	clearance = regexp.MustCompile(`(?i)\b(?:active|current|obtain|not required)\b[^.\n]{0,40}\bclearance\b|\bclearance\b[^.\n]{0,40}\bnot required\b|\bts/sci\b|\bpolygraph\b|\bpoly\b|\bcitizenship\b|\btop secret\b|\bsecret (?:level|clearance)\b`)
 	language  = regexp.MustCompile(`(?i)\b(?:mandarin|cantonese|japanese|korean|german|french|spanish|portuguese|italian|dutch|hebrew|arabic|hindi|turkish|polish|russian|nordic|swedish|danish|norwegian|finnish)\b`)
 )
 
@@ -171,10 +171,11 @@ type Posting struct {
 // SameJob decides a merge: same text, and no stated difference in years, shift, clearance,
 // language or pay. A place never splits a job, because the cluster keeps every member's
 // location. Pay is compared only within one location, as pay bands vary by metro and
-// currency. A fact one side leaves out doesn't count, except clearance and language.
+// currency. A shift or pay one side leaves out doesn't count; years, clearance and language do.
 func SameJob(a, b Posting) bool {
 	stated := func(x, y string) bool { return x != "" && y != "" && x != y }
-	if stated(a.Facts.Years, b.Facts.Years) || stated(a.Facts.Shift, b.Facts.Shift) ||
+	// Years stated on one side only is a different requirement too.
+	if a.Facts.Years != b.Facts.Years || stated(a.Facts.Shift, b.Facts.Shift) ||
 		a.Facts.Clearance != b.Facts.Clearance || a.Facts.Language != b.Facts.Language {
 		return false
 	}
