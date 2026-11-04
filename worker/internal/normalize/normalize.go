@@ -142,7 +142,7 @@ var (
 	entry       = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|grad|fresher|freshers|entry[- ]level|early career|junior|jr\.?|campus|associate (software|engineer|developer)|engineer i|developer i|sde[- ]?1|sde[- ]?i|software engineer 1)\b`)
 	senior      = regexp.MustCompile(`(?i)\b(senior|sr\.?|staff|principal|lead|manager|director|head of|vice president|vp|architect|distinguished|fellow|engineer iii|engineer iv|sde[- ]?3|sde[- ]?iii)\b`)
 	mid         = regexp.MustCompile(`(?i)\b(mid[- ]?level|engineer ii|developer ii|sde[- ]?2|sde[- ]?ii)\b`)
-	years       = regexp.MustCompile(`(?i)\b(\d{1,2})\s*(?:\+|[-–]\s*(\d{1,2})|to\s*(\d{1,2}))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,60}\b(?:experience|exp)\b`)
+	years       = regexp.MustCompile(`(?i)\b(\d{1,2}(?:\.\d)?)\s*(?:\+|[-–]\s*(\d{1,2}(?:\.\d)?)|to\s*(\d{1,2}(?:\.\d)?))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,60}\b(?:experience|exp)\b`)
 )
 
 // Level reads the title first, because titles are what employers set deliberately. A
@@ -154,6 +154,10 @@ func Level(title, body, employment string, seniority []string) string {
 	}
 	if senior.MatchString(title) {
 		return LevelSenior
+	}
+	// A graduate or campus programme is entry whatever years it mentions.
+	if graduate.MatchString(title) {
+		return LevelEntry
 	}
 	// Stated years beat a "Junior", "I" or "II" title: the rule judges what the posting asks.
 	if level := fromYears(body); level != "" {
@@ -180,20 +184,44 @@ func Level(title, body, employment string, seniority []string) string {
 
 // fromYears reads the first stated experience; a range counts by its middle, so "1-3 years"
 // is mid and "0-1 years" is entry.
+var (
+	graduate = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|university|campus|fresher|freshers|early career)\b`)
+	// "a Bachelor's degree or 3+ years" offers years in place of a degree, so a graduate qualifies.
+	inLieu = regexp.MustCompile(`(?i)\bdegree\b[^.\n]{0,20}\bor\s*$`)
+)
+
 func fromYears(body string) string {
-	m := years.FindStringSubmatch(body)
+	var m []string
+	for _, at := range years.FindAllStringSubmatchIndex(body, -1) {
+		start := max(at[0]-40, 0)
+		if inLieu.MatchString(body[start:at[0]]) || strings.Contains(strings.ToLower(body[at[1]:min(at[1]+20, len(body))]), "in lieu") {
+			continue
+		}
+		m = make([]string, 0, 4)
+		for g := 0; g < len(at); g += 2 {
+			if at[g] < 0 {
+				m = append(m, "")
+			} else {
+				m = append(m, body[at[g]:at[g+1]])
+			}
+		}
+		break
+	}
 	if m == nil {
+		if inLieu.MatchString(body) || years.MatchString(body) {
+			return LevelEntry // the only years stated stand in for a degree
+		}
 		return ""
 	}
-	low, _ := strconv.Atoi(m[1])
-	n := float64(low)
+	low, _ := strconv.ParseFloat(m[1], 64)
+	n := low
 	for _, upper := range m[2:] {
-		if high, err := strconv.Atoi(upper); err == nil && high >= low {
-			n = float64(low+high) / 2
+		if high, err := strconv.ParseFloat(upper, 64); err == nil && high >= low {
+			n = (low + high) / 2
 		}
 	}
 	switch {
-	case n <= 1:
+	case n <= 1.5: // "up to about 1 year" takes in "1 to 1.5" and "1-2 years"
 		return LevelEntry
 	case n <= 4:
 		return LevelMid

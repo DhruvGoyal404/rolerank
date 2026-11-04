@@ -59,6 +59,12 @@ func TestLevel(t *testing.T) {
 		{title: "Data Scientist", body: "1-3 years of experience", want: LevelMid},
 		{title: "Junior Developer", body: "0-1 years of experience", want: LevelEntry},
 		{title: "Full Stack Engineer - Junior", body: "2+ years of professional software engineering experience", want: LevelMid},
+		{title: "Software Engineer", body: "Bachelor's degree OR 3+ years of experience in software development", want: LevelEntry},
+		{title: "Software Engineer", body: "Bachelor's degree or 3+ years of experience. 1+ years of experience in full stack development", want: LevelEntry},
+		{title: "QA Engineer", body: "Mandatory 1 to 1.5 yrs Hands-on Exp with Java", want: LevelEntry},
+		{title: "QA Engineer", body: "1-2 years of experience in software testing", want: LevelEntry},
+		{title: "AI Engineer - University Graduate Level", body: "1-3 years of experience via internships", want: LevelEntry},
+		{title: "Backend Engineer", body: "Requires 5+ years of experience; a degree or equivalent", want: LevelSenior},
 	}
 	for _, tt := range tests {
 		if got := Level(tt.title, tt.body, tt.employment, tt.seniority); got != tt.want {
