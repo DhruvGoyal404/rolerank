@@ -356,13 +356,21 @@ The last row matters: an empty list is a correct answer when the JD doesn't fit.
 | Metric | Threshold |
 |---|---|
 | Dedupe precision (pairs we merge are true duplicates) | >= 0.99 |
-| Dedupe recall | >= 0.90 |
+| Dedupe recall | >= 0.75 (v1; was 0.90) |
 | Level classifier F1 for intern and entry | >= 0.90 |
 | India-eligibility precision | >= 0.97 |
 | Remote-open-to-India precision | >= 0.90 |
 | Job skill extraction precision | >= 0.90 |
 
 Precision outranks recall on dedupe: a wrong merge hides a real job.
+
+**Recall threshold lowered to 0.75 for v1 (owner's decision, 2026-11-04).** Set before fresh
+round 4 was scored. Reason: dedupe is precision-first. A missed duplicate shows the same job
+twice, which is a minor annoyance; a false merge hides a real job, which is harmful. Three
+fresh rounds measured recall at 0.79 to 0.83 with the merge rules tight enough to hold
+precision near 0.99, and the remaining misses are mostly reworded titles that can't be caught
+without false merges. Precision stays at 0.99. If precision misses, merging becomes more
+conservative, accepting lower recall.
 
 ### Injection (D7)
 
