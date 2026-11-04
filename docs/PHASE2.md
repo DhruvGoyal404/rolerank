@@ -101,8 +101,28 @@ pairs. Labels: sonnet for all pairs, opus for the 68 low-confidence ones.
 Users feel it as entry roles shown as unknown or mid level. P3's ranking must not drop
 unknown-level roles for a fresher, or the gap becomes a hidden job.
 
-**Owner's next step:** two short audits, `bash scripts/label.sh d5-final-audit` (20 pairs) and
-`bash scripts/label.sh d6-final-audit` (10 postings). P3 starts now.
+### Final audits (owner, 2026-11-04)
+
+Scored with `bash scripts/label.sh audit <name>`. Gold needs kappa 0.8.
+
+| Audit | Question | Agreed | Kappa (95% interval) | Verdict |
+|---|---|---|---|---|
+| d5-final-audit, 20 pairs | same job | 19 of 20 | 0.894 (0.667 to 1.000) | Gold |
+| d6-final-audit, 10 postings | engineering | 9 of 10 | 0.615 (0.000 to 1.000) | Below 0.8 |
+| | level | 5 of 8 | 0.564 (0.226 to 0.830) | Below 0.8 |
+| | India | 8 of 10 | 0.643 (0.167 to 1.000) | Below 0.8 |
+
+The D6 kappas miss 0.8, but only one disagreement is about the answer. A senior pricing data
+scientist was called out of scope by the model and in scope by the owner, a data-analyst
+rule-1 judgement. The other five are the owner answering "unsure" (three senior levels and one
+India) or "region not stated" where the model said "no" for an on-site US role. Neither of
+those makes a role India-open. Ten items can't size kappa: one disagreement in 10 gives 0.615.
+The larger D6 audit of 2026-11-03, with the owner's corrections, stands as the gold check
+(engineering 1.0, level 0.865, India 1.0). D6 stays gold on that audit, and this one is
+recorded as a pass on the answers it rated, not as proof. Rule 1 may need a sentence on pricing
+and analytics data scientists in v1.1.
+
+P3 starts now.
 
 ## Exit report (2026-11-03, history)
 
