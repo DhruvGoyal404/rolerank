@@ -118,8 +118,8 @@ detection, board registry, discovery tool, source health metrics, /sources and
 
 **Coverage after Ashby's exclusion (2026-11-02):** 37,538 in scope, 3,761 India engineering,
 96 India early-career, 27 India interns, 2,235 remote-open. Greenhouse is 85% of in scope;
-Himalayas is 69% of India early-career and 88% of remote-open. SPEC's targets of 2 lakh
-postings and 50,000 in scope are unmet, and stay as written.
+Himalayas is 69% of India early-career and 88% of remote-open. SPEC's targets became
+1.5 lakh postings and about 21,000 in scope on 2026-11-04, with the reasons in SPEC.md.
 
 **Demo:** dashboard of postings per source, lag, 304 rate, a live worker kill.
 

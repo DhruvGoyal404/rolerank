@@ -178,13 +178,20 @@ Reasoning and measurements are in SOURCES.md, "Scale". Summary:
 
 | Target | Number | Status |
 |---|---|---|
-| Postings ingested and deduplicated (all roles) | **>= 2 lakh active** as the v1 goal, 5 lakh as a stretch that depends on discovery | **Missed so far:** 1.86 lakh measured on 2026-11-02, without Ashby. No named source closes the gap in v1 |
-| In-scope postings embedded and searched | **50,000 to 1.25 lakh** | **Below the floor:** 37,538 measured on 2026-11-02 (20% of active postings). 55,571 before Ashby was removed |
+| Postings ingested and deduplicated (all roles) | **>= 1.5 lakh active** (was 2 lakh; changed 2026-11-04) | 1.83 lakh measured on 2026-11-03 |
+| In-scope postings embedded and searched | **about 21,000** (was 50,000 to 1.25 lakh; changed 2026-11-04) | 20,957 measured on 2026-11-03 |
 | Bench corpus for latency claims | **5 lakh** synthetic rows | Measured so the claim holds at the top of the range |
 | Refresh | Every 6 h while up, with conditional GET | 304 confirmed on Greenhouse and Lever |
 
-The original target, 2 to 5 lakh postings, is kept as an ingestion and engineering
-goal. It isn't a measure of value: at the measured shares, 5 lakh ATS postings would
+**Why the targets changed (owner's decision, 2026-11-04).** Ashby asked us not to aggregate
+its customers' boards, so 55,295 postings were deleted and its 18,000 in-scope roles with
+them. The scope rules also became stricter on 2026-11-03: hardware, field and customer roles
+are out, and a role in several cities is one job. Both changes lower the counts without
+lowering the value to the primary user. The 5 lakh bench corpus stays, so the latency claim
+still holds at the top of the range.
+
+The original target, 2 to 5 lakh postings, was an ingestion and engineering goal. It isn't
+a measure of value: at the measured shares, 5 lakh ATS postings would
 hold roughly 6,000 India engineering roles, and roughly 15,000 to 25,000 counting remote
 roles open to India. What counts for the primary user is
 in-scope coverage, tracked as its own metric on the admin page.
