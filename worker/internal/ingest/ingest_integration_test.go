@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -958,4 +959,68 @@ func TestDenyRemovesPostingsAndStaysDenied(t *testing.T) {
 	if _, err := h.store.Deny(ctx, h.adapter.Name(), "nobody"); err == nil {
 		t.Fatal("denied a board that doesn't exist")
 	}
+}
+
+func TestEnrichKeepsOneSearchRowPerJob(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	text := longText("w") + "\nRequirements\nPython and PostgreSQL\nNice to have\nKubernetes"
+	pune := h.posting("greenhouse", "acme", "1", "Acme", "Backend Engineer", "Pune", text)
+	h.posting("greenhouse", "acme", "2", "Acme", "Backend Engineer", "London", text)
+	outside := h.posting("greenhouse", "acme", "3", "Acme", "Account Executive", "Pune", longText("x"))
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET is_engineering = false WHERE id = $1`, outside); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := h.store.Dedupe(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if n, _, err := h.store.Enrich(ctx); err != nil || n != 1 {
+		t.Fatalf("enriched %d, err %v", n, err)
+	}
+	var req, nice []string
+	if err := h.pool.QueryRow(ctx, `SELECT skills_required, skills_nice FROM search_postings WHERE posting_id = $1`, pune).
+		Scan(&req, &nice); err != nil {
+		t.Fatal(err)
+	}
+	if !slices.Equal(req, []string{"PostgreSQL", "Python"}) || !slices.Equal(nice, []string{"Kubernetes"}) {
+		t.Fatalf("required %v, nice %v", req, nice)
+	}
+
+	// An unchanged posting keeps its embedding; a changed one loses it.
+	vector := "[" + strings.TrimSuffix(strings.Repeat("0.1,", 384), ",") + "]"
+	if _, err := h.pool.Exec(ctx, `UPDATE search_postings SET embedding = $1::halfvec, embed_model = 'm'`, vector); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := h.store.Enrich(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if got := h.searchCount("embedding IS NOT NULL"); got != 1 {
+		t.Fatalf("unchanged text lost its embedding: %d", got)
+	}
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET body = body || ' Go' WHERE id = $1`, pune); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := h.store.Enrich(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if got := h.searchCount("embedding IS NULL"); got != 1 {
+		t.Fatal("changed text kept a stale embedding")
+	}
+
+	// A job whose every listing closed leaves search.
+	if _, err := h.pool.Exec(ctx, `UPDATE postings SET closed_at = now()`); err != nil {
+		t.Fatal(err)
+	}
+	if _, removed, err := h.store.Enrich(ctx); err != nil || removed != 1 {
+		t.Fatalf("removed %d, err %v", removed, err)
+	}
+}
+
+func (h *harness) searchCount(where string) int {
+	h.t.Helper()
+	var n int
+	if err := h.pool.QueryRow(context.Background(), `SELECT count(*) FROM search_postings WHERE `+where).Scan(&n); err != nil {
+		h.t.Fatal(err)
+	}
+	return n
 }

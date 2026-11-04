@@ -97,6 +97,10 @@ func run(args []string) error {
 		changed, err := store.Reclassify(ctx)
 		fmt.Printf("reclassified: %d postings changed\n", changed)
 		return err
+	case "enrich":
+		upserted, removed, err := store.Enrich(ctx)
+		fmt.Printf("enrich: %d jobs searchable, %d removed\n", upserted, removed)
+		return err
 	case "deny":
 		if len(args) != 3 {
 			return fmt.Errorf("usage: ingest deny <source> <token>")
