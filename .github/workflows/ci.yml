@@ -102,6 +102,8 @@ jobs:
           cache-dependency-path: worker/go.mod
       - run: test -z "$(gofmt -l .)"
       - run: go vet ./...
+      - name: Vet the ONNX embedder (cgo, built only with -tags onnx)
+        run: CGO_ENABLED=1 go vet -tags onnx ./...
       - run: go test ./...
       - run: go build ./...
       - name: Start Postgres and Valkey
@@ -112,7 +114,7 @@ jobs:
       - name: Integration tests
         run: |
           . ../scripts/test-env.sh
-          go test -count=1 -tags integration -p 1 ./internal/ingest/ ./internal/limiter/
+          go test -count=1 -tags integration -p 1 ./internal/ingest/ ./internal/limiter/ ./internal/rank/
       - run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 
   arm64:
