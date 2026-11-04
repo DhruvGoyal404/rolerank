@@ -142,7 +142,7 @@ var (
 	entry       = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|grad|fresher|freshers|entry[- ]level|early career|junior|jr\.?|campus|associate (software|engineer|developer)|engineer i|developer i|sde[- ]?1|sde[- ]?i|software engineer 1)\b`)
 	senior      = regexp.MustCompile(`(?i)\b(senior|sr\.?|staff|principal|lead|manager|director|head of|vice president|vp|architect|distinguished|fellow|engineer iii|engineer iv|sde[- ]?3|sde[- ]?iii)\b`)
 	mid         = regexp.MustCompile(`(?i)\b(mid[- ]?level|engineer ii|developer ii|sde[- ]?2|sde[- ]?ii)\b`)
-	years       = regexp.MustCompile(`(?i)\b(\d{1,2}(?:\.\d)?)\s*(?:\+|[-–]\s*(\d{1,2}(?:\.\d)?)|to\s*(\d{1,2}(?:\.\d)?))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,60}\b(?:experience|exp)\b`)
+	years       = regexp.MustCompile(`(?i)\b(\d{1,2}(?:\.\d)?)\s*(?:\+|[-–]\s*(\d{1,2}(?:\.\d)?)|to\s*(\d{1,2}(?:\.\d)?))?\s*\+?\s*(?:years?|yrs?)\b[^.\n]{0,60}\b(?:experience|exp|background)\b`)
 )
 
 // Level reads the title first, because titles are what employers set deliberately. A
@@ -162,6 +162,9 @@ func Level(title, body, employment string, seniority []string) string {
 	// Stated years beat a "Junior", "I" or "II" title: the rule judges what the posting asks.
 	if level := fromYears(body); level != "" {
 		return level
+	}
+	if forGraduates.MatchString(body) {
+		return LevelEntry
 	}
 	switch {
 	case entry.MatchString(title):
@@ -185,16 +188,26 @@ func Level(title, body, employment string, seniority []string) string {
 // fromYears reads the first stated experience; a range counts by its middle, so "1-3 years"
 // is mid and "0-1 years" is entry.
 var (
-	graduate = regexp.MustCompile(`(?i)\b(new grad|new graduate|graduate|university|campus|fresher|freshers|early career)\b`)
+	graduate = regexp.MustCompile(`(?i)\b(new grad|new graduate|recent grads?|recent graduates?|graduate|university|campus|fresher|freshers|early[- ]career)\b`)
+	// In the text, only a phrase aimed at graduates counts: "graduate" alone is often a degree.
+	forGraduates = regexp.MustCompile(`(?i)\b(new grads?|new graduates?|recent grads?|recent graduates?|early[- ]career|freshers?)\b`)
+	// "two years" and "three (3) years" are read as numbers.
+	spelled = regexp.MustCompile(`(?i)\b(one|two|three|four|five|six|seven|eight|nine|ten)\b(?:\s*\(\s*\d{1,2}\s*\))?(\s*\+?\s*(?:years?|yrs?)\b)`)
+	numbers = map[string]string{"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10"}
 	// "a Bachelor's degree or 3+ years" offers years in place of a degree, so a graduate qualifies.
-	inLieu = regexp.MustCompile(`(?i)\bdegree\b[^.\n]{0,20}\bor\s*$`)
+	inLieu = regexp.MustCompile(`(?i)\bdegree\b[^.\n]{0,120}\bor\s*$`)
 )
 
 func fromYears(body string) string {
+	body = spelled.ReplaceAllStringFunc(body, func(s string) string {
+		m := spelled.FindStringSubmatch(s)
+		return numbers[strings.ToLower(m[1])] + m[2]
+	})
 	var m []string
 	for _, at := range years.FindAllStringSubmatchIndex(body, -1) {
-		start := max(at[0]-40, 0)
-		if inLieu.MatchString(body[start:at[0]]) || strings.Contains(strings.ToLower(body[at[1]:min(at[1]+20, len(body))]), "in lieu") {
+		start := max(at[0]-140, 0)
+		after := strings.ToLower(body[at[1]:min(at[1]+30, len(body))])
+		if inLieu.MatchString(body[start:at[0]]) || strings.Contains(after, "in lieu") || strings.Contains(after, "substitut") {
 			continue
 		}
 		m = make([]string, 0, 4)
