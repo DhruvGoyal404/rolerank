@@ -8,6 +8,7 @@ import (
 	"hash/fnv"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -132,11 +133,15 @@ func IsAggregator(source string) bool {
 }
 
 var (
-	years     = regexp.MustCompile(`(?i)\b\d{1,2}\s*(?:\+|-|–|to)?\s*\d{0,2}\s*\+?\s*(?:years|yrs)\b`)
+	years     = regexp.MustCompile(`(?i)\b\d{1,2}\s*(?:\+|-|–|to)?\s*\d{0,2}\s*\+?\s*(?:years|yrs|anos|años|jahre|ans)\b`)
 	pay       = regexp.MustCompile(`[$€£₹]\s?\d[\d,.]*[kK]?`)
 	shift     = regexp.MustCompile(`(?i)\b(?:mon|tues|wednes|thurs|fri|satur|sun)day\s*(?:-|–|to|through)\s*(?:mon|tues|wednes|thurs|fri|satur|sun)day\b|\b\d{1,2}(?::\d\d)?\s*[ap]\.?m\.?\s*(?:-|–|to)\s*\d{1,2}(?::\d\d)?\s*[ap]\.?m\b|\b(?:apac|emea|us|uk|est|pst|cst|ist|cet|gmt|utc)\s+(?:business\s+)?(?:hours|time\s?zones?)\b|\b\d(?:\s*-\s*\d)?\s*days?\s+(?:a|per)\s+week\b`)
 	clearance = regexp.MustCompile(`(?i)\b(?:active|current|obtain|not required)\b[^.\n]{0,40}\bclearance\b|\bclearance\b[^.\n]{0,40}\bnot required\b|\bts/sci\b|\bpolygraph\b|\bpoly\b|\bcitizenship\b|\btop secret\b|\bsecret (?:level|clearance)\b`)
 	language  = regexp.MustCompile(`(?i)\b(?:mandarin|cantonese|japanese|korean|german|french|spanish|portuguese|italian|dutch|hebrew|arabic|hindi|turkish|polish|russian|nordic|swedish|danish|norwegian|finnish)\b`)
+	// must words say how hard a requirement is; one changed from required to preferred is a
+	// different job, so they are counted, not just collected.
+	must  = regexp.MustCompile(`(?i)\b(?:required|requirements?|preferred|preferably|ideally|optional|nice[- ]to[- ]have|must(?:[- ]have)?|bonus|a plus|on[- ]call)\b`)
+	terms = regexp.MustCompile(`(?i)\b(?:independent\s+)?contract(?:or)?(?:\s+|-)(?:role|position|basis|to[- ]hire|employee)\b|\bfreelance\b|\b1099\b|\bc2c\b|\bcorp[- ]to[- ]corp\b|\bfixed[- ]term\b|\btemporary\s+(?:role|position|contract)\b`)
 )
 
 func set(re *regexp.Regexp, body string) string {
@@ -152,13 +157,32 @@ func set(re *regexp.Regexp, body string) string {
 	return strings.Join(list, ";")
 }
 
+// count is like set but counts each match, over the lines that aren't boilerplate.
+func count(re *regexp.Regexp, body string) string {
+	n := map[string]int{}
+	for _, line := range strings.Split(body, "\n") {
+		if boilerplate.MatchString(line) {
+			continue
+		}
+		for _, m := range re.FindAllString(line, -1) {
+			n[strings.Join(strings.Fields(strings.ToLower(m)), " ")]++
+		}
+	}
+	list := make([]string, 0, len(n))
+	for m, k := range n {
+		list = append(list, m+"="+strconv.Itoa(k))
+	}
+	sort.Strings(list)
+	return strings.Join(list, ";")
+}
+
 // Facts are the things a posting can state that make it a different job even when the
 // text is otherwise the same.
-type Facts struct{ Years, Pay, Shift, Clearance, Language string }
+type Facts struct{ Years, Pay, Shift, Clearance, Language, Terms, Must string }
 
 // Read extracts a posting's facts.
 func Read(body string) Facts {
-	return Facts{set(years, body), set(pay, body), set(shift, body), set(clearance, body), set(language, body)}
+	return Facts{set(years, body), set(pay, body), set(shift, body), set(clearance, body), set(language, body), set(terms, body), count(must, body)}
 }
 
 // Posting is what a merge decision looks at.
@@ -169,14 +193,15 @@ type Posting struct {
 }
 
 // SameJob decides a merge: same text, and no stated difference in years, shift, clearance,
-// language or pay. A place never splits a job, because the cluster keeps every member's
+// language, employment terms, how hard each requirement is, or pay. A place never splits a job, because the cluster keeps every member's
 // location. Pay is compared only within one location, as pay bands vary by metro and
-// currency. A shift or pay one side leaves out doesn't count; years, clearance and language do.
+// currency. A shift or pay one side leaves out doesn't count; years, clearance, language, terms and must words do.
 func SameJob(a, b Posting) bool {
 	stated := func(x, y string) bool { return x != "" && y != "" && x != y }
 	// Years stated on one side only is a different requirement too.
 	if a.Facts.Years != b.Facts.Years || stated(a.Facts.Shift, b.Facts.Shift) ||
-		a.Facts.Clearance != b.Facts.Clearance || a.Facts.Language != b.Facts.Language {
+		a.Facts.Clearance != b.Facts.Clearance || a.Facts.Language != b.Facts.Language ||
+		a.Facts.Terms != b.Facts.Terms || a.Facts.Must != b.Facts.Must {
 		return false
 	}
 	if a.Location == b.Location && stated(a.Facts.Pay, b.Facts.Pay) {

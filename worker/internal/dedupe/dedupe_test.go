@@ -115,6 +115,12 @@ func TestSameJob(t *testing.T) {
 		{"shift", job("x", "Sunday - Thursday", sig), job("x", "Tuesday - Saturday", sig), false},
 		{"clearance", job("x", "Active Secret clearance", sig), job("x", "", sig), false},
 		{"language", job("x", "fluent Japanese", sig), job("x", "", sig), false},
+		{"contract vs permanent", job("x", "This is an Independent Contract Role", sig), job("x", "", sig), false},
+		{"contract-to-hire vs fixed-term", job("x", "contract-to-hire", sig), job("x", "a fixed-term role", sig), false},
+		{"required vs preferred", job("x", "Go is required. Rust is preferred.", sig), job("x", "Go is preferred. Rust is preferred.", sig), false},
+		{"on-call dropped", job("x", "There is an on-call rotation", sig), job("x", "", sig), false},
+		{"years in Portuguese", job("x", "Mais de 5 anos de experiência", sig), job("x", "Experiência", sig), false},
+		{"must words in localised pay lines don't count", job("x", "Go required\nSalary: a degree is required", sig), job("y", "Go required\nSalary: varies", sig), true},
 		{"pay in one city", job("x", "$100,000", sig), job("x", "$120,000", sig), false},
 		{"pay across cities", job("x", "$100,000", sig), job("y", "$120,000", sig), true},
 	}
