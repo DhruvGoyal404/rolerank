@@ -5,7 +5,9 @@ go 1.27.3
 require (
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/valkey-io/valkey-go v1.0.79
+	github.com/yalue/onnxruntime_go v1.36.0
 	golang.org/x/net v0.62.0
+	golang.org/x/text v0.43.0
 )
 
 require (
@@ -14,5 +16,4 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
-	golang.org/x/text v0.43.0 // indirect
 )

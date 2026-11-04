@@ -38,3 +38,6 @@ Thumbs.db
 # Tooling output
 .claude/
 graphify-out/
+
+# Embedding model files: downloaded by scripts, pinned by revision and SHA-256, never committed
+/models/

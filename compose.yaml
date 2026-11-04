@@ -71,8 +71,35 @@ services:
     volumes:
       - ./db/corpus/migrations:/db/migrations:ro
 
+  # Embeddings need cgo and ONNX Runtime, so they run here, in Linux, as on the host.
+  # scripts/models.sh fills ./models first; scripts/embed.sh runs this.
+  embed:
+    image: golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+    labels: *labels
+    profiles: ["tools"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /src/worker
+    environment:
+      CGO_ENABLED: "1"
+      GOFLAGS: -buildvcs=false
+      GOTOOLCHAIN: auto # go.mod pins go1.27.3; the image is 1.27.2, the newest old enough
+      ROLERANK_CORPUS_URL: postgres://corpus_rw:${ROLERANK_PW_CORPUS_RW:?set in .env}@postgres:5432/corpus?sslmode=disable
+      ROLERANK_ORT_LIB: /models/onnxruntime/onnxruntime-linux-x64-1.31.0/lib/libonnxruntime.so.1.31.0
+      ROLERANK_EMBED_MODEL: /models/bge-small-en-v1.5/model.onnx
+    volumes:
+      - ./worker:/src/worker:ro
+      - ./models:/models:ro
+      - gocache:/root/.cache/go-build
+      - gomod:/go/pkg/mod
+
 volumes:
   pg:
     labels: *labels
   valkey:
+    labels: *labels
+  gocache:
+    labels: *labels
+  gomod:
     labels: *labels
