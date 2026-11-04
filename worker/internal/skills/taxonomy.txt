@@ -1,0 +1,447 @@
+# RoleRank skill taxonomy. Written by us; see ARCHITECTURE.md, "Skills".
+# One skill per line: canonical | category | aliases, comma-separated.
+# Matching is case-insensitive on whole tokens. An alias starting with "=" matches only with
+# that exact case, for names that are also plain words (Go, R, C, Swift, Spark).
+# The canonical name always matches too, unless it is listed with "=".
+
+# languages
+Python | language | python3, py
+=Java | language | java se, java ee, java 8, java 11, java 17, java 21, core java
+JavaScript | language | javascript, js, es6, ecmascript
+TypeScript | language | ts, typescript
+=Go | language | golang, =Go
+=C | language | ansi c, =C
+C++ | language | cpp, c plus plus, c++11, c++14, c++17, c++20
+C# | language | csharp, c sharp
+Rust | language | rustlang
+=Ruby | language | =Ruby
+PHP | language | php7, php8
+Kotlin | language |
+=Swift | language | =Swift
+Objective-C | language | objective c, objc
+Scala | language |
+=R | language | r programming, rstudio, =R
+MATLAB | language |
+Perl | language |
+Bash | language | shell scripting, shell script, bash scripting, zsh
+PowerShell | language |
+SQL | language | t-sql, tsql, pl/sql, plsql, ansi sql
+Dart | language |
+Elixir | language |
+Erlang | language |
+Haskell | language |
+Clojure | language |
+=Julia | language | =Julia
+Lua | language |
+Groovy | language |
+Solidity | language |
+COBOL | language |
+Fortran | language |
+Assembly | language | assembly language, x86 assembly, arm assembly
+VHDL | language |
+Verilog | language | systemverilog
+=Elm | language | =Elm
+F# | language | fsharp
+OCaml | language |
+Zig | language |
+Visual Basic | language | vb.net, vba
+
+# web frontend
+React | frontend | react.js, reactjs, react js
+Next.js | frontend | nextjs, next js
+Angular | frontend | angularjs, angular.js
+Vue.js | frontend | vue, vuejs, vue js, vue 3
+Nuxt | frontend | nuxt.js, nuxtjs
+Svelte | frontend | sveltekit
+Redux | frontend | redux toolkit
+HTML | frontend | html5
+CSS | frontend | css3
+Sass | frontend | scss
+Tailwind CSS | frontend | tailwind, tailwindcss
+Bootstrap | frontend |
+jQuery | frontend |
+Webpack | frontend |
+Vite | frontend |
+Babel | frontend |
+GraphQL | api | graph ql
+Apollo GraphQL | api | apollo client, apollo server
+REST APIs | api | rest, restful, rest api, restful apis, restful services, rest apis
+gRPC | api | grpc
+WebSockets | api | websocket, socket.io
+OpenAPI | api | swagger
+Storybook | frontend |
+Material UI | frontend | mui, material-ui
+Three.js | frontend | threejs
+D3.js | frontend | d3, d3js
+WebAssembly | frontend | wasm
+Web Accessibility | frontend | wcag, a11y, accessibility
+Responsive Design | frontend | responsive web design
+Micro-frontends | frontend | microfrontends, micro frontends
+
+# backend frameworks
+Node.js | backend | node, nodejs, node js
+Express.js | backend | expressjs
+NestJS | backend | nest.js, nestjs
+Fastify | backend |
+Django | backend | django rest framework, drf
+=Flask | backend | flask api, =Flask
+FastAPI | backend | fast api
+Spring Framework | backend | spring mvc, spring core, spring data, spring security
+Spring Boot | backend | springboot, spring-boot
+Hibernate | backend | jpa
+Ruby on Rails | backend | rails, ror
+Laravel | backend |
+Symfony | backend |
+ASP.NET | backend | asp.net core, asp.net mvc
+.NET | backend | dotnet, .net core, .net framework, .net 6, .net 8
+Entity Framework | backend | ef core
+=Gin | backend | gin-gonic, gin gonic, =Gin
+Phoenix Framework | backend | elixir phoenix
+Ktor | backend |
+Quarkus | backend |
+Micronaut | backend |
+Deno | backend |
+=Bun | backend | bun.js, =Bun
+Celery | backend |
+Microservices | architecture | microservice, micro-services, microservices architecture
+Event-driven Architecture | architecture | event driven, event-driven
+Domain-driven Design | architecture | ddd, domain driven design
+System Design | architecture | distributed systems design
+Distributed Systems | architecture | distributed computing
+Serverless | architecture | serverless architecture
+Design Patterns | architecture |
+Object-oriented Programming | concepts | oop, object oriented, object-oriented, object oriented programming, ood
+Functional Programming | concepts |
+Data Structures | concepts | data structures and algorithms, dsa
+Algorithms | concepts |
+Multithreading | concepts | concurrency, multi-threading, concurrent programming
+Unit Testing | testing | unit tests
+Test-driven Development | testing | tdd
+Behavior-driven Development | testing | bdd
+Integration Testing | testing | integration tests
+End-to-end Testing | testing | e2e testing, e2e tests
+
+# mobile
+Android | mobile | android sdk, android development
+iOS | mobile | ios development
+React Native | mobile | react-native
+Flutter | mobile |
+Jetpack Compose | mobile |
+SwiftUI | mobile |
+UIKit | mobile |
+Xamarin | mobile |
+Ionic | mobile |
+Expo | mobile | expo go, =Expo
+
+# databases
+PostgreSQL | database | postgres, postgresql, psql
+MySQL | database | mysql 8
+MariaDB | database |
+Oracle Database | database | oracle db, oracle sql, oracle 19c
+SQL Server | database | mssql, ms sql, microsoft sql server, sql server
+SQLite | database |
+MongoDB | database | mongo, mongo db
+Redis | database |
+Valkey | database |
+Cassandra | database | apache cassandra
+DynamoDB | database | dynamo db, amazon dynamodb
+Elasticsearch | database | elastic search, elk, elastic stack
+OpenSearch | database |
+Neo4j | database |
+CouchDB | database |
+Couchbase | database |
+Firebase | database | firestore, firebase realtime database
+Supabase | database |
+Snowflake | data | snowflake data warehouse
+BigQuery | data | google bigquery, big query
+Redshift | data | amazon redshift, aws redshift
+Databricks | data |
+ClickHouse | database |
+TimescaleDB | database |
+InfluxDB | database |
+CockroachDB | database |
+HBase | database |
+Memcached | database |
+pgvector | database |
+Pinecone | database |
+Milvus | database |
+Weaviate | database |
+Qdrant | database |
+Vector Databases | database | vector database, vector db, vector store
+NoSQL | database | nosql databases
+Database Design | database | data modeling, data modelling, schema design
+Query Optimization | database | query tuning, sql tuning, performance tuning
+
+# cloud
+AWS | cloud | amazon web services
+Azure | cloud | microsoft azure
+Google Cloud | cloud | gcp, google cloud platform
+Oracle Cloud | cloud | oci
+IBM Cloud | cloud |
+DigitalOcean | cloud |
+Heroku | cloud |
+Vercel | cloud |
+Netlify | cloud |
+Cloudflare | cloud | cloudflare workers
+AWS Lambda | cloud | lambda functions, aws lambda
+Amazon EC2 | cloud | ec2
+Amazon S3 | cloud | s3
+Amazon ECS | cloud | ecs, fargate
+Amazon EKS | cloud | eks
+Amazon RDS | cloud | rds, aurora
+Amazon SQS | cloud | sqs
+Amazon SNS | cloud | sns
+API Gateway | cloud | aws api gateway
+CloudFormation | cloud | aws cloudformation
+AWS CDK | cloud | cdk
+CloudWatch | cloud | amazon cloudwatch
+AWS IAM | cloud | aws iam, =IAM
+Azure DevOps | devops | azure pipelines, vsts
+Azure Functions | cloud |
+AKS | cloud | azure kubernetes service
+GKE | cloud | google kubernetes engine
+Cloud Run | cloud | google cloud run
+Firebase Functions | cloud | cloud functions
+
+# devops and infrastructure
+Docker | devops | containers, containerization, dockerfile, docker compose, docker-compose
+Kubernetes | devops | k8s, kubernetes clusters, kubectl
+Helm | devops | helm charts
+Terraform | devops | hcl, terraform cloud
+Ansible | devops |
+Pulumi | devops |
+=Chef | devops | chef infra, =Chef
+Puppet | devops |
+Jenkins | devops |
+GitHub Actions | devops | github workflows
+GitLab CI | devops | gitlab ci/cd, gitlab-ci
+CircleCI | devops | circle ci
+Travis CI | devops |
+Argo CD | devops | argocd, argo
+FluxCD | devops | flux cd
+CI/CD | devops | ci cd, continuous integration, continuous delivery, continuous deployment, ci/cd pipelines
+Git | devops | github, gitlab, bitbucket, version control, git workflows
+Linux | devops | unix, ubuntu, centos, rhel, red hat enterprise linux, debian
+Nginx | devops |
+Apache HTTP Server | devops | apache httpd, apache web server
+Prometheus | observability |
+Grafana | observability |
+Datadog | observability |
+New Relic | observability | newrelic
+Splunk | observability |
+OpenTelemetry | observability | otel
+Jaeger | observability |
+ELK Stack | observability | logstash, kibana
+PagerDuty | observability |
+Site Reliability Engineering | devops | sre
+Infrastructure as Code | devops | iac, infrastructure-as-code
+Observability | observability | monitoring and alerting
+Istio | devops | service mesh
+Envoy | devops |
+HashiCorp Consul | devops |
+HashiCorp Vault | security |
+Packer | devops |
+Vagrant | devops |
+Computer Networking | infrastructure | tcp/ip, computer networks, network protocols, network engineering
+Load Balancing | infrastructure | load balancers
+CDN | infrastructure | content delivery network
+
+# messaging and streaming
+Kafka | streaming | apache kafka, kafka streams
+RabbitMQ | streaming | rabbit mq
+ActiveMQ | streaming |
+Amazon Kinesis | streaming | kinesis
+Pub/Sub | streaming | google pub/sub, pubsub
+NATS | streaming |
+Apache Pulsar | streaming | pulsar
+Apache Flink | data | flink
+Apache Spark | data | spark, pyspark, spark sql, =Spark
+Apache Airflow | data | airflow
+Apache Beam | data |
+Hadoop | data | hdfs, mapreduce, hive, apache hive
+Presto | data | trino
+dbt | data | data build tool
+Apache Iceberg | data | iceberg
+Delta Lake | data |
+ETL | data | elt, etl pipelines, data pipelines, data pipeline
+Data Warehousing | data | data warehouse, data warehouses
+Data Lake | data | data lakes, lakehouse
+Data Engineering | data |
+Fivetran | data |
+Airbyte | data |
+Informatica | data |
+Talend | data |
+SSIS | data |
+Kafka Connect | streaming |
+Debezium | streaming | change data capture, cdc
+
+# data science and ML
+Machine Learning | ml | ml, machine-learning
+Deep Learning | ml | deep-learning, neural networks
+Natural Language Processing | ml | nlp
+Computer Vision | ml | image processing
+Large Language Models | ml | llm, llms, large language model, generative ai, genai, gen ai
+Retrieval-augmented Generation | ml | rag, retrieval augmented generation
+Prompt Engineering | ml |
+Reinforcement Learning | ml |
+Recommender Systems | ml | recommendation systems, recommendation engines
+Time Series | ml | time series analysis, forecasting
+Statistics | ml | statistical modeling, statistical analysis, hypothesis testing
+A/B Testing | ml | ab testing, experimentation, split testing
+Feature Engineering | ml |
+MLOps | ml | ml ops, ml engineering
+TensorFlow | ml | tensor flow, tf, keras
+PyTorch | ml | torch
+scikit-learn | ml | sklearn, scikit learn
+XGBoost | ml | lightgbm, catboost
+Pandas | ml | pandas dataframes
+NumPy | ml | numpy
+SciPy | ml |
+Jupyter | ml | jupyter notebooks, jupyter notebook
+Hugging Face | ml | huggingface, transformers
+LangChain | ml |
+LlamaIndex | ml |
+OpenAI API | ml | openai, gpt-4, chatgpt api
+spaCy | ml | spacy
+NLTK | ml |
+OpenCV | ml |
+MLflow | ml |
+Kubeflow | ml |
+SageMaker | ml | amazon sagemaker, aws sagemaker
+Vertex AI | ml | google vertex ai
+Amazon Bedrock | ml | bedrock
+ONNX | ml | onnx runtime
+CUDA | ml | gpu programming
+Triton | ml | triton inference server
+vLLM | ml | vllm
+Embeddings | ml | vector embeddings, text embeddings
+Fine-tuning | ml | fine tuning, lora, peft
+Model Deployment | ml | model serving
+Data Analysis | analytics | data analytics
+Data Visualization | analytics | data visualisation, visualization
+Tableau | analytics |
+Power BI | analytics | powerbi
+Looker | analytics | looker studio
+Metabase | analytics |
+=Excel | analytics | microsoft excel, advanced excel, ms excel, =Excel
+Matplotlib | analytics | seaborn, plotly
+Google Analytics | analytics | ga4
+Mixpanel | analytics |
+Amplitude | analytics |
+
+# testing and quality
+Selenium | testing | selenium webdriver
+Cypress | testing |
+Playwright | testing |
+Puppeteer | testing |
+Jest | testing |
+Vitest | testing |
+Mocha | testing | chai
+JUnit | testing | junit5, junit 5
+TestNG | testing |
+pytest | testing | py.test
+Appium | testing |
+Postman | testing |
+JMeter | testing | apache jmeter
+k6 | testing | grafana k6
+Gatling | testing |
+Cucumber | testing | gherkin
+Robot Framework | testing |
+Test Automation | testing | automation testing, automated testing, qa automation
+Manual Testing | testing | manual qa
+Performance Testing | testing | load testing, stress testing
+API Testing | testing | rest assured, rest-assured
+Mockito | testing |
+SonarQube | testing | sonar
+Quality Assurance | testing | qa, software testing
+
+# security
+Application Security | security | appsec
+Penetration Testing | security | pentesting, pen testing, ethical hacking
+OWASP | security | owasp top 10
+Threat Modeling | security | threat modelling
+Vulnerability Management | security | vulnerability assessment
+SIEM | security |
+Security Operations | security | security operations center, =SOC
+Incident Response | security | dfir
+Cryptography | security | encryption, pki, tls, ssl
+OAuth | security | oauth2, oauth 2.0, openid connect, oidc
+SAML | security | sso, single sign-on
+Identity and Access Management | security | identity management
+Zero Trust | security |
+Network Security | security | firewalls
+Cloud Security | security |
+DevSecOps | security |
+Burp Suite | security | burp
+Wireshark | security |
+Metasploit | security |
+Nmap | security |
+Snyk | security |
+SAST | security | static analysis, static application security testing
+DAST | security | dynamic analysis
+Malware Analysis | security | reverse engineering
+Detection Engineering | security | threat detection
+CrowdStrike | security |
+ISO 27001 | security | iso27001
+SOC 2 | security | soc2
+GDPR | security | data privacy
+PCI DSS | security | pci-dss, pci
+
+# embedded and systems
+Embedded Systems | embedded | embedded software, embedded c, firmware, firmware development
+RTOS | embedded | freertos, real-time operating systems, zephyr
+Embedded Linux | embedded | yocto, buildroot
+Microcontrollers | embedded | arm cortex, stm32, arduino, esp32, mcu
+Linux Kernel | embedded | kernel development, device drivers, linux device drivers
+Operating Systems | systems | os internals
+Compilers | systems | llvm, compiler design
+Robotics | embedded | ros, ros2, robot operating system
+Autonomous Systems | embedded | autonomous vehicles, self-driving
+IoT | embedded | internet of things
+CAN Bus | embedded | canbus, =CAN
+AUTOSAR | embedded |
+Systems Programming | systems | low-level programming
+Performance Optimization | systems | profiling, performance engineering
+Memory Management | systems |
+High-performance Computing | systems | hpc, parallel computing, mpi, openmp
+
+# blockchain
+Blockchain | blockchain | web3, distributed ledger
+Ethereum | blockchain | evm
+Smart Contracts | blockchain | smart contract
+Hyperledger | blockchain | hyperledger fabric
+
+# game and graphics
+=Unity | games | unity3d, unity 3d, unity engine, =Unity
+Unreal Engine | games | unreal, ue4, ue5
+Game Development | games | gamedev
+OpenGL | graphics |
+Vulkan | graphics |
+DirectX | graphics |
+Computer Graphics | graphics | rendering
+
+# product tools and practices
+Agile | practice | scrum, kanban, agile methodologies, agile development
+Jira | practice | atlassian jira
+Confluence | practice |
+Code Review | practice | code reviews
+Technical Documentation | practice | technical writing
+Figma | design |
+UI/UX Design | design | ui design, ux design, ux/ui, user interface design, ux research
+
+# business systems
+Salesforce | business | sfdc, apex, salesforce development, lightning web components, lwc
+SAP | business | sap abap, abap, sap hana, s/4hana
+ServiceNow | business |
+Workday | business |
+Dynamics 365 | business | microsoft dynamics, dynamics crm
+Shopify | business | shopify plus, liquid
+WordPress | business |
+Stripe | business | payments integration
+Twilio | business |
+Zapier | business |
+NetSuite | business |
+Guidewire | business |
+Pega | business | pegasystems
+UiPath | business | rpa, robotic process automation
+Power Automate | business | power apps, power platform
