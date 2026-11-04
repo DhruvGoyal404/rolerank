@@ -17,8 +17,9 @@ const (
 	shingleWords = 5
 	// MinWords is the shortest text worth comparing. Below it, similarity means little.
 	MinWords = 30
-	// Threshold is the estimated Jaccard similarity needed to merge.
-	Threshold = 0.95
+	// Threshold is the estimated Jaccard similarity needed to merge. 0.97, not 0.95: at 0.95 a single
+	// changed requirement, clearance or shift line still merged (fresh rounds 4 and 5).
+	Threshold = 0.97
 )
 
 var (
