@@ -7,28 +7,27 @@ takes a written reason.
 
 ## Schedule
 
-The owner's target (Q12): 140 hours a week, **P1 to P5 done by 2026-11-10**, P6 to P8
-after, ahead of an internship starting in January 2027. Dates are ends of phases.
+**Lean v1 (owner's decision, 2026-11-04).** v1 is P3, P4, P5 (with Bring a JD), a minimal
+P6 and P8, **deployed by 2026-11-22**. P7's email alerts and everything listed under "v1.1"
+below wait until after v1. Every dataset is model-labelled with a small human audit; the
+owner's time goes only to audits. Dates are ends of phases.
 
 | Phase | Done by | Owner's time needed |
 |---|---|---|
-| P1 Foundation and CI | 2026-11-02 | Create the Google and GitHub OAuth apps |
-| P2 Ingestion | 2026-11-04 | Label D5 and D6 (600 labels). Send the three outreach emails |
-| P3 Search and ranking | 2026-11-06 | Grade D3 (500 pairs, plus 50 repeats) |
-| P4 Resume parsing | 2026-11-08 | Review the hostile-file results |
-| P4b Bring a JD | 2026-11-09 | Audit 50 tailoring suggestions |
-| P5 Explanations and gaps | 2026-11-10 | Review the demo |
-| P6 Product UI | 2026-11-24 | Walkthrough with someone new |
-| P7 Alerts and tracker | 2026-12-05 | Real use for real applications |
-| P8 Deploy, up and down | 2026-12-15 | AWS SSO login, budget and alarm emails |
-| Buffer | 2026-12-31 | |
+| P1 Foundation and CI | 2026-11-02 (done) | |
+| P2 Ingestion | 2026-11-04 (closed with one known gap) | Two final audits, 30 items |
+| P3 Search and ranking | 2026-11-08 | Audit of the model-graded D3 sample; pick the embedding model |
+| P4 Resume parsing | 2026-11-11 | Review the hostile-file results |
+| P5 Bring a JD, explanations, tailoring | 2026-11-14 | Audit a sample of tailoring suggestions |
+| P6 Minimal product UI | 2026-11-18 | One walkthrough |
+| P8 Deploy, up and down | 2026-11-22 | AWS SSO login, budget and alarm emails |
 
 Risks to these dates:
 
 - P1 to P5 in 10 days is aggressive even at this pace, and the phases are sequential.
   A gate is never skipped to hold a date. If a date slips, it slips, and the report says
   so.
-- The eval gates need the owner's hands: about 1,150 labels and grades between P2 and P3.
+- The eval gates need the owner's hands only for audits now, not full labelling passes.
 - Providers may not reply to the outreach emails in time. P2 proceeds at 1 request per
   second per host regardless.
 - The first full ingestion cycle runs at polite rates, so it can't be rushed. Common
@@ -114,7 +113,9 @@ detection, board registry, discovery tool, source health metrics, /sources and
 - **Per-source share of in-scope roles** in the P2 report, recorded in `coverage_snapshots`
   and shown on the admin metrics page in P6, so reliance on one source is visible over time.
 
-**Exit status (2026-11-03): not met.** See PHASE2.md, "Exit report".
+**Exit status (2026-11-04): closed by the owner with one known v1 gap,** entry-level F1 (0.70
+against 0.90). Dedupe passed on the last fresh round. The thresholds weren't changed. See
+PHASE2.md, "Close report".
 
 **Coverage after Ashby's exclusion (2026-11-02):** 37,538 in scope, 3,761 India engineering,
 96 India early-career, 27 India interns, 2,235 remote-open. Greenhouse is 85% of in scope;
@@ -171,7 +172,7 @@ encrypted storage; LLM ledger and caps. Datasets D1 and D7.
 
 **Demo:** upload a synthetic resume, see the parse, correct a field, watch a zip bomb fail.
 
-## P4b: Bring a JD (first user-facing milestone)
+## P4b: Bring a JD (first user-facing milestone, done inside P5 for v1)
 
 The first thing a real person can use. Paste a job description, get the same breakdown
 as an indexed job: matched skills, missing skills, level fit, and tailoring with the
@@ -194,23 +195,24 @@ doesn't show Kubernetes.
 
 ## P5: explanations and gaps
 
-Deterministic explanations on indexed jobs, on-demand LLM prose, skill-gap analysis.
+Deterministic explanations on indexed jobs and on-demand LLM prose, with P4b's Bring a JD and
+grounded tailoring. The skill-gap page is v1.1; the per-job matched and missing skills stay.
 
 **Exit criteria**
 
 - All explanation thresholds in EVALS.md pass.
 - The gate rejects any skill in LLM prose that isn't in the deterministic lists (test).
-- The gap view is checked against D2's known skill sets.
 - Mean cost per explanation reported, within budget.
 - Explanation p95 <= 3 s.
 
-**Demo:** a resume's ranked matches, each explained, and the skills that would unlock the
-most near-matches.
+**Demo:** a resume's ranked matches, each explained, and a pasted JD with grounded tailoring.
 
-## P6: product UI
+## P6: product UI (minimal for v1)
 
-The full React app: onboarding, matches, filters, job detail, tracker view, gap view,
-tailoring view, settings, /privacy. Design pass and a real accessibility pass.
+Sign in, upload and confirm the profile, matches, job detail, Bring a JD, tailoring, a simple
+tracker (save a job, set its status), /privacy and /sources. Design pass and a real
+accessibility pass. The gap view, tracker notes, multiple profiles and extra dashboards are
+v1.1.
 
 **Exit criteria**
 
@@ -224,7 +226,7 @@ tailoring view, settings, /privacy. Design pass and a real accessibility pass.
 
 **Demo:** an end-to-end walkthrough by someone who hasn't seen it.
 
-## P7: alerts and tracker
+## P7: alerts and tracker (v1.1; the simple tracker moved into P6)
 
 Tracker states and persistence past posting closure. Email digests through SES:
 opt-in, unsubscribe, bounces, complaints. Sent only while the site is up (Q1). GitHub users
@@ -265,6 +267,12 @@ CDK: persistent stack and host stack. GitHub OIDC, deploy by digest, SSM, auto-r
   `docs/SECURITY_REVIEW.md`, findings fixed or accepted in writing.
 
 **Demo:** the full cycle, timed, from a terminal.
+
+## v1.1 (after v1 is deployed)
+
+- Email alerts: P7 as written above.
+- Skill-gap page, multiple profiles, tracker notes, extra dashboards.
+- Entry-level recall: v1 misses F1 0.90 (PHASE2.md, "Known v1 gaps").
 
 ## Later (not committed)
 

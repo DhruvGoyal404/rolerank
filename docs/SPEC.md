@@ -129,9 +129,16 @@ showcase.
 ### In
 
 Resume upload and confirmed profile; ingestion from the approved sources; dedupe;
-hybrid search with deterministic ranking; explainable matches; Bring a JD; skill-gap
-view; tailoring with the grounding gate; tracker; cost caps; deletion and export;
-/privacy, /sources and /about/bot; evals, bench harness, backups; up and down scripts.
+hybrid search with deterministic ranking; explainable matches; Bring a JD; tailoring
+with the grounding gate; a simple tracker (save a job, set its status, kept after the
+posting closes); cost caps; deletion and export; /privacy, /sources and /about/bot; evals,
+bench harness, backups; up and down scripts.
+
+### Moved to v1.1 (owner's decision, 2026-11-04)
+
+Email alerts, the skill-gap page, multiple profiles, tracker notes and dates, and the
+admin metrics page and other extra dashboards. The aim is v1 deployed by 2026-11-22
+(ROADMAP.md). The stories above keep their M and S marks; these ones ship in v1.1.
 
 ### Conditional
 

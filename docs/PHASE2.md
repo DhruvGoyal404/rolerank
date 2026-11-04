@@ -63,7 +63,48 @@ down 7%, interns unchanged, remote-open down 6%. The table above stays as measur
 The recovered boards added about 4,300 in-scope postings but only 24 in India and no India
 early-career posting. Five of them hold no engineering role at all.
 
-## Exit report (2026-11-03)
+## Close report (2026-11-04)
+
+**P2 is closed by the owner's decision, with one known v1 gap:** entry-level F1. Every other
+eval passes. No threshold was changed for this report. The exit report of 2026-11-03 below is
+kept as history.
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| 1.5 lakh active postings, per source | Met | 1.83 lakh on 2026-11-03 |
+| Full cycle inside 6 h, 304 rate reported | Met | 131 minutes, 98.1% 304; `ingest status` shows lag and 304% |
+| Never above the rate, 4 workers | Met | `TestWorkersNeverExceedTheRate` |
+| 429, 5xx, huge bodies, gzip bombs, slow responses | Met | `fetch` tests, `TestSlowResponseTimesOut` |
+| Kill mid-batch loses nothing | Met by test | `TestStopAtEveryPageResumesWithoutLossOrDuplicates` |
+| Closed postings leave within a cycle, error under 1% | Met | 0.045% and 0.057% against a fresh fetch of 300 boards (`closecheck`) |
+| Dedupe eval D5 | Met | Precision 298 of 300, 0.993 (0.976 to 0.998); recall 0.826 against 0.75 |
+| Classifier eval D6 | **Partly** | Remote-open 59 of 60, India 60 of 60, intern 47 of 47 pass; **entry F1 0.70 misses 0.90** |
+| Bot obeys a disallowing robots.txt | Met | `TestRobotsIsObeyedBeforeTheRequest` |
+| Attribution stored per posting | Met | `TestEveryPostingReachesItsSourcesAttribution` |
+| Bytes per cycle, split into 200 and 304 | Partly | Requests are split; bytes are only totalled |
+| In-scope coverage report | Met | 20,957 in scope, 3,461 India engineering (2026-11-03) |
+
+**How dedupe got there.** Six rounds, each scored on pairs the fix before it hadn't seen.
+Rounds 4 and 5 still merged jobs that differed in one line: contract against permanent,
+"required" against "preferred", a dropped on-call duty, a clearance level, a shift. The merge
+now also needs matching employment terms and matching counts of requirement words, and text
+similarity of 0.97 instead of 0.95. Round 6 was the first to pass. No posting-fresh pairs were
+left by then, so round 6 used pairs never labelled before; some postings had appeared in other
+pairs. Labels: sonnet for all pairs, opus for the 68 low-confidence ones.
+
+### Known v1 gaps
+
+| Gap | Measured | Threshold | Cause | v1.1 item |
+|---|---|---|---|---|
+| Entry-level F1 | 0.70: precision 58 of 67 (0.866), recall 0.58 | 0.90 | A posting that states no years can't be told from a mid or senior one by rules. 5 of 110 postings with an entry signal were entry, and each stands for about 115 postings. "1.5+ years" also reads as entry where the labels say mid | An entry signal that reads the whole posting, scored on a fresh entry sample |
+
+Users feel it as entry roles shown as unknown or mid level. P3's ranking must not drop
+unknown-level roles for a fresher, or the gap becomes a hidden job.
+
+**Owner's next step:** two short audits, `bash scripts/label.sh d5-final-audit` (20 pairs) and
+`bash scripts/label.sh d6-final-audit` (10 postings). P3 starts now.
+
+## Exit report (2026-11-03, history)
 
 **P2 hasn't passed.** The ingestion machinery works, and most criteria are met. Dedupe merges
 different jobs far too often, two classifier thresholds aren't met, and closed-posting accuracy

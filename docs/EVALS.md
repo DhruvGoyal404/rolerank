@@ -209,6 +209,23 @@ Grades, per (profile, job):
   stratum doesn't size the gap it was drawn to size. The next D6 draw caps items per
   company, as D5 does.
 
+- **Final P2 scores (2026-11-04).** Model labels: sonnet, then opus on every low-confidence
+  item. Each dedupe round was scored on pairs the code before it hadn't seen.
+
+  | Metric | Threshold | Measured | Verdict |
+  |---|---:|---|---|
+  | Dedupe precision | 0.99 | round 6: 298 of 300, 0.993 (0.976 to 0.998) | Pass |
+  | Dedupe recall | 0.75 | round 6: 0.826, population-weighted over merged, split and near strata | Pass |
+  | Remote-open precision | 0.90 | 59 of 60 | Pass |
+  | India precision | 0.97 | 60 of 60 | Pass |
+  | Level F1, intern | 0.90 | precision 47 of 47, F1 about 0.995 | Pass |
+  | Level F1, entry | 0.90 | 0.70: precision 58 of 67, recall 0.58 (entry sample 3, 280 postings) | **Fails**, known v1 gap |
+
+  Earlier rounds, for the record: dedupe precision 0.983, 0.993, 0.967, 0.980 and 0.979 in
+  rounds 1 to 5, each failing on a new kind of one-line difference. Entry recall rests on 5
+  missed postings out of 210, so its interval is wide. Labels are in `evals/labels/d5-fresh*-model.jsonl`
+  and `d6-entry*-model.jsonl`.
+
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.
 

@@ -15,7 +15,7 @@
 | Q9 | A: m7g.xlarge. Confirmed in P1: the compose images run under gVisor on arm64 and 45 integration tests pass there (PHASE1.md). D (x86 t3.xlarge) stays the fallback if a later image fails |
 | Q10 | A: delete the original after extraction |
 | Q11 | A: `pg_dump` to S3 |
-| Q12 | 140 hours a week; P1 to P5 by 2026-11-10, P6 to P8 after (ROADMAP.md) |
+| Q12 | 140 hours a week. Since 2026-11-04: lean v1 (P3, P4, P5, a minimal P6, P8) deployed by 2026-11-22; alerts and extras in v1.1 (ROADMAP.md) |
 | Q13 | A: public. Repository created 2026-10-31 |
 | Q14 | A: 18+ |
 | Q15 | No decision needed: the account is already on the PAID plan (`codejudge-down.sh` printed "plan: PAID ACTIVE" on 2026-10-30). Same account, separated by tags and stack names. Both budgets move to the current rate in P8 |
