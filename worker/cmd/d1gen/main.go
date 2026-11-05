@@ -2,7 +2,8 @@
 // Generation runs backwards: a seeded generator writes the gold JSON, then renders it to a PDF or
 // DOCX in one of five template families. The parser never sees the gold.
 //
-//	d1gen <out-dir>   writes <out-dir>/<id>.pdf|.docx and <out-dir>/gold.jsonl
+//	d1gen <out-dir>        writes D1: <out-dir>/<id>.pdf|.docx and <out-dir>/gold.jsonl
+//	d1gen <out-dir> hard   writes D1-hard, the held-out set (hard.go)
 package main
 
 import (
@@ -228,13 +229,17 @@ func render(g gold) []string {
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir>")
+	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard") {
+		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		panic(err)
+	}
+	if len(os.Args) == 3 {
+		generateHard(dir)
+		return
 	}
 	r := rand.New(rand.NewPCG(20261105, 1))
 	gf, err := os.Create(filepath.Join(dir, "gold.jsonl"))
