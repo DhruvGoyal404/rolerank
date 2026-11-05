@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/DhruvGoyal404/rolerank/worker/internal/extract"
@@ -22,7 +23,8 @@ func (f *fake) Run(_ context.Context, b []byte) (extract.Result, error) {
 	return extract.Result{Kind: "pdf", Lines: []extract.Line{{N: 1, Text: "Jane"}}}, nil
 }
 
-const token = "0123456789abcdef0123456789abcdef"
+// A dummy, built at run time so no secret-shaped literal sits in the source.
+var token = strings.Repeat("t", 32)
 
 func post(h http.Handler, auth string, body []byte) *httptest.ResponseRecorder {
 	req := httptest.NewRequest(http.MethodPost, "/extract", bytes.NewReader(body))
