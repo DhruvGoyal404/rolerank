@@ -229,8 +229,8 @@ func render(g gold) []string {
 }
 
 func main() {
-	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard" && os.Args[2] != "hard2") {
-		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2]")
+	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard" && os.Args[2] != "hard2" && os.Args[2] != "hard3") {
+		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
@@ -240,6 +240,10 @@ func main() {
 	if len(os.Args) == 3 {
 		// hard: D1-hard, run once for P4's honest figure. hard2: D1-hard-2, made after the
 		// parse-v3 fix and held out to measure it.
+		if os.Args[2] == "hard3" {
+			generateHard3(dir) // real-resume patterns, 2026-11-06
+			return
+		}
 		if os.Args[2] == "hard2" {
 			generateHard(dir, 20261107, "D1H2")
 		} else {
