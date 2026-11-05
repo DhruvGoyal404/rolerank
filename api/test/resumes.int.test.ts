@@ -64,6 +64,9 @@ beforeAll(async () => {
   const url = urlFor(dbs.roles.appRw, dbs.passwords.APP_RW ?? "", dbs.appDb);
   pool = new pg.Pool({ connectionString: url });
   admin = new pg.Pool({ connectionString: urlFor(dbs.roles.migratorApp, dbs.passwords.MIGRATOR_APP ?? "", dbs.appDb) });
+  // The forced drop at the end kills idle connections; that's expected, not a failure.
+  pool.on("error", () => undefined);
+  admin.on("error", () => undefined);
   valkey = testValkey();
   vault = new Vault(randomBytes(32), 1);
   llm = createServer((req, res) => {

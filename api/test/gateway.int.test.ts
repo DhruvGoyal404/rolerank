@@ -16,6 +16,8 @@ let requests: Array<Record<string, unknown>>;
 beforeAll(async () => {
   dbs = await createTestDatabases();
   pool = new pg.Pool({ connectionString: urlFor(dbs.roles.appRw, dbs.passwords.APP_RW ?? "", dbs.appDb) });
+  // The forced drop at the end kills idle connections; that's expected, not a failure.
+  pool.on("error", () => undefined);
   server = createServer((req, res) => {
     let body = "";
     req.on("data", (c: Buffer) => (body += c.toString()));
