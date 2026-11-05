@@ -68,14 +68,64 @@ Three reasons:
   real school rows missing from the gold. Fabricated is now measured against the resume text,
   as EVALS.md defines it.
 
+## The honest figure: D1-hard, held out (2026-11-05)
+
+D1-hard has 40 resumes from a new seed. Its layouts are the ones real Indian fresher resumes
+use:
+- a true two-column sidebar;
+- tables, in PDF and as Word tables;
+- icon contact rows;
+- mixed fonts;
+- Canva-style letter-spaced headings with a skills grid;
+- Overleaf-style right-aligned dates;
+- dates like `Jul'24`, `08/2021` and "Till date".
+
+70% are freshers and interns. The set was committed (`0cf9d23`) before it was run. It was run
+**once**, and nothing was tuned afterwards. The report is
+`evals/reports/d1-hard-live-2026-11-05.json`.
+
+| Field | Precision | Recall | Threshold (P / R) | Verdict |
+|---|---|---|---|---|
+| Employer, title, dates | 1.000 | 1.000 | 0.97 / 0.95 | Pass |
+| Skills | 1.000 | 0.980 | 0.95 / 0.90 | Pass |
+| Projects | 0.922 | 0.922 | 0.95 / 0.90 | **Fails precision** |
+| Institution, degree, grad year, CGPA | 1.000 | **0.200** | 0.97 / 0.95 | **Fails recall** |
+| Fabricated values / contacts reaching the model | 0 / 0 | | 0 / 0 | Pass |
+| Months of experience within 3 | 40 of 40 | | ≥ 90% | Pass |
+| Schema-valid first time / parse success | 1.000 / 1.000 | | | Pass |
+| p95 / mean cost | 4.8 s / $0.0003 | | | Pass |
+
+**Why education fails.** Of the 40, 8 kept their education, and they are exactly the 8 table
+PDFs. In those, degree, institute, year and score sit in one row. In the sidebar, Overleaf,
+Canva and Word-table layouts they sit on separate lines.
+
+An education entry cites a single line (`line`), and the grounding gate requires the
+institution and the degree in that one line, so it drops the entry. Precision stays 1.000:
+nothing is invented. But on real layouts most users would see no education in their draft and
+would have to add it by hand.
+
+This was diagnosed from the layout, not tuned against the set.
+
+**Why projects miss.** In the Overleaf and table layouts, a project's name shares its line with
+its tech stack ("Online Judge | Go, Python"). The model sometimes kept the stack in the name.
+
+**The fix is known, and isn't measured here.**
+- Education will cite `lines`, as experience already does, and the gate will check each value
+  against all of them.
+- The prompt will say a project's name excludes its stack.
+
+D1-hard can't measure that fix, because the fix came from seeing it. A fresh held-out set
+(D1-hard-2) will. Until then, **the figures above are P4's honest parsing numbers.**
+
 ## Known gaps and open items
 
 | Item | State | Next |
 |---|---|---|
-| No real resumes tested | D1 is synthetic and easy | Owner: upload one or two real resumes once P6's screen exists, and check the draft |
+| Education recall 0.200 and projects precision 0.922 on held-out D1-hard | The fix is known (above); not yet built | Build it first in P5; measure on a fresh held-out D1-hard-2 |
+| Real resumes | The owner can check one now: `bash scripts/parse-resume.sh my-resumes/<file>` | Owner |
 | Profile confirmation screen | API done; the page is P6 | P6 |
 | D7's job-description cases | Need Bring a JD | P5 |
-| Zero-retention with the LLM provider | An agreement with Anthropic, not an API setting; not arranged | Owner decision before public signup |
+| Zero-retention with the LLM provider | Not for v1, by the owner's decision (Q17); /privacy states Anthropic's 30-day terms | Revisit before public signup |
 | The live evals don't run in CI | Tier T1: run before prompt or schema changes, at about $0.07 a run | As designed |
 
 ## Spend

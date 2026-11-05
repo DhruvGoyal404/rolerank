@@ -176,9 +176,12 @@ encrypted storage; LLM ledger and caps. Datasets D1 and D7.
   including under concurrent requests.
 - Delete account: the row-level test proves nothing with that `user_id` remains.
 
-**Exit status (2026-11-05): met**, with the D1 caveat in PHASE4.md. D1 and D7 pass every
-threshold, the hostile suite passes under gVisor, and encryption, caps and deletion are proven
-by tests. D1 is synthetic, so real resumes are untested until P6's screen exists.
+**Exit status (2026-11-05): partly met.**
+- D1 and D7 pass, and so do the hostile suite, encryption, caps and deletion.
+- The held-out D1-hard set, P4's honest figure, misses two thresholds: education recall
+  0.200, because an entry cites one line while real layouts split it, and projects precision
+  0.922.
+- The fix is known and comes first in P5, measured on a fresh held-out set (PHASE4.md).
 
 **Demo:** upload a synthetic resume, see the parse, correct a field, watch a zip bomb fail.
 
