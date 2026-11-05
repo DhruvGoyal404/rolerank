@@ -1,0 +1,187 @@
+{
+ "find": [
+  {
+   "text": "Experience with React.js, Node.js. and k8s",
+   "want": [
+    "React",
+    "Node.js",
+    "Kubernetes"
+   ]
+  },
+  {
+   "text": "We use Go and gRPC",
+   "want": [
+    "Go",
+    "gRPC"
+   ]
+  },
+  {
+   "text": "go to the office",
+   "want": []
+  },
+  {
+   "text": "C++ and C# on .NET",
+   "want": [
+    "C++",
+    "C#",
+    ".NET"
+   ]
+  },
+  {
+   "text": "CI/CD with GitHub Actions",
+   "want": [
+    "CI/CD",
+    "GitHub Actions"
+   ]
+  },
+  {
+   "text": "react-native and React Native apps",
+   "want": [
+    "React Native"
+   ]
+  },
+  {
+   "text": "Spring Boot microservices",
+   "want": [
+    "Spring Boot",
+    "Microservices"
+   ]
+  },
+  {
+   "text": "Spring 2027 internship in Phoenix",
+   "want": []
+  },
+  {
+   "text": "express your interest; excel at teamwork",
+   "want": []
+  },
+  {
+   "text": "Strong SQL; PostgreSQL or MySQL",
+   "want": [
+    "SQL",
+    "PostgreSQL",
+    "MySQL"
+   ]
+  },
+  {
+   "text": "Python, R and Excel",
+   "want": [
+    "Python",
+    "R",
+    "Excel"
+   ]
+  },
+  {
+   "text": "C/C++ and C, not (C), P\u0026C, C-level or Series C",
+   "want": [
+    "C",
+    "C++"
+   ]
+  },
+  {
+   "text": "networking events and documentation",
+   "want": []
+  },
+  {
+   "text": "Built REST APIs in FastAPI, deployed on AWS Lambda with Terraform",
+   "want": [
+    "REST APIs",
+    "FastAPI",
+    "AWS Lambda",
+    "Terraform"
+   ]
+  },
+  {
+   "text": "PyTorch, TensorFlow, scikit-learn; LLMs \u0026 RAG pipelines on Kubernetes",
+   "want": [
+    "PyTorch",
+    "TensorFlow",
+    "scikit-learn",
+    "Large Language Models",
+    "Retrieval-augmented Generation",
+    "Kubernetes"
+   ]
+  },
+  {
+   "text": "Unity Catalog on Databricks, Spark and Airflow",
+   "want": [
+    "Databricks",
+    "Apache Spark",
+    "Apache Airflow"
+   ]
+  },
+  {
+   "text": "Docker containers and Git version control",
+   "want": [
+    "Docker",
+    "Git"
+   ]
+  },
+  {
+   "text": "Senior Software Engineer (Go/Kubernetes) - Bengaluru",
+   "want": [
+    "Go",
+    "Kubernetes"
+   ]
+  },
+  {
+   "text": "B.Tech Computer Science, CGPA 8.4; Data Structures and Algorithms",
+   "want": [
+    "Data Structures"
+   ]
+  },
+  {
+   "text": "Selenium, Cypress and Playwright for test automation; JMeter load testing",
+   "want": [
+    "Selenium",
+    "Cypress",
+    "Playwright",
+    "Test Automation",
+    "JMeter",
+    "Performance Testing"
+   ]
+  }
+ ],
+ "extract": [
+  {
+   "body": "About the role\nYou will build services in Go.\nRequirements\n- 2+ years of Python\n- PostgreSQL\nNice to have\n- Kubernetes\n- Python\nBenefits\nThis role uses Terraform, which is a plus.",
+   "required": [
+    "Go",
+    "PostgreSQL",
+    "Python"
+   ],
+   "nice": [
+    "Kubernetes",
+    "Terraform"
+   ]
+  },
+  {
+   "body": "What you'll do\nShip React and TypeScript features.\nQualifications\nJavaScript, HTML, CSS\nBonus: GraphQL, Next.js",
+   "required": [
+    "CSS",
+    "HTML",
+    "JavaScript",
+    "React",
+    "TypeScript"
+   ],
+   "nice": [
+    "GraphQL",
+    "Next.js"
+   ]
+  },
+  {
+   "body": "Must have: Java, Spring Boot, Kafka\nGood to have: AWS, Docker\nWe use Jira and Confluence.",
+   "required": [
+    "Confluence",
+    "Java",
+    "Jira",
+    "Kafka",
+    "Spring Boot"
+   ],
+   "nice": [
+    "AWS",
+    "Docker"
+   ]
+  }
+ ]
+}
