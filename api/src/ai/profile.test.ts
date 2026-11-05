@@ -16,7 +16,7 @@ const base: Profile = {
     { name: "PostgreSQL", line: 2 },
   ],
   experience: [{ employer: "Acme Corp", title: "Software Engineer", start: "2022-03", end: "2024-06", lines: [1, 2] }],
-  education: [{ institution: "Thapar Institute", degree: "B.Tech Computer Science", grad_year: 2022, line: 3 }],
+  education: [{ institution: "Thapar Institute", degree: "B.Tech Computer Science", grad_year: 2022, score: "", line: 3 }],
   projects: [{ name: "RoleRank job matcher", line: 4 }],
 };
 
@@ -36,7 +36,7 @@ describe("ground", () => {
         { employer: "Google", title: "Software Engineer", start: "2020", end: "2021", lines: [1] },
         { employer: "Acme Corp", title: "Software Engineer", start: "2019-01", end: "present", lines: [1] },
       ],
-      education: [{ institution: "Thapar Institute", degree: "M.Tech", grad_year: 2022, line: 3 }],
+      education: [{ institution: "Thapar Institute", degree: "M.Tech", grad_year: 2022, score: "", line: 3 }],
     };
     const g = ground(p, lines);
     expect(g.profile.skills.map((s) => s.name)).toEqual(["Go", "PostgreSQL"]);

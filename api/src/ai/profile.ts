@@ -28,6 +28,7 @@ export const ProfileSchema = z
           institution: z.string(),
           degree: z.string(),
           grad_year: z.number().int().nullable(),
+          score: z.string(), // "CGPA 8.6/10", "91%", or "" when the resume gives none
           line: lineRef,
         })
         .strict(),
@@ -73,11 +74,12 @@ export const profileJsonSchema = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["institution", "degree", "grad_year", "line"],
+        required: ["institution", "degree", "grad_year", "score", "line"],
         properties: {
           institution: { type: "string" },
           degree: { type: "string" },
           grad_year: { anyOf: [{ type: "integer" }, { type: "null" }] },
+          score: { type: "string" },
           line: { type: "integer" },
         },
       },
@@ -149,7 +151,10 @@ export function ground(p: Profile, lines: Line[]): Grounded {
       return [e.start, e.end].every((d) => d === "" || d === "present" || c.some((t) => t.includes(year(d))));
     }),
     education: keep("education", p.education, (e) => {
+      // A score may sit on the line after the degree, so it may come from the next line too.
       const c = cite([e.line]);
+      const near = cite([e.line, e.line + 1]) ?? c;
+      if (e.score !== "" && (near === null || !inLines(e.score, near))) return false;
       if (c === null || !inLines(e.institution, c) || (e.degree !== "" && !inLines(e.degree, c))) return false;
       return e.grad_year === null || c.some((t) => t.includes(String(e.grad_year)));
     }),
