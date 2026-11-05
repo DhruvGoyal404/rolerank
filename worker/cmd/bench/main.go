@@ -252,6 +252,11 @@ func run(ctx context.Context, users, queries, writes int) error {
 	// Ingestion load: a writer touching rows at the given rate for the whole run.
 	stop := make(chan struct{})
 	var wrote atomic.Int64
+	writer, err := pgx.Connect(ctx, target) // its own connection, so searches can't starve it
+	if err != nil {
+		return err
+	}
+	defer writer.Close(ctx)
 	go func() {
 		if writes <= 0 {
 			return
@@ -264,7 +269,7 @@ func run(ctx context.Context, users, queries, writes int) error {
 			case <-stop:
 				return
 			case <-tick.C:
-				if _, err := pool.Exec(ctx, `UPDATE search_postings SET posted_at = now() WHERE posting_id = $1`,
+				if _, err := writer.Exec(ctx, `UPDATE search_postings SET posted_at = now() WHERE posting_id = $1`,
 					1+w.IntN(500000)); err == nil {
 					wrote.Add(1)
 				}
@@ -314,20 +319,86 @@ func run(ctx context.Context, users, queries, writes int) error {
 	prev := "0"
 	for i, e := range edges {
 		fmt.Printf("  %5s to %5d ms: %d\n", prev, e, counts[i])
-		prev = fmt.Sprint(e)
+		prev = fmt.Sprint(int64(e))
 	}
 	fmt.Printf("  over %5s ms: %d\n", prev, counts[len(edges)])
+	sample := make([]rank.Profile, 0, 50)
+	for _, x := range qs[:min(50, len(qs))] {
+		sample = append(sample, x.p)
+	}
+	if err := recallCheck(ctx, pool, sample); err != nil {
+		return err
+	}
 	return explainCheck(ctx, pool, qs[0].p)
+}
+
+// recallCheck measures filtered recall@20 of the HNSW plan against exact search, on the real
+// filter mix of the bench's queries. EVALS.md asks for at least 0.95.
+func recallCheck(ctx context.Context, pool *pgxpool.Pool, qs []rank.Profile) error {
+	var sum float64
+	for _, p := range qs {
+		where, err := rank.Eligible(p)
+		if err != nil {
+			return err
+		}
+		args := []any{rank.Levels(p.Level), embed.Literal(p.Embedding)}
+		top := func(hnsw bool) (map[int64]bool, error) {
+			tx, err := pool.Begin(ctx)
+			if err != nil {
+				return nil, err
+			}
+			defer tx.Rollback(ctx)
+			order := "(embedding <=> $2::halfvec) + 0"
+			if hnsw {
+				order = "embedding <=> $2::halfvec"
+				if _, err := tx.Exec(ctx, fmt.Sprintf(`SET LOCAL hnsw.iterative_scan = relaxed_order; SET LOCAL hnsw.ef_search = %d`, rank.EfSearch)); err != nil {
+					return nil, err
+				}
+			}
+			rows, err := tx.Query(ctx, `SELECT posting_id FROM search_postings WHERE `+where+` ORDER BY `+order+` LIMIT 20`, args...)
+			if err != nil {
+				return nil, err
+			}
+			ids, err := pgx.CollectRows(rows, pgx.RowTo[int64])
+			m := map[int64]bool{}
+			for _, id := range ids {
+				m[id] = true
+			}
+			return m, err
+		}
+		exact, err := top(false)
+		if err != nil {
+			return err
+		}
+		approx, err := top(true)
+		if err != nil {
+			return err
+		}
+		hit := 0
+		for id := range exact {
+			if approx[id] {
+				hit++
+			}
+		}
+		if len(exact) > 0 {
+			sum += float64(hit) / float64(len(exact))
+		}
+	}
+	fmt.Printf("filtered recall@20, HNSW ef_search %d against exact, %d queries: %.3f\n", rank.EfSearch, len(qs), sum/float64(len(qs)))
+	return nil
 }
 
 // explainCheck compares the client's timer with the server's own execution time for the
 // vector query, on one connection with nothing else running. The Phase 0 harness overstated
 // latency by up to 100x; this is the check that it doesn't here.
 func explainCheck(ctx context.Context, pool *pgxpool.Pool, p rank.Profile) error {
-	sql := `SELECT posting_id FROM search_postings WHERE embedding IS NOT NULL AND level = ANY($1)
-		AND ($2 = ANY(countries) OR ($3 AND 'remote_global' = ANY(remote_scopes)))
-		ORDER BY (embedding <=> $4::halfvec) + 0, posting_id LIMIT 200`
-	args := []any{rank.Levels(p.Level), p.Country, p.Remote, embed.Literal(p.Embedding)}
+	where, err := rank.Eligible(p)
+	if err != nil {
+		return err
+	}
+	sql := `SELECT posting_id FROM search_postings WHERE ` + where + `
+		ORDER BY (embedding <=> $2::halfvec) + 0, posting_id LIMIT 200`
+	args := []any{rank.Levels(p.Level), embed.Literal(p.Embedding)}
 	for range 3 {
 		t := time.Now()
 		rows, err := pool.Query(ctx, sql, args...)

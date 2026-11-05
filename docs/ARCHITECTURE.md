@@ -152,7 +152,8 @@ close jobs it never read; a concurrency test found exactly that.
   read, so it's **unknown** and unused.
 - **Dedupe:** exact on `(source, source_job_id)`; Greenhouse's `internal_job_id` groups
   posts of one job; cross-source blocks on normalised company + title + city, then
-  MinHash Jaccard >= 0.9 on 5-word shingles. Search returns one posting per cluster,
+  MinHash Jaccard >= 0.97 on 5-word shingles, outside boilerplate lines, plus matching years, shift,
+  clearance, language, employment terms and requirement words (P2, 2026-11-04). Search returns one posting per cluster,
   preferring the employer's ATS over an aggregator.
 
 ## Search and ranking
@@ -181,6 +182,23 @@ features.
 5. **Explanation without an LLM:** matched skills = required ∩ profile; missing =
    required − profile; plus level and location verdicts. The optional LLM paragraph may
    only rephrase these lists; a gate rejects any skill it names that isn't in them.
+
+**Two plans, by corpus size (P3, 2026-11-05).** Under 50,000 searchable rows (the real corpus
+is 21,279), step 2 runs as written: exact vector search plus the lexical retriever, fused. Above
+it, both scans cost seconds. On the 5 lakh bench, the lexical query alone took 2.5 s, because
+common skills match 56,000 rows. So the large plan skips the lexical retriever, and skill
+coverage still counts in the rerank. Vectors go through a partial HNSW index over India-open
+rows (migration 9), with `hnsw.iterative_scan = relaxed_order` and `ef_search = 200`. The
+whole-table HNSW index gave filtered recall@20 of 0.759 and p95 937 ms. The partial one gives:
+
+| 5 lakh bench, laptop, 20 users | p50 | p95 | p99 | Filtered recall@20 |
+|---|---|---|---|---|
+| Large plan with the India partial index | 94 ms | **188 ms** | 263 ms | **0.961** |
+
+These are 4,000 hybrid searches, with a writer sustaining 21 row updates a second. The client
+timer agrees with `EXPLAIN ANALYZE` (166 ms against 151 ms). The machine is an i5-1235U, with
+Postgres given 1.5 GB of shared buffers. Production hardware is measured in P8. A country other
+than India needs its own partial index before the large plan serves it well.
 
 Hard filters (never violated): job type, level window, geography. A fresher never sees a
 "5+ years" posting unless they widen the filter.

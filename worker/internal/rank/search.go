@@ -3,7 +3,9 @@ package rank
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"slices"
+	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -24,10 +26,30 @@ const (
 // PerRetriever is how many candidates each retriever passes on.
 const PerRetriever = 200
 
-// Hard filters, never violated: the level window and geography. A job is open to the profile if
-// it lists the profile's country, or, when the profile accepts remote work, it is remote for
-// anyone.
-const eligible = `level = ANY($1) AND ($2 = ANY(countries) OR ($3 AND 'remote_global' = ANY(remote_scopes)))`
+// Eligible is the hard filter, never violated: the level window ($1) and geography. A job is
+// open to the profile if it lists the profile's country, or, when the profile accepts remote
+// work, it is remote for anyone. The country is written into the SQL, not passed as a
+// parameter, so the planner can match a per-country partial index (migration 9); it is checked
+// to be two capital letters first.
+func Eligible(p Profile) (string, error) {
+	if !country.MatchString(p.Country) {
+		return "", fmt.Errorf("country %q isn't an ISO code", p.Country)
+	}
+	geo := "'" + p.Country + "' = ANY(countries)"
+	if p.Remote {
+		geo = "(" + geo + " OR 'remote_global' = ANY(remote_scopes))"
+	}
+	return "level = ANY($1) AND " + geo, nil
+}
+
+var country = regexp.MustCompile(`^[A-Z]{2}$`)
+
+// LargeCorpus is the row count above which search switches to its large-corpus plan. Below it
+// (the real corpus: 21,279 rows on 2026-11-05) vectors are searched exactly and the lexical
+// retriever runs. Above it, an exact scan and the lexical scan both cost seconds (bench, 5 lakh
+// rows, 2026-11-05), so vectors go through HNSW with iterative scan and the lexical retriever is
+// skipped; skill coverage still counts in the rerank.
+const LargeCorpus = 50000
 
 // Searcher runs searches against db-corpus.
 type Searcher struct {
@@ -35,32 +57,54 @@ type Searcher struct {
 	Weights Weights
 	Bands   Bands
 	Now     func() time.Time
+
+	mu     sync.Mutex
+	sizeAt time.Time
+	large  bool
+}
+
+// isLarge reads the planner's row estimate, at most once a minute.
+func (s *Searcher) isLarge(ctx context.Context) (bool, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if time.Since(s.sizeAt) < time.Minute {
+		return s.large, nil
+	}
+	var rows float64
+	if err := s.Pool.QueryRow(ctx, `SELECT reltuples FROM pg_class WHERE oid = 'search_postings'::regclass`).Scan(&rows); err != nil {
+		return false, fmt.Errorf("corpus size: %w", err)
+	}
+	s.large, s.sizeAt = rows > LargeCorpus, time.Now()
+	return s.large, nil
 }
 
 // Search returns up to limit ranked jobs.
 func (s *Searcher) Search(ctx context.Context, p Profile, mode Mode, limit int) ([]Ranked, error) {
-	args := []any{Levels(p.Level), p.Country, p.Remote}
+	args := []any{Levels(p.Level)}
+	where, err := Eligible(p)
+	if err != nil {
+		return nil, err
+	}
+	large, err := s.isLarge(ctx)
+	if err != nil {
+		return nil, err
+	}
 	var vec, lex []int64
-	var err error
 	if mode != Lexical {
 		if len(p.Embedding) != embed.Dims {
 			return nil, fmt.Errorf("profile embedding has %d dimensions", len(p.Embedding))
 		}
-		// "+ 0" keeps the planner off the HNSW index: exact search over the filtered subset,
-		// recall 1.0, the normal case for selective filters (ARCHITECTURE.md, Phase 0 spike).
-		vec, err = s.ids(ctx, `SELECT posting_id FROM search_postings WHERE embedding IS NOT NULL AND `+eligible+`
-			ORDER BY (embedding <=> $4::halfvec) + 0, posting_id LIMIT $5`, append(args, embed.Literal(p.Embedding), PerRetriever)...)
-		if err != nil {
+		if vec, err = s.vectorIDs(ctx, large, where, append(args, embed.Literal(p.Embedding), PerRetriever)); err != nil {
 			return nil, err
 		}
 	}
-	if mode != Vector {
-		lex, err = s.ids(ctx, `SELECT posting_id FROM search_postings WHERE `+eligible+`
-			AND (skills_required && $4 OR skills_nice && $4 OR title_terms && $5)
-			ORDER BY 2 * cardinality(ARRAY(SELECT unnest(skills_required) INTERSECT SELECT unnest($4::text[])))
-			  + cardinality(ARRAY(SELECT unnest(skills_nice) INTERSECT SELECT unnest($4::text[])))
-			  + cardinality(ARRAY(SELECT unnest(title_terms) INTERSECT SELECT unnest($5::text[]))) DESC, posting_id
-			LIMIT $6`, append(args, p.Skills, p.Titles, PerRetriever)...)
+	if mode == Lexical || (mode == Hybrid && !large) {
+		lex, err = s.ids(ctx, `SELECT posting_id FROM search_postings WHERE `+where+`
+			AND (skills_required && $2 OR skills_nice && $2 OR title_terms && $3)
+			ORDER BY 2 * (SELECT count(*) FROM unnest(skills_required) x WHERE x = ANY($2))
+			  + (SELECT count(*) FROM unnest(skills_nice) x WHERE x = ANY($2))
+			  + (SELECT count(*) FROM unnest(title_terms) x WHERE x = ANY($3)) DESC, posting_id
+			LIMIT $4`, append(args, p.Skills, p.Titles, PerRetriever)...)
 		if err != nil {
 			return nil, err
 		}
@@ -90,6 +134,36 @@ func (s *Searcher) Search(ctx context.Context, p Profile, mode Mode, limit int) 
 	}
 	return out[:min(limit, len(out))], nil
 }
+
+// vectorIDs returns the nearest eligible jobs, nearest first.
+func (s *Searcher) vectorIDs(ctx context.Context, large bool, where string, args []any) ([]int64, error) {
+	if !large {
+		// "+ 0" keeps the planner off the HNSW index: exact search over the filtered subset,
+		// recall 1.0, the normal case for selective filters (ARCHITECTURE.md, Phase 0 spike).
+		return s.ids(ctx, `SELECT posting_id FROM search_postings WHERE embedding IS NOT NULL AND `+where+`
+			ORDER BY (embedding <=> $2::halfvec) + 0, posting_id LIMIT $3`, args...)
+	}
+	// HNSW with iterative scan keeps walking the graph until enough rows pass the filters.
+	// relaxed_order can return rows slightly out of order, so they're sorted again by distance.
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+	if _, err := tx.Exec(ctx, `SET LOCAL hnsw.iterative_scan = relaxed_order; SET LOCAL hnsw.ef_search = `+fmt.Sprint(EfSearch)); err != nil {
+		return nil, fmt.Errorf("hnsw settings: %w", err)
+	}
+	rows, err := tx.Query(ctx, `SELECT posting_id FROM (SELECT posting_id, embedding <=> $2::halfvec AS d FROM search_postings
+		WHERE `+where+` ORDER BY embedding <=> $2::halfvec LIMIT $3) n ORDER BY d, posting_id`, args...)
+	if err != nil {
+		return nil, fmt.Errorf("retrieve: %w", err)
+	}
+	return pgx.CollectRows(rows, pgx.RowTo[int64])
+}
+
+// EfSearch is HNSW's search breadth on the large-corpus plan; the bench measures its recall
+// against exact search.
+var EfSearch = 200
 
 func (s *Searcher) ids(ctx context.Context, sql string, args ...any) ([]int64, error) {
 	rows, err := s.Pool.Query(ctx, sql, args...)

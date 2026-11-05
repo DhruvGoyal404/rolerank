@@ -58,3 +58,13 @@ func TestBands(t *testing.T) {
 		t.Fatal("bands")
 	}
 }
+
+func TestEligibleWritesOnlyAnISOCode(t *testing.T) {
+	if _, err := Eligible(Profile{Country: "IN') OR true --"}); err == nil {
+		t.Fatal("a country that isn't an ISO code must be refused")
+	}
+	got, err := Eligible(Profile{Country: "IN", Remote: true})
+	if err != nil || got != "level = ANY($1) AND ('IN' = ANY(countries) OR 'remote_global' = ANY(remote_scopes))" {
+		t.Fatalf("%q %v", got, err)
+	}
+}

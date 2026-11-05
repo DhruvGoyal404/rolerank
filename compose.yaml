@@ -15,6 +15,12 @@ services:
       ROLERANK_PW_APP_RW: ${ROLERANK_PW_APP_RW:?set in .env}
       ROLERANK_PW_CORPUS_RW: ${ROLERANK_PW_CORPUS_RW:?set in .env}
       ROLERANK_PW_CORPUS_RO: ${ROLERANK_PW_CORPUS_RO:?set in .env}
+    # Memory sized like the Phase 0 spike, so the bench's indexes stay in memory. The host's
+    # values are set in P8 from its own size.
+    command: >-
+      postgres -c shared_buffers=1536MB -c effective_cache_size=3GB -c maintenance_work_mem=512MB
+      -c work_mem=16MB -c max_parallel_maintenance_workers=4
+    shm_size: 1gb # parallel index builds use shared memory; Docker's default is 64 MB
     ports:
       - "127.0.0.1:55433:5432"
     volumes:
