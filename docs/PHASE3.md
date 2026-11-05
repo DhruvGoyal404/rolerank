@@ -54,15 +54,47 @@ or five profiles per segment, neither difference is sized.
   fresh 0, fusion 0.076. Bands: strong ≥ 0.505, good ≥ 0.46.
 - **Two plans by corpus size.** The numbers that forced this are in ARCHITECTURE.md.
 
+## D3 audit (owner, 2026-11-05)
+
+The owner graded 30 of the D3 pairs: 15 of the hard ones opus had regraded, and 15 that
+sonnet graded with high confidence.
+
+| Grades | Agreed with the owner | Cohen's kappa | Quadratic-weighted kappa |
+|---|---|---|---|
+| Rubric v1 (the grades above) | 19 of 30 | 0.507 (0.288 to 0.721) | 0.831; every disagreement one grade apart |
+| Rubric v2, sonnet regrade of all 438 | 19 of 30 | 0.49 | |
+
+Under v1 there were two patterns. The model gave 0 where the owner gave 1 four times: a level
+far off, which the v1 rubric's own example called 0. The model also gave 3 where the owner gave
+2 four times. Rubric v2 makes any level mismatch a 1 and asks for most core requirements before
+a 3, and that fixed the first pattern (one case left). The second grew to six: the owner is
+stricter than the model about "would apply today". v2 was written after reading the owner's
+answers, so its agreement on these same 30 is flattering, not independent.
+
+**Below the 0.6 bar, D3 can't gate (EVALS.md).** Here is how much the results depend on that
+3-or-2 boundary:
+
+| D3 hybrid | v2 grades | Strict: every low-confidence 3 made a 2 | Threshold |
+|---|---|---|---|
+| nDCG@10 | 0.795 | 0.762 | 0.75 |
+| MRR | 0.806 | **0.645** | 0.70 |
+| Beats lexical-only | interval 0.012 to 0.148 | **-0.028 to 0.122** | above 0 |
+| Beats vector-only | interval 0.016 to 0.168 | **-0.000 to 0.142** | above 0 |
+
+nDCG@10 passes under both. MRR and the comparison rule pass only under the model's reading.
+D3 is therefore **not gold**, and its MRR and comparison verdicts are **not proven**. The
+ranker ships with v1 weights; v1.1 needs owner-graded pairs, or a rubric the owner and model
+agree on at kappa 0.6 or above. `evals/labels/d3-grades-v2.jsonl` holds the v2 grades.
+
 ## Known gaps and open items
 
 | Item | State | Next |
 |---|---|---|
 | Skill extraction precision 0.896 against 0.90 | One alias fix, then re-measured on a fresh sample. Most errors are skills named only about the company or its products | v1.1: skip company-description sections |
 | p95 with ingestion writes on this laptop: 188 to 217 ms | Borderline; the laptop isn't the target host | P8 measures it on m7g.xlarge |
-| D3 is model-graded | sonnet for all 438 pairs, opus for the 231 hard ones | **Owner: `bash scripts/label.sh d3-audit`** (30 items) |
+| D3 is model-graded, and the owner audit gives kappa 0.49 to 0.51 | Not gold; MRR and the comparison rule are not proven (above) | v1.1: owner-graded pairs, or a rubric agreed at kappa ≥ 0.6 |
 | Weights and prefix were chosen with D3 visible | The cross-validated estimate (0.78 to 0.80) is the honest number, not 0.787 | A second D3 draw in v1.1 |
-| Cloud embedding candidates (Titan, OpenAI) | Not run: they need cloud credentials and spending | Owner decision; bge-small passes, so not needed for v1 |
+| Cloud embedding candidates (Titan, OpenAI) | Not run, by the owner's decision of 2026-11-05: local bge-small passes and keeps resume data on our host | v1.1 option |
 | The large plan has no lexical retriever | Its quality isn't measured on D3, which runs the small plan | Measure if the corpus passes 50,000 rows |
 | The bench writer sustains 21 updates a second, not 50 | One connection, serial updates | Enough to show the effect |
 

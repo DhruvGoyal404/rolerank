@@ -150,8 +150,9 @@ harness with the 5 lakh synthetic corpus.
 
 **Exit status (2026-11-05): met except two items,** both in PHASE3.md. Skill extraction
 precision is 0.896 against 0.90, a known gap. p95 with ingestion writes is borderline on the
-laptop (188 to 217 ms) and is measured on the target host in P8. The owner's 30-item D3 audit
-is pending. D2, D3, recall, the comparison rule and reproducibility pass.
+laptop (188 to 217 ms) and is measured on the target host in P8. The owner's D3 audit gives
+kappa 0.49, below 0.6, so D3 isn't gold. Its nDCG@10 passes under every grade reading tested;
+MRR and the comparison rule are not proven. D2, recall and reproducibility pass.
 
 **Demo:** type a profile, get ranked jobs with matched and missing skills, then show the
 bench report and eval report side by side.
@@ -278,6 +279,10 @@ CDK: persistent stack and host stack. GitHub OIDC, deploy by digest, SSM, auto-r
 - Email alerts: P7 as written above.
 - Skill-gap page, multiple profiles, tracker notes, extra dashboards.
 - Entry-level recall: v1 misses F1 0.90 (PHASE2.md, "Known v1 gaps").
+- D3 made gold: owner-graded pairs, or a rubric agreed at kappa 0.6 or above (PHASE3.md).
+- Skill extraction precision to 0.90: skip company-description sections (PHASE3.md).
+- Cloud embedding bake-off (Titan, OpenAI): optional; local bge-small passes and keeps resume
+  data on our host.
 
 ## Later (not committed)
 

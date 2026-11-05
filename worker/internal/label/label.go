@@ -111,8 +111,8 @@ var d6Questions = []Question{
 var d3Questions = []Question{{
 	ID:   "grade",
 	Text: "How good is this job (left) for this candidate (right)?",
-	Rule: "3 would apply today: level, location and most core skills fit. 2 plausible stretch: right field and level, some core skills missing. 1 same broad field, wrong level or stack. 0 irrelevant or ineligible.",
-	Help: "The candidate is in India. A job only in another country, or remote but closed to India, is 0.",
+	Rule: "3 would apply today: level and location fit and most core requirements are on the profile. 2 plausible stretch: right field and level, some core skills missing. 1 same broad field but the wrong level or stack, however far off the level. 0 a different field, or a job the location rules out.",
+	Help: "The candidate is in India. A job only in another country, or remote but closed to India, is 0. A level mismatch alone is 1, never 0.",
 	Choices: []Choice{
 		{"3", "3", "3: would apply today"}, {"2", "2", "2: plausible stretch"}, {"1", "1", "1: same field, wrong level or stack"},
 		{"0", "0", "0: irrelevant or ineligible"}, unsure,

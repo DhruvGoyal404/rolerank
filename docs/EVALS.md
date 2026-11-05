@@ -230,7 +230,8 @@ Grades, per (profile, job):
   and opus regraded the 231 low- and medium-confidence ones. Hybrid nDCG@10 is 0.787 and MRR
   0.770. The hybrid beats lexical-only by 0.090 (interval 0.023 to 0.159) and vector-only by
   0.099 (0.023 to 0.189). Recall@200 is 0.985. The full table is in PHASE3.md. The owner audits
-  30 of the grades with `d3-audit`; D3 isn't gold until that is scored.
+  30 of the grades: kappa 0.507, and 0.49 after a rubric revision, both below 0.6. So D3 is not
+  gold, and its MRR and comparison verdicts are not proven (PHASE3.md, "D3 audit").
 
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.
