@@ -1,5 +1,5 @@
 {
- "at": "2026-11-05T14:16:20.291Z",
+ "at": "2026-11-05T15:47:09.993Z",
  "model": "claude-haiku-5-5",
  "d1": {
   "resumes": 200,
@@ -10,8 +10,8 @@
   "notInGold": 0,
   "contactsLeaked": 0,
   "monthsWithin3": 1,
-  "p95LatencyMs": 6238,
-  "meanCostUsd": 0.000297275,
+  "p95LatencyMs": 6764,
+  "meanCostUsd": 0.00030713,
   "calls": 200,
   "fields": {
    "skills": {

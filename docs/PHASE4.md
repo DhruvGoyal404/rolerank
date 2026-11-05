@@ -114,14 +114,38 @@ its tech stack ("Online Judge | Go, Python"). The model sometimes kept the stack
   against all of them.
 - The prompt will say a project's name excludes its stack.
 
-D1-hard can't measure that fix, because the fix came from seeing it. A fresh held-out set
-(D1-hard-2) will. Until then, **the figures above are P4's honest parsing numbers.**
+D1-hard can't measure that fix, because the fix came from seeing it. A fresh held-out set,
+D1-hard-2, does.
+
+## The fix, measured on held-out D1-hard-2 (2026-11-05)
+
+`parse-v3` makes education cite several lines and keeps tech stacks out of project names. It
+was built from D1-hard's diagnosis. D1-hard-2 then measured it:
+- 40 new resumes in the same five layouts, seed 20261107;
+- committed (`31c72c6`) before its one run, with nothing tuned afterwards;
+- report: `evals/reports/d1-hard-2-live-2026-11-05.json`.
+
+| Field | D1-hard, parse-v2 | **D1-hard-2, parse-v3** | Threshold (P / R) |
+|---|---|---|---|
+| Institution, degree, grad year, CGPA | 1.000 / 0.200 | **1.000 / 1.000** | 0.97 / 0.95 |
+| Projects | 0.922 / 0.922 | **0.972 / 0.972** | 0.95 / 0.90 |
+| Skills | 1.000 / 0.980 | 1.000 / 0.997 | 0.95 / 0.90 |
+| Employer, title, dates | 1.000 / 1.000 | 1.000 / 1.000 | 0.97 / 0.95 |
+| Fabricated / contacts reaching the model | 0 / 0 | 0 / 0 | 0 / 0 |
+| p95 / mean cost | 4.8 s / $0.0003 | 4.5 s / $0.0003 | 20 s / $0.002 |
+
+With `parse-v3`, synthetic D1 still scores 1.000 on every field, and D7 is still 0 canaries,
+0 planted skills and 0 prompt leaks on 80 cases (`evals/reports/p4-live-2026-11-05.json`).
+
+**D1-hard-2 is now P4's honest parsing figure: every threshold passes.** It is still
+synthetic: our generator's take on real layouts, not real files. The owner's own resume
+(`scripts/parse-resume.sh`) is the first real check.
 
 ## Known gaps and open items
 
 | Item | State | Next |
 |---|---|---|
-| Education recall 0.200 and projects precision 0.922 on held-out D1-hard | The fix is known (above); not yet built | Build it first in P5; measure on a fresh held-out D1-hard-2 |
+| Education recall 0.200 and projects precision 0.922 on held-out D1-hard | Fixed in parse-v3: 1.000 and 0.972 on held-out D1-hard-2 | Done |
 | Real resumes | The owner can check one now: `bash scripts/parse-resume.sh my-resumes/<file>` | Owner |
 | Profile confirmation screen | API done; the page is P6 | P6 |
 | D7's job-description cases | Need Bring a JD | P5 |
