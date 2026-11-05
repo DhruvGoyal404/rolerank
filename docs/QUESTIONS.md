@@ -20,6 +20,7 @@
 | Q14 | A: 18+ |
 | Q15 | No decision needed: the account is already on the PAID plan (`codejudge-down.sh` printed "plan: PAID ACTIVE" on 2026-10-30). Same account, separated by tags and stack names. Both budgets move to the current rate in P8 |
 | Q16 | A: `bot@dhruvgoyal.tech` through Cloudflare Email Routing; drafts in OUTREACH.md |
+| Q17 | No zero-data-retention (ZDR) agreement with Anthropic for v1, which is invite-only. **Revisit ZDR before public signup** (2026-11-05) |
 
 Later changes by the owner (2026-10-31): one Postgres cluster with two databases instead
 of two clusters; D3, D5 and D6 reduced; Bring a JD moved to P4b. The docs reflect these.
@@ -217,3 +218,21 @@ Before P2, please also send these short emails, because the answers go in SOURCE
   rate limit? Their docs state none.
 - **Workable support:** is `apply.workable.com/api/v1/widget/accounts/{slug}` permitted
   for this use? (Decides Q7.)
+
+## Q17. Zero data retention with Anthropic
+
+**Decided 2026-11-05: not for v1. Revisit before public signup.**
+
+Anthropic's terms were checked on 2026-11-05 in the API data-retention docs and the commercial
+retention article:
+- Without ZDR, API inputs and outputs are deleted within 30 days.
+- They can be kept up to 2 years if automated safety systems flag them, and longer where the
+  law requires.
+- API data isn't used for training without permission.
+- ZDR is a separate agreement with Anthropic, not an API setting. It doesn't cover Covered
+  Models (the Fable and Mythos families); Claude Haiku 5.5, which RoleRank uses, isn't one.
+
+v1 is invite-only, so the 30-day window is accepted and stated on /privacy. Before public signup:
+ask Anthropic for ZDR, or say plainly on /privacy why not. Either way, /privacy changes in the
+same commit as the decision.
+

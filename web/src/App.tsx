@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from "react-router";
 import { AboutBot } from "./pages/AboutBot";
 import { Home } from "./pages/Home";
+import { Privacy } from "./pages/Privacy";
 import { SignIn } from "./pages/SignIn";
 import { Sources } from "./pages/Sources";
 
@@ -19,11 +20,13 @@ export function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/about/bot" element={<AboutBot />} />
           <Route path="/sources" element={<Sources />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<h1>Page not found</h1>} />
         </Routes>
       </main>
       <footer>
-        <Link to="/sources">Sources and opt-out</Link> <Link to="/about/bot">About our bot</Link>
+        <Link to="/sources">Sources and opt-out</Link> <Link to="/about/bot">About our bot</Link>{" "}
+        <Link to="/privacy">Privacy</Link>
       </footer>
     </>
   );

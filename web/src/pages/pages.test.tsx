@@ -3,6 +3,7 @@ import { expect, it } from "vitest";
 import { AboutBot } from "./AboutBot";
 import { MemoryRouter } from "react-router";
 import { startUrl } from "./SignIn";
+import { Privacy } from "./Privacy";
 import { Sources } from "./Sources";
 
 it("publishes the bot contact, and no personal address", () => {
@@ -26,4 +27,12 @@ it("builds sign-in links", () => {
   expect(startUrl("google", "", false)).toBe("/api/auth/google/start");
   expect(startUrl("github", " abc ", true)).toBe("/api/auth/github/start?invite=abc&age18=1");
   expect(startUrl("github", "a&b=c", false)).toBe("/api/auth/github/start?invite=a%26b%3Dc");
+});
+
+it("states what privacy actually means here", () => {
+  const html = renderToString(<Privacy />);
+  for (const fact of ["30 days", "2 years", "no zero-data-retention agreement", "before any text is sent", "within 7"]) {
+    expect(html).toContain(fact);
+  }
+  expect(html).not.toContain("gmail");
 });
