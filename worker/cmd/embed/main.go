@@ -28,8 +28,18 @@ func main() {
 	threads := flag.Int("threads", 4, "intra-op threads")
 	batch := flag.Int("batch", 16, "texts per model call")
 	prefix := flag.Bool("query-prefix", false, "prepend bge's query instruction (text mode)")
-	flag.Parse()
-	if err := run(flag.Arg(0), *lib, *model, *threads, *batch, *prefix); err != nil {
+	// The mode comes first and the flags after it ("embed text -query-prefix"); Go's flag package
+	// stops at the first non-flag, so the flags are parsed from after the mode.
+	mode := ""
+	if len(os.Args) > 1 {
+		mode = os.Args[1]
+		_ = flag.CommandLine.Parse(os.Args[2:])
+	}
+	if flag.NArg() > 0 {
+		fmt.Fprintln(os.Stderr, "embed: unexpected arguments", flag.Args())
+		os.Exit(2)
+	}
+	if err := run(mode, *lib, *model, *threads, *batch, *prefix); err != nil {
 		fmt.Fprintln(os.Stderr, "embed:", err)
 		os.Exit(1)
 	}
