@@ -243,9 +243,9 @@ func renderHard(g gold, style int) []byte {
 	return extract.MakeDOCXBlocks(b)
 }
 
-// generateHard writes the held-out set: 40 resumes, 60% freshers and interns.
-func generateHard(dir string) {
-	r := rand.New(rand.NewPCG(20261106, 7))
+// generateHard writes a held-out set; each new set takes a new seed and ID prefix.
+func generateHard(dir string, seed uint64, prefix string) {
+	r := rand.New(rand.NewPCG(seed, 7))
 	gf, err := os.Create(filepath.Join(dir, "gold.jsonl"))
 	if err != nil {
 		panic(err)
@@ -261,7 +261,7 @@ func generateHard(dir string) {
 			seg = "fresher"
 			g = generate(0, r) // the base generator's fresher branch
 		}
-		g.ID = fmt.Sprintf("D1H-%03d", i+1)
+		g.ID = fmt.Sprintf("%s-%03d", prefix, i+1)
 		g.Segment = seg
 		g.Template = hardTemplates[i%len(hardTemplates)]
 		g.Format = "pdf"

@@ -229,8 +229,8 @@ func render(g gold) []string {
 }
 
 func main() {
-	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard") {
-		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard]")
+	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard" && os.Args[2] != "hard2") {
+		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
@@ -238,7 +238,13 @@ func main() {
 		panic(err)
 	}
 	if len(os.Args) == 3 {
-		generateHard(dir)
+		// hard: D1-hard, run once for P4's honest figure. hard2: D1-hard-2, made after the
+		// parse-v3 fix and held out to measure it.
+		if os.Args[2] == "hard2" {
+			generateHard(dir, 20261107, "D1H2")
+		} else {
+			generateHard(dir, 20261106, "D1H")
+		}
 		return
 	}
 	r := rand.New(rand.NewPCG(20261105, 1))
