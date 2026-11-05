@@ -61,6 +61,14 @@ export class Vault {
     return Vault.seal(key, Buffer.from(JSON.stringify(value)), `${column}:${rowId}:${userId}`);
   }
 
+  async encryptBytes(db: Db, userId: string, column: string, rowId: string, value: Buffer): Promise<Buffer> {
+    return Vault.seal(await this.userKey(db, userId), value, `${column}:${rowId}:${userId}`);
+  }
+
+  async decryptBytes(db: Db, userId: string, column: string, rowId: string, sealed: Buffer): Promise<Buffer> {
+    return Vault.open(await this.userKey(db, userId), sealed, `${column}:${rowId}:${userId}`);
+  }
+
   async decrypt<T>(db: Db, userId: string, column: string, rowId: string, sealed: Buffer): Promise<T> {
     const key = await this.userKey(db, userId);
     return JSON.parse(Vault.open(key, sealed, `${column}:${rowId}:${userId}`).toString("utf8")) as T;

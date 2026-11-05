@@ -16,6 +16,7 @@ const production = {
   NODE_ENV: "production",
   PUBLIC_ORIGIN: "https://rolerank.dhruvgoyal.tech",
   APP_DATABASE_URL: "postgres://u:p@db/app",
+  ROLERANK_KEK: Buffer.alloc(32, 7).toString("base64"),
 };
 
 describe("loadConfig", () => {
@@ -36,6 +37,13 @@ describe("loadConfig", () => {
     expect(() =>
       loadConfig({ ...base, APP_DATABASE_URL: "postgres://u:p@localhost/app" }),
     ).toThrow(/_test/);
+  });
+
+  it("needs a 32-byte key-encryption key in production", () => {
+    expect(loadConfig(production).kek?.key.length).toBe(32);
+    expect(() => loadConfig({ ...production, ROLERANK_KEK: undefined })).toThrow(/required in production/);
+    expect(() => loadConfig({ ...production, ROLERANK_KEK: Buffer.alloc(16).toString("base64") })).toThrow(/32 bytes/);
+    expect(loadConfig(base).kek).toBeNull();
   });
 
   it("refuses http and provider overrides in production", () => {

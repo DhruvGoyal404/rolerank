@@ -4,7 +4,8 @@ import { pino, type DestinationStream, type Logger } from "pino";
  * Only these fields ever reach a log line. It's an allowlist so a new field can't
  * leak by accident: resume text, profile fields and tokens have no way in.
  */
-const ALLOWED = ["event", "method", "route", "status", "ms", "code", "provider"] as const;
+// resume_id is an id, outcome a fixed code, type an error class name: none can carry content.
+const ALLOWED = ["event", "method", "route", "status", "ms", "code", "provider", "resume_id", "outcome", "type"] as const;
 type Field = (typeof ALLOWED)[number];
 export type LogFields = Partial<Record<Field, string | number>>;
 

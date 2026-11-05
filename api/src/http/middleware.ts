@@ -40,9 +40,10 @@ export function originCheck(publicOrigin: string): RequestHandler {
   };
 }
 
-export function rateLimit(limiter: RateLimiterAbstract): RequestHandler {
+/** Limits by IP, or by key(req) when given (for example the signed-in user). */
+export function rateLimit(limiter: RateLimiterAbstract, key?: (req: Request) => string): RequestHandler {
   return (req, res, next) => {
-    limiter.consume(req.ip ?? "unknown").then(
+    limiter.consume(key ? key(req) : (req.ip ?? "unknown")).then(
       () => {
         next();
       },

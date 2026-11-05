@@ -9,7 +9,9 @@ import { deleteUser, loginOrSignup } from "../auth/users.js";
 import type { Config } from "../config.js";
 import { randomToken, safeEqual, sha256 } from "../crypto.js";
 import type { Log } from "../log.js";
+import type { Vault } from "../vault.js";
 import { originCheck, parseCookies, rateLimit, requireUser, sessionLoader } from "./middleware.js";
+import { mountResumes } from "./resumes.js";
 
 export interface AppDeps {
   config: Config;
@@ -17,6 +19,8 @@ export interface AppDeps {
   valkey: Redis;
   providers: Record<ProviderName, Provider>;
   log: Log;
+  /** Resume and profile routes exist only with a vault: they never run without encryption. */
+  vault?: Vault;
 }
 
 interface PendingLogin {
@@ -225,6 +229,8 @@ export function createApp(deps: AppDeps): Express {
     }, next);
   });
 
+  if (deps.vault) mountResumes(app, { pool, valkey, vault: deps.vault });
+
   // Exists only with NODE_ENV=test: loadConfig refuses the flag anywhere else.
   if (config.testAuthShortcut) {
     app.post("/test/login", (req: Request, res, next) => {
@@ -261,7 +267,11 @@ export function createApp(deps: AppDeps): Express {
       return;
     }
     const type = (error as { type?: string }).type;
-    if (type === "entity.too.large" || type === "entity.parse.failed") {
+    if (type === "entity.too.large") {
+      res.status(413).json({ error: "too_large" });
+      return;
+    }
+    if (type === "entity.parse.failed") {
       res.status(400).json({ error: "bad_request" });
       return;
     }

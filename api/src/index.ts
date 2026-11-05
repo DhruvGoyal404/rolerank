@@ -4,6 +4,7 @@ import { githubProvider, googleProvider } from "./auth/providers.js";
 import { loadConfig } from "./config.js";
 import { createApp } from "./http/app.js";
 import { createLog } from "./log.js";
+import { Vault } from "./vault.js";
 
 const log = createLog();
 
@@ -21,6 +22,7 @@ try {
     valkey,
     log,
     providers: { google: googleProvider(config.google), github: githubProvider(config.github) },
+    ...(config.kek ? { vault: new Vault(config.kek.key, config.kek.version) } : {}),
   });
   const server = app.listen(config.port, "0.0.0.0", () => {
     log.info({ event: "listening", status: config.port });

@@ -18,6 +18,9 @@ const schema = z.object({
   GITHUB_WEB_URL: z.url().default(GITHUB_WEB_URL),
   GITHUB_API_URL: z.url().default(GITHUB_API_URL),
   TEST_AUTH_SHORTCUT: z.string().optional(),
+  // The key-encryption key for resume data: 32 bytes, base64. Read from SSM in production.
+  ROLERANK_KEK: z.string().optional(),
+  ROLERANK_KEK_VERSION: z.coerce.number().int().min(1).default(1),
 });
 
 export interface Config {
@@ -30,6 +33,8 @@ export interface Config {
   github: { clientId: string; clientSecret: string; webUrl: string; apiUrl: string };
   testAuthShortcut: boolean;
   secureCookies: boolean;
+  /** Absent in development without resume features; required in production. */
+  kek: { key: Buffer; version: number } | null;
 }
 
 function databaseName(url: string): string {
@@ -52,6 +57,9 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
   if (c.NODE_ENV === "test" && !databaseName(c.APP_DATABASE_URL).endsWith("_test")) {
     throw new Error("NODE_ENV=test needs a database whose name ends in _test");
   }
+  const kek = c.ROLERANK_KEK ? Buffer.from(c.ROLERANK_KEK, "base64") : null;
+  if (kek && kek.length !== 32) throw new Error("ROLERANK_KEK must be 32 bytes, base64");
+  if (!kek && c.NODE_ENV === "production") throw new Error("ROLERANK_KEK is required in production");
   if (c.NODE_ENV === "production") {
     if (!c.PUBLIC_ORIGIN.startsWith("https://")) {
       throw new Error("PUBLIC_ORIGIN must be https in production");
@@ -84,5 +92,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     },
     testAuthShortcut: shortcut,
     secureCookies: c.NODE_ENV === "production",
+    kek: kek ? { key: kek, version: c.ROLERANK_KEK_VERSION } : null,
   };
 }

@@ -416,13 +416,13 @@ describe("headers, limits and logs", () => {
     expect(Number(limited?.headers["retry-after"])).toBeGreaterThan(0);
   });
 
-  it("rejects oversized and malformed JSON with 400", async () => {
+  it("rejects oversized JSON with 413", async () => {
     const big = await request(app)
       .post("/api/auth/logout")
       .set("Origin", ORIGIN)
       .set("content-type", "application/json")
       .send(`{"a":"${"x".repeat(200_000)}"}`);
-    expect(big.status).toBe(400);
+    expect(big.status).toBe(413);
   });
 
   it("never logs codes, tokens, invites or email", async () => {
