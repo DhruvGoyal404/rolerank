@@ -73,7 +73,9 @@ async function pdf(bytes) {
       const text = parts.map((q) => q.str).join(" ").replace(/\s+/g, " ").trim();
       if (!text) continue;
       const tiny = parts.every((q) => q.size < TINY_PT);
-      const isHidden = [...hidden].some((h) => h.length >= 3 && text.includes(h));
+      // Either way round: pdf.js clips text that runs off the page, so a line can be a
+      // fragment of a longer hidden string.
+      const isHidden = [...hidden].some((h) => h.length >= 3 && (text.includes(h) || (text.length >= 8 && h.includes(text))));
       lines.push({ text, hidden: isHidden, tiny });
     }
     page.cleanup();
@@ -106,7 +108,11 @@ async function docx(bytes) {
     .split(/\r?\n/)
     .map((t) => t.replace(/\s+/g, " ").trim())
     .filter(Boolean)
-    .map((text) => ({ text, hidden: [...hidden].some((h) => text.includes(h)), tiny: false }));
+    .map((text) => ({
+      text,
+      hidden: [...hidden].some((h) => text.includes(h) || (text.length >= 8 && h.includes(text))),
+      tiny: false,
+    }));
   return { kind: "docx", pages: 0, lines };
 }
 
