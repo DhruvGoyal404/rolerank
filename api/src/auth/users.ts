@@ -88,6 +88,8 @@ export async function deleteUser(pool: Pool, userId: string): Promise<void> {
   try {
     await client.query("BEGIN");
     await client.query(`DELETE FROM users WHERE id = $1`, [userId]);
+    // Cascades remove keys, resumes and profiles; the ledger's per-user rows are keyed by text.
+    await client.query(`DELETE FROM llm_ledger WHERE scope = $1`, [userId]);
     await client.query(
       `INSERT INTO deletion_tombstones (user_id) VALUES ($1) ON CONFLICT DO NOTHING`,
       [userId],
