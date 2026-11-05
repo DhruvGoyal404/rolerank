@@ -50,6 +50,14 @@ describe("ground", () => {
     expect(g.profile.skills).toHaveLength(0);
   });
 
+  it("accepts a two-digit year written after an apostrophe", () => {
+    const awk = [{ n: 1, text: "Data Engineer | Zoho" }, { n: 2, text: "Mar'24 - Present" }];
+    const role = { employer: "Zoho", title: "Data Engineer", start: "2024-03", end: "present", lines: [1, 2] };
+    expect(ground({ ...base, experience: [role], skills: [], education: [], projects: [] }, awk).profile.experience).toHaveLength(1);
+    const wrong = { ...role, start: "2023-03" };
+    expect(ground({ ...base, experience: [wrong], skills: [], education: [], projects: [] }, awk).profile.experience).toHaveLength(0);
+  });
+
   it("refuses malformed dates", () => {
     const role = { employer: "Acme Corp", title: "Software Engineer", start: "March 2022", end: "2024-06", lines: [1] };
     const g = ground({ ...base, experience: [role] }, lines);

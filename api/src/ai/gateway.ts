@@ -12,7 +12,7 @@ import { ground, profileJsonSchema, ProfileSchema, type Grounded } from "./profi
  * here; invalid output is retried once with the same input, then the task fails. Every attempt
  * reserves its worst case in the ledger first. Prompts, resume text and output are never logged.
  */
-export const PARSE_PROMPT_VERSION = "parse-v1";
+export const PARSE_PROMPT_VERSION = "parse-v2"; // v2: school marks are not education (D1, 2026-11-05)
 export const MAX_OUTPUT_TOKENS = 4096;
 
 const SYSTEM = `You extract a structured profile from a resume for a job-matching service.
@@ -27,6 +27,9 @@ Each resume line starts with its number, like "L12: ". For every value you retur
 or lines it comes from. Copy employers, titles, institutions, degrees, skills and project names
 exactly as they are written in the cited line. Dates are YYYY-MM or YYYY, "present" for a current
 role, or "" when the resume gives none. Never invent or infer a value the resume does not state.
+
+education lists degrees and diplomas from colleges and universities only: leave out school
+results such as Class X and Class XII marks.
 
 level is your judgement of the candidate's career stage: intern (a student seeking an
 internship), entry (no full-time experience or under about 1 year), mid (about 2 to 4 years),

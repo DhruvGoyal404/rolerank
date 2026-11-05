@@ -112,6 +112,8 @@ function inLines(value: string, cited: string[]): boolean {
 
 const dateOK = (d: string): boolean => d === "" || d === "present" || /^\d{4}(-(0[1-9]|1[0-2]))?$/.test(d);
 const year = (d: string): string => d.slice(0, 4);
+/** A line states a year as "2024", or as "'24" / "’24" (Jul'24). */
+const hasYear = (text: string, y: string): boolean => text.includes(y) || new RegExp(`['’]${y.slice(2)}\\b`).test(text);
 
 export interface Grounded {
   profile: Profile;
@@ -148,7 +150,7 @@ export function ground(p: Profile, lines: Line[]): Grounded {
       const c = cite(e.lines);
       if (c === null || !inLines(e.employer, c) || !inLines(e.title, c)) return false;
       if (!dateOK(e.start) || !dateOK(e.end)) return false;
-      return [e.start, e.end].every((d) => d === "" || d === "present" || c.some((t) => t.includes(year(d))));
+      return [e.start, e.end].every((d) => d === "" || d === "present" || c.some((t) => hasYear(t, year(d))));
     }),
     education: keep("education", p.education, (e) => {
       // A score may sit on the line after the degree, so it may come from the next line too.
