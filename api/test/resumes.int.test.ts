@@ -54,9 +54,12 @@ const reply = JSON.stringify({
     { name: "PostgreSQL", line: 3 },
     { name: "Kubernetes", line: 4 },
   ],
-  experience: [{ employer: "Acme Corp", title: "Software Engineer", start: "2022", end: "present", lines: [2] }],
+  experience: [{ employer: "Acme Corp", title: "Software Engineer", kind: "job", periods: [{ start: "2022", end: "present" }], lines: [2] }],
   education: [],
   projects: [],
+  publications: [],
+  achievements: [],
+  certifications: [],
 });
 
 beforeAll(async () => {

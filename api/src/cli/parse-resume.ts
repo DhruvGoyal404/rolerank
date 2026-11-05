@@ -56,14 +56,15 @@ try {
     console.error(`parse ${r.outcome} after ${r.attempts} attempt(s)`);
     process.exit(1);
   }
-  const { profile, dropped, droppedBy } = r.grounded;
+  const { profile, dropped, droppedBy, school } = r.grounded;
   const { rows } = await pool.query<{ usd: number }>(
     `SELECT COALESCE(cost_usd, 0)::float AS usd FROM llm_calls WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
     [LOCAL_USER],
   );
   console.log(`\nDraft profile (prompt ${PARSE_PROMPT_VERSION}, ${((Date.now() - started) / 1000).toFixed(1)} s, $${(rows[0]?.usd ?? 0).toFixed(5)}):`);
   console.log(JSON.stringify(profile, null, 2));
-  console.log(`\nExperience: ${experienceMonths(profile)} months.`);
+  console.log(`\nWork experience: ${experienceMonths(profile)} months (jobs and internships, overlaps once; programmes excluded).`);
+  if (school) console.log(`School rows left out of education: ${school}.`);
   console.log(
     dropped
       ? `Dropped by the grounding gate (a value not found in the line it cited): ${JSON.stringify(droppedBy)}`

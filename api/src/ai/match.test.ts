@@ -10,9 +10,12 @@ const profile: Profile = {
     { name: "k8s", line: 3 },
     { name: "PostgreSQL", line: 3 },
   ],
-  experience: [{ employer: "Acme Corp", title: "Software Engineer Intern", start: "2025-05", end: "2025-07", lines: [2] }],
+  experience: [{ employer: "Acme Corp", title: "Software Engineer Intern", kind: "internship", periods: [{ start: "2025-05", end: "2025-07" }], lines: [2] }],
   education: [],
   projects: [{ name: "Expense Splitter", line: 4 }],
+  publications: [],
+  achievements: [],
+  certifications: [],
 };
 
 describe("explain", () => {

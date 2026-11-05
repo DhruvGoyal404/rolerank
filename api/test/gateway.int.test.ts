@@ -68,9 +68,12 @@ const good = JSON.stringify({
     { name: "Go", line: 2 },
     { name: "Kubernetes", line: 3 },
   ],
-  experience: [{ employer: "Acme Corp", title: "Software Engineer", start: "2022", end: "present", lines: [1] }],
+  experience: [{ employer: "Acme Corp", title: "Software Engineer", kind: "job", periods: [{ start: "2022", end: "present" }], lines: [1] }],
   education: [],
   projects: [],
+  publications: [],
+  achievements: [],
+  certifications: [],
 });
 
 const gateway = (caps = { userUsd: 0.05, globalUsd: 1 }) =>

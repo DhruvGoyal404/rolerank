@@ -5,28 +5,46 @@ import type { Profile } from "./profile.js";
  * set matching for skills and names, best-assignment matching for entries. A fabricated value is
  * an extracted employer, title, institution, degree or date that appears nowhere in the gold.
  */
+type Period = { start: string; end: string };
 export interface Gold {
   id: string;
   segment: string;
   skills: string[];
-  experience: Array<{ employer: string; title: string; start: string; end: string }>;
+  experience: Array<{ employer: string; title: string; kind?: string; periods: Period[] }>;
   education: Array<{ institution: string; degree: string; grad_year: number; score: string }>;
   projects: string[];
+  publications: string[];
+  achievements: string[];
+  certifications: string[];
+  months?: number; // D1-hard-3 states it; older sets compute it from the periods
 }
 
-/** Gold as the generator writes it: an empty list may be null. */
-export type GoldIn = {
-  [K in keyof Gold]: Gold[K] extends unknown[] ? Gold[K] | null : Gold[K];
+/**
+ * Gold as the generators write it: an empty list may be null (Go's nil slice), and sets before
+ * D1-hard-3 give one start and end per role instead of periods and no new sections.
+ */
+export type GoldIn = Omit<Gold, "skills" | "education" | "projects" | "experience" | "publications" | "achievements" | "certifications"> & {
+  [K in "skills" | "education" | "projects"]: Gold[K] | null;
+} & {
+  experience: Array<{ employer: string; title: string; kind?: string; periods?: Period[]; start?: string; end?: string }> | null;
+  publications?: string[] | null;
+  achievements?: string[] | null;
+  certifications?: string[] | null;
 };
 
-/** Reads null lists as empty. */
 export function normalise(raw: GoldIn): Gold {
   return {
     ...raw,
     skills: raw.skills ?? [],
-    experience: raw.experience ?? [],
+    experience: (raw.experience ?? []).map(({ start, end, periods, ...e }) => ({
+      ...e,
+      periods: periods ?? [{ start: start ?? "", end: end ?? "" }],
+    })),
     education: raw.education ?? [],
     projects: raw.projects ?? [],
+    publications: raw.publications ?? [],
+    achievements: raw.achievements ?? [],
+    certifications: raw.certifications ?? [],
   };
 }
 
@@ -45,9 +63,15 @@ export type Field =
   | "degree"
   | "grad_year"
   | "score"
-  | "projects";
+  | "projects"
+  | "kind"
+  | "publications"
+  | "achievements"
+  | "certifications";
 
 const norm = (s: string): string => s.toLowerCase().replace(/\s+/g, " ").replace(/[.,]+$/g, "").trim();
+/** A list item without its bullet or label ("– Certification: AWS ..." is "AWS ..."). */
+const item = (s: string): string => s.replace(/^[\s\-–—•*]+/, "").replace(/^(project|certification|certificate)s?:\s*/i, "");
 
 function setCounts(got: string[], want: string[]): Counts {
   const w = new Set(want.map(norm));
@@ -79,17 +103,34 @@ export function score(p: Profile, raw: GoldIn): Scored {
     p.skills.map((s) => s.name),
     g.skills,
   );
-  counts.projects = setCounts(
-    p.projects.map((x) => x.name.replace(/^project:\s*/i, "")),
-    g.projects,
-  );
+  counts.projects = setCounts(p.projects.map((x) => item(x.name)), g.projects);
+  counts.publications = setCounts(p.publications.map((x) => item(x.title)), g.publications);
+  counts.achievements = setCounts(p.achievements.map((x) => item(x.text)), g.achievements);
+  counts.certifications = setCounts(p.certifications.map((x) => item(x.name)), g.certifications);
   const exp = assign(p.experience, g.experience, (e) => e.employer, (e) => e.employer);
   const per = (n: number) => ({ extracted: p.experience.length * n, gold: g.experience.length * n, correct: 0 });
   counts.employer = { ...per(1), correct: exp.length };
   counts.title = { ...per(1), correct: exp.filter(([a, b]) => norm(a.title) === norm(b.title)).length };
+  // Each period's start and end; periods pair by start, each gold period used once.
   counts.dates = {
-    ...per(2),
-    correct: exp.reduce((n, [a, b]) => n + Number(a.start === b.start) + Number(a.end === b.end), 0),
+    extracted: 2 * p.experience.reduce((n, e) => n + e.periods.length, 0),
+    gold: 2 * g.experience.reduce((n, e) => n + e.periods.length, 0),
+    correct: exp.reduce((n, [a, b]) => {
+      const free = [...b.periods];
+      for (const x of a.periods) {
+        const i = free.findIndex((y) => y.start === x.start);
+        if (i < 0) continue;
+        const [y] = free.splice(i, 1);
+        n += 1 + Number(y?.end === x.end);
+      }
+      return n;
+    }, 0),
+  };
+  const kinded = g.experience.filter((e) => e.kind !== undefined);
+  counts.kind = {
+    extracted: kinded.length ? p.experience.length : 0,
+    gold: kinded.length,
+    correct: exp.filter(([a, b]) => b.kind !== undefined && a.kind === b.kind).length,
   };
   const edu = assign(p.education, g.education, (e) => e.institution, (e) => e.institution);
   const eper = { extracted: p.education.length, gold: g.education.length };
@@ -106,12 +147,12 @@ export function score(p: Profile, raw: GoldIn): Scored {
   // Fabricated: a value the resume's gold doesn't contain anywhere.
   const known = new Set(
     [
-      ...g.experience.flatMap((e) => [e.employer, e.title, e.start, e.end]),
+      ...g.experience.flatMap((e) => [e.employer, e.title, ...e.periods.flatMap((x) => [x.start, x.end])]),
       ...g.education.flatMap((e) => [e.institution, e.degree, String(e.grad_year)]),
     ].map(norm),
   );
   const values = [
-    ...p.experience.flatMap((e) => [e.employer, e.title, e.start, e.end].filter((v) => v !== "")),
+    ...p.experience.flatMap((e) => [e.employer, e.title, ...e.periods.flatMap((x) => [x.start, x.end])].filter((v) => v !== "")),
     ...p.education.flatMap((e) => [e.institution, e.degree, e.grad_year === null ? "" : String(e.grad_year)].filter(Boolean)),
   ];
   const fabricated = values.filter((v) => !known.has(norm(v))).length;

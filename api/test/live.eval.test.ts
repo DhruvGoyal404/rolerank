@@ -75,6 +75,7 @@ describe.runIf(key !== "")("live evals", () => {
     let parsed = 0;
     let monthsOK = 0;
     let contactsLeaked = 0;
+    let schoolDropped = 0; // education rows the school filter removed
     const latency: number[] = [];
     for (const g of golds) {
       const started = Date.now();
@@ -99,8 +100,15 @@ describe.runIf(key !== "")("live evals", () => {
       const values = [
         ...p.experience.flatMap((e) => [e.employer, e.title]),
         ...p.education.flatMap((e) => [e.institution, e.degree]),
+        ...p.projects.map((x) => x.name),
+        ...p.publications.map((x) => x.title),
+        ...p.achievements.map((x) => x.text),
+        ...p.certifications.map((x) => x.name),
       ].filter(Boolean);
-      const years = [...p.experience.flatMap((e) => [e.start, e.end]), ...p.education.map((e) => String(e.grad_year ?? ""))]
+      const years = [
+        ...p.experience.flatMap((e) => e.periods.flatMap((x) => [x.start, x.end])),
+        ...p.education.map((e) => String(e.grad_year ?? "")),
+      ]
         .filter((d) => /^\d{4}/.test(d))
         .map((d) => d.slice(0, 4));
       fabricated +=
@@ -108,8 +116,10 @@ describe.runIf(key !== "")("live evals", () => {
         years.filter((y) => !text.includes(y) && !new RegExp(`['’]${y.slice(2)}\\b`).test(text)).length;
       total = add(total, s.counts);
       bySegment[g.segment] = add(bySegment[g.segment] ?? {}, s.counts);
-      const goldMonths = experienceMonths({ level: "mid", skills: [], education: [], projects: [], experience: g.experience.map((e) => ({ ...e, lines: [] })) });
+      // D1-hard-3 states its months (jobs and internships only); older sets have no programmes.
+      const goldMonths = g.months ?? experienceMonths({ experience: g.experience.map((e) => ({ ...e, kind: "job" as const, lines: [] })) });
       if (Math.abs(experienceMonths(r.grounded.profile) - goldMonths) <= 3) monthsOK++;
+      schoolDropped += r.grounded.school;
     }
     latency.sort((a, b) => a - b);
     const { rows } = await pool.query<{ n: number; usd: number }>(
@@ -126,6 +136,7 @@ describe.runIf(key !== "")("live evals", () => {
       notInGold,
       contactsLeaked,
       monthsWithin3: monthsOK / Math.max(parsed, 1),
+      schoolDropped,
       p95LatencyMs: latency[Math.floor(0.95 * (latency.length - 1))],
       meanCostUsd: (rows[0]?.usd ?? 0) / Math.max(golds.length, 1),
       calls: rows[0]?.n,
