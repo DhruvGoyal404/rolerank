@@ -189,17 +189,18 @@ jobs:
           echo "$inside" | grep -qx 'UID=65534'
           echo "$inside" | grep -qx ROOTFS_READONLY
           echo "$inside" | grep -qx NET_BLOCKED
-      - name: Resume extractor under gVisor (hostile files, isolation)
-        working-directory: worker
-        run: |
-          set -euo pipefail
-          docker build -q --label rolerank.managed=true -t rolerank-extractor:ci ../extractor
-          ROLERANK_EXTRACTOR_IMAGE=rolerank-extractor:ci ROLERANK_SANDBOX_RUNTIME=runsc             go test -count=1 -tags sandbox -v ./internal/extract/
 
           # Control: the same probe under runc must not look like gVisor.
           control=$(sandbox rr-control runc --entrypoint sh "$valkey" -c "$probe")
           echo "$control"
           ! echo "$control" | grep -q gvisor
+      - name: Resume extractor under gVisor (hostile files, isolation)
+        working-directory: worker
+        run: |
+          set -euo pipefail
+          docker build -q --label rolerank.managed=true -t rolerank-extractor:ci ../extractor
+          export ROLERANK_EXTRACTOR_IMAGE=rolerank-extractor:ci ROLERANK_SANDBOX_RUNTIME=runsc
+          go test -count=1 -tags sandbox -v ./internal/extract/
       - name: Start services
         run: |
           bash scripts/gen-env.sh
