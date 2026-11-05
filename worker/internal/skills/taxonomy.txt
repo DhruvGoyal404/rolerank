@@ -26,7 +26,7 @@ Perl | language |
 Bash | language | shell scripting, shell script, bash scripting, zsh
 PowerShell | language |
 SQL | language | t-sql, tsql, pl/sql, plsql, ansi sql
-Dart | language |
+=Dart | language | dart language, =Dart
 Elixir | language |
 Erlang | language |
 Haskell | language |
@@ -65,7 +65,7 @@ Vite | frontend |
 Babel | frontend |
 GraphQL | api | graph ql
 Apollo GraphQL | api | apollo client, apollo server
-REST APIs | api | rest, restful, rest api, restful apis, restful services, rest apis
+REST APIs | api | restful, rest api, restful apis, restful services, rest apis, =REST
 gRPC | api | grpc
 WebSockets | api | websocket, socket.io
 OpenAPI | api | swagger
@@ -79,7 +79,7 @@ Responsive Design | frontend | responsive web design
 Micro-frontends | frontend | microfrontends, micro frontends
 
 # backend frameworks
-Node.js | backend | node, nodejs, node js
+Node.js | backend | nodejs, node js
 Express.js | backend | expressjs
 NestJS | backend | nest.js, nestjs
 Fastify | backend |
@@ -155,7 +155,7 @@ Supabase | database |
 Snowflake | data | snowflake data warehouse
 BigQuery | data | google bigquery, big query
 Redshift | data | amazon redshift, aws redshift
-Databricks | data |
+Databricks | data | unity catalog
 ClickHouse | database |
 TimescaleDB | database |
 InfluxDB | database |
@@ -176,7 +176,7 @@ Query Optimization | database | query tuning, sql tuning, performance tuning
 AWS | cloud | amazon web services
 Azure | cloud | microsoft azure
 Google Cloud | cloud | gcp, google cloud platform
-Oracle Cloud | cloud | oci
+Oracle Cloud | cloud | oracle cloud infrastructure
 IBM Cloud | cloud |
 DigitalOcean | cloud |
 Heroku | cloud |
@@ -204,7 +204,7 @@ Cloud Run | cloud | google cloud run
 Firebase Functions | cloud | cloud functions
 
 # devops and infrastructure
-Docker | devops | containers, containerization, dockerfile, docker compose, docker-compose
+Docker | devops | dockerfile, docker compose, docker-compose, docker containers
 Kubernetes | devops | k8s, kubernetes clusters, kubectl
 Helm | devops | helm charts
 Terraform | devops | hcl, terraform cloud
@@ -220,7 +220,7 @@ Travis CI | devops |
 Argo CD | devops | argocd, argo
 FluxCD | devops | flux cd
 CI/CD | devops | ci cd, continuous integration, continuous delivery, continuous deployment, ci/cd pipelines
-Git | devops | github, gitlab, bitbucket, version control, git workflows
+Git | devops | github, gitlab, bitbucket, git workflows
 Linux | devops | unix, ubuntu, centos, rhel, red hat enterprise linux, debian
 Nginx | devops |
 Apache HTTP Server | devops | apache httpd, apache web server
@@ -255,7 +255,7 @@ Pub/Sub | streaming | google pub/sub, pubsub
 NATS | streaming |
 Apache Pulsar | streaming | pulsar
 Apache Flink | data | flink
-Apache Spark | data | spark, pyspark, spark sql, =Spark
+Apache Spark | data | pyspark, spark sql, spark streaming, =Spark
 Apache Airflow | data | airflow
 Apache Beam | data |
 Hadoop | data | hdfs, mapreduce, hive, apache hive
@@ -263,7 +263,7 @@ Presto | data | trino
 dbt | data | data build tool
 Apache Iceberg | data | iceberg
 Delta Lake | data |
-ETL | data | elt, etl pipelines, data pipelines, data pipeline
+ETL | data | elt, etl pipelines
 Data Warehousing | data | data warehouse, data warehouses
 Data Lake | data | data lakes, lakehouse
 Data Engineering | data |
@@ -273,7 +273,7 @@ Informatica | data |
 Talend | data |
 SSIS | data |
 Kafka Connect | streaming |
-Debezium | streaming | change data capture, cdc
+Debezium | streaming |
 
 # data science and ML
 Machine Learning | ml | ml, machine-learning
@@ -285,9 +285,9 @@ Retrieval-augmented Generation | ml | rag, retrieval augmented generation
 Prompt Engineering | ml |
 Reinforcement Learning | ml |
 Recommender Systems | ml | recommendation systems, recommendation engines
-Time Series | ml | time series analysis, forecasting
-Statistics | ml | statistical modeling, statistical analysis, hypothesis testing
-A/B Testing | ml | ab testing, experimentation, split testing
+Time Series | ml | time series analysis, time-series
+Statistics | ml | statistical modeling, statistical analysis, hypothesis testing, applied statistics
+A/B Testing | ml | ab testing, a/b tests, split testing
 Feature Engineering | ml |
 MLOps | ml | ml ops, ml engineering
 TensorFlow | ml | tensor flow, tf, keras
@@ -353,7 +353,7 @@ Performance Testing | testing | load testing, stress testing
 API Testing | testing | rest assured, rest-assured
 Mockito | testing |
 SonarQube | testing | sonar
-Quality Assurance | testing | qa, software testing
+Quality Assurance | testing | software testing, qa engineering, qa testing
 
 # security
 Application Security | security | appsec
@@ -384,7 +384,7 @@ Detection Engineering | security | threat detection
 CrowdStrike | security |
 ISO 27001 | security | iso27001
 SOC 2 | security | soc2
-GDPR | security | data privacy
+GDPR | security |
 PCI DSS | security | pci-dss, pci
 
 # embedded and systems
