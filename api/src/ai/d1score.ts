@@ -14,6 +14,22 @@ export interface Gold {
   projects: string[];
 }
 
+/** Gold as the generator writes it: an empty list may be null. */
+export type GoldIn = {
+  [K in keyof Gold]: Gold[K] extends unknown[] ? Gold[K] | null : Gold[K];
+};
+
+/** Reads null lists as empty. */
+export function normalise(raw: GoldIn): Gold {
+  return {
+    ...raw,
+    skills: raw.skills ?? [],
+    experience: raw.experience ?? [],
+    education: raw.education ?? [],
+    projects: raw.projects ?? [],
+  };
+}
+
 export interface Counts {
   extracted: number;
   gold: number;
@@ -55,7 +71,9 @@ export interface Scored {
   fabricated: number;
 }
 
-export function score(p: Profile, g: Gold): Scored {
+export function score(p: Profile, raw: GoldIn): Scored {
+  // The generator writes an empty list as null (Go's nil slice).
+  const g = normalise(raw);
   const counts = {} as Record<Field, Counts>;
   counts.skills = setCounts(
     p.skills.map((s) => s.name),

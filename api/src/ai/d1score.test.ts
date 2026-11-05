@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { add, precision, recall, score, type Gold } from "./d1score.js";
+import { add, precision, recall, score, type Gold, type GoldIn } from "./d1score.js";
 import type { Profile } from "./profile.js";
 
 const gold: Gold = {
@@ -37,5 +37,12 @@ describe("score", () => {
     expect(precision(s.counts.employer)).toBe(0.5);
     expect(recall(s.counts.skills)).toBeCloseTo(2 / 3);
     expect(add(s.counts, s.counts).skills).toEqual({ extracted: 6, gold: 6, correct: 4 });
+  });
+
+  it("reads a null list in the gold as empty", () => {
+    const g: GoldIn = { ...gold, projects: null, experience: null };
+    const s = score({ ...profile, experience: [], projects: [] }, g);
+    expect(s.counts.projects).toEqual({ extracted: 0, gold: 0, correct: 0 });
+    expect(s.counts.employer.gold).toBe(0);
   });
 });

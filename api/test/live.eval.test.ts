@@ -4,7 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { stripContacts } from "../src/ai/contacts.js";
-import { add, precision, recall, score, type Counts, type Field, type Gold } from "../src/ai/d1score.js";
+import { add, normalise, precision, recall, score, type Counts, type Field, type GoldIn } from "../src/ai/d1score.js";
 import { Gateway } from "../src/ai/gateway.js";
 import { httpExtractor } from "../src/ai/pipeline.js";
 import { experienceMonths } from "../src/ai/profile.js";
@@ -55,12 +55,14 @@ const lines = (file: string) => readFileSync(file, "utf8").split("\n").filter(Bo
 
 describe.runIf(key !== "")("live evals", () => {
   it("D1: resume parsing", { timeout: 3_600_000 }, async () => {
-    const golds = lines(join(root, "evals", "d1", "gold.jsonl")).map(
-      (l) => JSON.parse(l) as Gold & { format: string; email: string; phone: string; experience: Gold["experience"] },
-    );
+    const golds = lines(join(root, "evals", "d1", "gold.jsonl")).map((l) => {
+      const raw = JSON.parse(l) as GoldIn & { format: string; email: string; phone: string };
+      return { ...raw, ...normalise(raw) };
+    });
     const bySegment: Record<string, Partial<Record<Field, Counts>>> = {};
     let total: Partial<Record<Field, Counts>> = {};
-    let fabricated = 0;
+    let fabricated = 0; // a value with no support in the resume's visible text (EVALS.md)
+    let notInGold = 0; // a value the gold doesn't list: real school rows count here, not above
     let firstValid = 0;
     let parsed = 0;
     let monthsOK = 0;
@@ -80,7 +82,22 @@ describe.runIf(key !== "")("live evals", () => {
       parsed++;
       if (r.attempts === 1) firstValid++;
       const s = score(r.grounded.profile, g);
-      fabricated += s.fabricated;
+      notInGold += s.fabricated;
+      const text = ex.lines
+        .filter((l) => !l.hidden)
+        .map((l) => l.text.toLowerCase())
+        .join("\n");
+      const p = r.grounded.profile;
+      const values = [
+        ...p.experience.flatMap((e) => [e.employer, e.title]),
+        ...p.education.flatMap((e) => [e.institution, e.degree]),
+      ].filter(Boolean);
+      const years = [...p.experience.flatMap((e) => [e.start, e.end]), ...p.education.map((e) => String(e.grad_year ?? ""))]
+        .filter((d) => /^\d{4}/.test(d))
+        .map((d) => d.slice(0, 4));
+      fabricated +=
+        values.filter((v) => !text.includes(v.toLowerCase())).length +
+        years.filter((y) => !text.includes(y) && !new RegExp(`['’]${y.slice(2)}\\b`).test(text)).length;
       total = add(total, s.counts);
       bySegment[g.segment] = add(bySegment[g.segment] ?? {}, s.counts);
       const goldMonths = experienceMonths({ level: "mid", skills: [], education: [], projects: [], experience: g.experience.map((e) => ({ ...e, lines: [] })) });
@@ -98,6 +115,7 @@ describe.runIf(key !== "")("live evals", () => {
       parseSuccess: parsed / golds.length,
       schemaValidFirstTime: firstValid / Math.max(parsed, 1),
       fabricated,
+      notInGold,
       contactsLeaked,
       monthsWithin3: monthsOK / Math.max(parsed, 1),
       p95LatencyMs: latency[Math.floor(0.95 * (latency.length - 1))],
