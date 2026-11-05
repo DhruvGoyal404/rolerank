@@ -106,6 +106,19 @@ var d6Questions = []Question{
 	},
 }
 
+// d3Questions grade a job for a candidate. The page shows the job as A and the candidate's
+// profile as B.
+var d3Questions = []Question{{
+	ID:   "grade",
+	Text: "How good is this job (left) for this candidate (right)?",
+	Rule: "3 would apply today: level, location and most core skills fit. 2 plausible stretch: right field and level, some core skills missing. 1 same broad field, wrong level or stack. 0 irrelevant or ineligible.",
+	Help: "The candidate is in India. A job only in another country, or remote but closed to India, is 0.",
+	Choices: []Choice{
+		{"3", "3", "3: would apply today"}, {"2", "2", "2: plausible stretch"}, {"1", "1", "1: same field, wrong level or stack"},
+		{"0", "0", "0: irrelevant or ineligible"}, unsure,
+	},
+}}
+
 // seen ends each audit item: the page shows the model's answer and reason, and any key
 // moves on. Only after this does the human see what the model said.
 var seen = Question{
@@ -131,6 +144,7 @@ var Questions = map[string][]Question{
 	"d6-recheck":      d6Questions,
 	"d6-audit":        audit(d6Questions),
 	"d6-final-audit":  audit(d6Questions),
+	"d3-audit":        audit(d3Questions),
 }
 
 // Answer is one line of the label log. Undo appends a line too: the log is never rewritten,

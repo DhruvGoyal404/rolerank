@@ -184,7 +184,27 @@ func TestD2(t *testing.T) {
 				name, sum.NDCG10, sum.MRR, sum.Recall, sum.LevelViolation, sum.GeoViolate, sum.Judged10)
 		}
 	}
-	h := results["hybrid prefix=false"]
+	// A rank is reproducible from stored features: the same search twice gives the same order
+	// and the same scores.
+	p := ps[0]
+	prof := Profile{Skills: p.Skills, Titles: skills.TitleTerms(strings.Split(p.Text, ".")[0]), Level: p.Level,
+		Country: d2.Country, Remote: p.Remote, Embedding: vec["q"+p.ID]}
+	first, err := s.Search(ctx, prof, Hybrid, 50)
+	if err != nil {
+		t.Fatal(err)
+	}
+	again, err := s.Search(ctx, prof, Hybrid, 50)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := range first {
+		if first[i].ID != again[i].ID || first[i].Score != again[i].Score {
+			t.Fatalf("rank %d differs between runs: %d %.6f vs %d %.6f", i, first[i].ID, first[i].Score, again[i].ID, again[i].Score)
+		}
+	}
+
+	// Profiles are embedded with bge's query prefix: the P3 bake-off chose it on D3.
+	h := results["hybrid prefix=true"]
 	if h.NDCG10 < 0.85 || h.MRR < 0.90 || h.Recall < 0.98 || h.LevelViolation > 0.01 || h.GeoViolate != 0 {
 		t.Errorf("D2 thresholds missed by the hybrid: %+v", h)
 	}

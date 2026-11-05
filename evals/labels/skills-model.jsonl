@@ -1,0 +1,1530 @@
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Apache Airflow", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Database Design", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "ETL", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Presto", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "REST APIs", "ok": "n"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Redshift", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Snowflake", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/mactores/jobs/aws-data-engineer-senior-2948507528", "skill": "Data Analysis", "ok": "n"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "Data Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "Git", "ok": "y"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "MongoDB", "ok": "y"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:mthreerecruitingportal:4703461006", "skill": "R", "ok": "n"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Angular", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Couchbase", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Cypress", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Elasticsearch", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "NoSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "OpenSearch", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "Playwright", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "RabbitMQ", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "SQL Server", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:betsson:8236512", "skill": ".NET", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Angular", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "C#", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "CSS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Data Lake", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Databricks", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "HTML", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "JavaScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Node.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Observability", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Scala", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Unity", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8029679002", "skill": "Vue.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "API Gateway", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Docker", "ok": "n"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Istio", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": ".NET", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Bash", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "C#", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "PowerShell", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truveta:6114473004", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "AWS IAM", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "JavaScript", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "OAuth", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "PowerShell", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "SAML", "ok": "y"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "ServiceNow", "ok": "n"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "SonarQube", "ok": "n"}
+{"sample": 1, "job": "lever:sonarsource:7b304f33-35f3-4734-9772-b4ceb447f8c0", "skill": "Zero Trust", "ok": "y"}
+{"sample": 1, "job": "greenhouse:stubhubinc:4901673101", "skill": "Algorithms", "ok": "n"}
+{"sample": 1, "job": "greenhouse:stubhubinc:4901673101", "skill": "C#", "ok": "y"}
+{"sample": 1, "job": "greenhouse:stubhubinc:4901673101", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:stubhubinc:4901673101", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:stubhubinc:4901673101", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Cypress", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "GraphQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Jest", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Micro-frontends", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Performance Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "UI/UX Design", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "D3.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Data Visualization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "End-to-end Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cssmerge:8588199002", "skill": "Mixpanel", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Game Development", "ok": "n"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Microservices", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Test-driven Development", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:2k:7865984003", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "lever:spreetail:d984a921-7e5b-4738-b363-382dfa2e56e3", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "lever:spreetail:d984a921-7e5b-4738-b363-382dfa2e56e3", "skill": "Dart", "ok": "n"}
+{"sample": 1, "job": "lever:spreetail:d984a921-7e5b-4738-b363-382dfa2e56e3", "skill": "Data Analysis", "ok": "y"}
+{"sample": 1, "job": "lever:spreetail:d984a921-7e5b-4738-b363-382dfa2e56e3", "skill": "Data Visualization", "ok": "y"}
+{"sample": 1, "job": "lever:spreetail:d984a921-7e5b-4738-b363-382dfa2e56e3", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "lever:spreetail:d984a921-7e5b-4738-b363-382dfa2e56e3", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "AWS IAM", "ok": "n"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Cloudflare", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Identity and Access Management", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Rust", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "OAuth", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Oracle Cloud", "ok": "n"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Serverless", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:discord:8649856002", "skill": "Zero Trust", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "A/B Testing", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Amazon SQS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Data Lake", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Data Warehousing", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Databricks", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Debezium", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Delta Lake", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Model Deployment", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "MySQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Operating Systems", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Oracle Database", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "SQL", "ok": "n"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Scala", "ok": "y"}
+{"sample": 1, "job": "greenhouse:databricks:8815669002", "skill": "Unity", "ok": "n"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Algorithms", "ok": "n"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Deep Learning", "ok": "n"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "SIEM", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Security Operations", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Bash", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Computer Networking", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Linux", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:rtbhouse:4919809101", "skill": "Splunk", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Apache Spark", "ok": "n"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Docker", "ok": "n"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Domain-driven Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Microservices", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Ruby on Rails", "ok": "n"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:alpaca:6231660004", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "A/B Testing", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Agile", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Android", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Autonomous Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "ETL", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Node.js", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "React", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "React Native", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "iOS", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Docker", "ok": "n"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Embeddings", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:tribalscale:4722058006", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "C", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "Cloudflare", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "Linux Kernel", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:7541032", "skill": "Rust", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Autonomous Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "CAN Bus", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Computer Vision", "ok": "n"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Embedded Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Integration Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Robotics", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Unit Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "Embedded Linux", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "GDPR", "ok": "n"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5083521007", "skill": "RTOS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "AWS IAM", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Amazon EC2", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Amazon EKS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Amazon S3", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Data Engineering", "ok": "n"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "GKE", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Machine Learning", "ok": "n"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Node.js", "ok": "n"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Argo CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Clojure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Hadoop", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Helm", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Query Optimization", "ok": "n"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Scala", "ok": "y"}
+{"sample": 1, "job": "greenhouse:roblox:8042578", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "A/B Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Apache Airflow", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Data Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "MLOps", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Model Deployment", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Recommender Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Reinforcement Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:truecaller:8042955", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": ".NET", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "AWS CDK", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "AWS IAM", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "AWS Lambda", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Amazon ECS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Amazon EKS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Amazon S3", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "C#", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "CDN", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Computer Graphics", "ok": "n"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Cypress", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Database Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Design Patterns", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Domain-driven Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "DynamoDB", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "End-to-end Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Laravel", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Large Language Models", "ok": "n"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Memcached", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Multithreading", "ok": "n"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "MySQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Next.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "NoSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Observability", "ok": "n"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "PHP", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Playwright", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Quality Assurance", "ok": "n"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Query Optimization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "RabbitMQ", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Redis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Redux", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "SQL Server", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Serverless", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Symfony", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "System Design", "ok": "n"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:amtechsoftware:4397786009", "skill": "Unit Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Ansible", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Apache Spark", "ok": "n"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Blockchain", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Grafana", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Node.js", "ok": "n"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Prometheus", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:robinhood:7648454", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Algorithms", "ok": "n"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Deep Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Feature Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Hugging Face", "ok": "n"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Model Deployment", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "PyTorch", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "TensorFlow", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "XGBoost", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Apache Airflow", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "BigQuery", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Recommender Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Redis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:reddit:6960831", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Data Analysis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Data Visualization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Git", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Power BI", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "R", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Statistics", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Tableau", "ok": "y"}
+{"sample": 1, "job": "greenhouse:fanaticsfbg:4417989009", "skill": "Amplitude", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "A/B Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Deep Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Feature Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "MLOps", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "PyTorch", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Ruby", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Ruby on Rails", "ok": "y"}
+{"sample": 1, "job": "greenhouse:kikoff:4396892009", "skill": "Statistics", "ok": "n"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "API Gateway", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "AWS IAM", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Amazon ECS", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Amazon SQS", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Bash", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "CircleCI", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "CloudWatch", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Cryptography", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Datadog", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Gatling", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Git", "ok": "n"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "GitHub Actions", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Grafana", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Identity and Access Management", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "JMeter", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Load Balancing", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Network Security", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "New Relic", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Node.js", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "OAuth", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "PCI DSS", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Performance Testing", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Prometheus", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Quality Assurance", "ok": "n"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "himalayas:feed:https://himalayas.app/companies/ourxplor/jobs/senior-devops-engineer-embedded-payments", "skill": "k6", "ok": "y"}
+{"sample": 1, "job": "greenhouse:deliveroo:8261231", "skill": "A/B Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:deliveroo:8261231", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:deliveroo:8261231", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:deliveroo:8261231", "skill": "Recommender Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:coinbase:8180833", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:coinbase:8180833", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:coinbase:8180833", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:coinbase:8180833", "skill": "Large Language Models", "ok": "n"}
+{"sample": 1, "job": "greenhouse:coinbase:8180833", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:coinbase:8180833", "skill": "GDPR", "ok": "n"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "A/B Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "Data Analysis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "Large Language Models", "ok": "n"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "Machine Learning", "ok": "n"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "Time Series", "ok": "n"}
+{"sample": 1, "job": "greenhouse:zocdoc:7560841", "skill": "Statistics", "ok": "y"}
+{"sample": 1, "job": "lever:palantir:1bb19522-3936-4adc-9ced-c3df8b5900b9", "skill": "Data Structures", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Malware Analysis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "SIEM", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Detection Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5448539008", "skill": "Security Operations", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Amazon Kinesis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Apache Airflow", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Computer Vision", "ok": "n"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Data Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Databricks", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Django", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "ETL", "ok": "n"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "IoT", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Jenkins", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "MLOps", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Natural Language Processing", "ok": "n"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Time Series", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Travis CI", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:avathon:4714155005", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "GitHub Actions", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Grafana", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Machine Learning", "ok": "n"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "REST APIs", "ok": "n"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Splunk", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Argo CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "GDPR", "ok": "n"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Git", "ok": "n"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Istio", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8260950", "skill": "Vector Databases", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "Android", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "Figma", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "Git", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "Vite", "ok": "y"}
+{"sample": 1, "job": "greenhouse:goodsservices:8005858003", "skill": "iOS", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "CSS", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Django", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "FastAPI", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Flask", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "GraphQL", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Integration Testing", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Microservices", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "MongoDB", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "NoSQL", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "REST APIs", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Redis", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Redux", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Sass", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "pytest", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Helm", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "OAuth", "ok": "y"}
+{"sample": 1, "job": "lever:brillio-2:17f5b956-a0a4-4627-b573-4e5e8d16937a", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Apache Pulsar", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Database Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Git", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Microservices", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "REST APIs", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Salesforce", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "JavaScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Jira", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Node.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:hearcomin:8143565", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "Machine Learning", "ok": "n"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "NoSQL", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "lever:payjoy:ac978469-904b-416b-aeeb-99289c26afa8", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Amazon Bedrock", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Ansible", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Apache Spark", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Git", "ok": "n"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "JavaScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "LangChain", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Node.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Object-oriented Programming", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "OpenAI API", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "REST APIs", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:pmg:8765658002", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "AWS CDK", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Amazon Bedrock", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "CloudFormation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Database Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "MLOps", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "OpenAI API", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Pandas", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "PyTorch", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "SageMaker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Statistics", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "TensorFlow", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Amazon S3", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Computer Vision", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Feature Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:externaljobboards:6211678004", "skill": "Redshift", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "Machine Learning", "ok": "n"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "OAuth", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "SAML", "ok": "y"}
+{"sample": 1, "job": "greenhouse:okta:8239421", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Data Analysis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Deep Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "MLOps", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "MLflow", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Natural Language Processing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:eudia:4020078009", "skill": "Statistics", "ok": "n"}
+{"sample": 1, "job": "greenhouse:spacex:8827481002", "skill": "Shopify", "ok": "n"}
+{"sample": 1, "job": "greenhouse:spacex:8827481002", "skill": "Data Analysis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:spacex:8827481002", "skill": "IoT", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "OAuth", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "Salesforce", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "Time Series", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "REST APIs", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cpisecurity:4716338006", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Agile", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Computer Networking", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Linux", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Network Security", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Twilio", "ok": "n"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:twilio:7657993", "skill": "Zero Trust", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Blockchain", "ok": "n"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Kafka", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Multithreading", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Apache Flink", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "ClickHouse", "ok": "y"}
+{"sample": 1, "job": "greenhouse:bybit:4996982101", "skill": "Debezium", "ok": "n"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Argo CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Computer Vision", "ok": "n"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Docker", "ok": "n"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "GDPR", "ok": "n"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Helm", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:andurilindustries:5264403007", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "A/B Testing", "ok": "n"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Cryptography", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Excel", "ok": "n"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Flutter", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Microservices", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Next.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Rust", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "C#", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Dart", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affinidi:8012939003", "skill": "Node.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Database Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "FastAPI", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Flask", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Git", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "MySQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "OpenAI API", "ok": "n"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Quality Assurance", "ok": "n"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Query Optimization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "REST APIs", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:selffinancial:6139484004", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Domain-driven Design", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "GraphQL", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "JavaScript", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "MongoDB", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "NestJS", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Node.js", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "REST APIs", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "React Native", "ok": "y"}
+{"sample": 1, "job": "lever:flashapp:4d649a5f-051e-4c1a-9f0a-d0207df059e0", "skill": "Site Reliability Engineering", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "ETL", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Jira", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "OpenAI API", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Snowflake", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Tableau", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Vercel", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "dbt", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cookunity:7712141003", "skill": "Zapier", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Android", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Data Analysis", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "End-to-end Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Jetpack Compose", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Kotlin", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "REST APIs", "ok": "n"}
+{"sample": 1, "job": "greenhouse:textnowinc:4221364009", "skill": "iOS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "A/B Testing", "ok": "n"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datacamp:7481117", "skill": "System Design", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Ansible", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Argo CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Bash", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Docker", "ok": "n"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "GitLab CI", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Helm", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "PowerShell", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Technical Documentation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:isaraerospace:4974349101", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datadog:6761448", "skill": "Confluence", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datadog:6761448", "skill": "Datadog", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datadog:6761448", "skill": "Jira", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datadog:6761448", "skill": "Linux", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datadog:6761448", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:datadog:6761448", "skill": "Web Accessibility", "ok": "n"}
+{"sample": 1, "job": "greenhouse:neuralink:7931610003", "skill": "Embedded Systems", "ok": "n"}
+{"sample": 1, "job": "greenhouse:neuralink:7931610003", "skill": "Robotics", "ok": "n"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "Code Review", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "Kotlin", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "REST APIs", "ok": "n"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "React Native", "ok": "y"}
+{"sample": 1, "job": "greenhouse:affirm:8032173003", "skill": "Vue.js", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "A/B Testing", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "Data Visualization", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "Large Language Models", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "Machine Learning", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:anthropic:5182605008", "skill": "Statistics", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Azure", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Azure DevOps", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Datadog", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "GitHub Actions", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "GitLab CI", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Terraform", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Test Automation", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "AWS", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:schubergphilis:7626457003", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "ClickHouse", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Cloudflare", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Data Lake", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "ETL", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Go", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Observability", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "React", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "CI/CD", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Docker", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "GitLab CI", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Google Cloud", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Java", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "JavaScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Kubernetes", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "MySQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Python", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "SQL", "ok": "y"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "Statistics", "ok": "n"}
+{"sample": 1, "job": "greenhouse:cloudflare:8050813", "skill": "TypeScript", "ok": "y"}
+{"sample": 1, "job": "greenhouse:plume:8757374002", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 1, "job": "greenhouse:plume:8757374002", "skill": "Incident Response", "ok": "y"}
+{"sample": 1, "job": "greenhouse:plume:8757374002", "skill": "Machine Learning", "ok": "n"}
+{"sample": 1, "job": "greenhouse:plume:8757374002", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 1, "job": "greenhouse:graphcore:8894310002", "skill": "C++", "ok": "y"}
+{"sample": 1, "job": "greenhouse:graphcore:8894310002", "skill": "Git", "ok": "n"}
+{"sample": 1, "job": "greenhouse:graphcore:8894310002", "skill": "Machine Learning", "ok": "n"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Data Structures", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Design Patterns", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Kafka", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Object-oriented Programming", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Redis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "Snowflake", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "System Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:clearstreet:6675504", "skill": "gRPC", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Bash", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Network Security", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Penetration Testing", "ok": "n"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Security Operations", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/vrinda-international/jobs/solutions-testing-engineer", "skill": "Test Automation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4620112006", "skill": "Bash", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4620112006", "skill": "Linux", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4620112006", "skill": "PowerShell", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4620112006", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4620112006", "skill": "Splunk", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4620112006", "skill": "TypeScript", "ok": "n"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Data Structures", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Database Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Kafka", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Multithreading", "ok": "n"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "MySQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Operating Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Redis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Spring Boot", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "Spring Framework", "ok": "y"}
+{"sample": 2, "job": "greenhouse:reolink:4449536009", "skill": "System Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Test Automation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Test-driven Development", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:equalexperts:8921267002", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "Agile", "ok": "n"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "Couchbase", "ok": "n"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "NetSuite", "ok": "y"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "Salesforce", "ok": "y"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "Amazon Bedrock", "ok": "n"}
+{"sample": 2, "job": "greenhouse:couchbaseinc:4723164006", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 2, "job": "greenhouse:point72:8163904002", "skill": "Apache Spark", "ok": "y"}
+{"sample": 2, "job": "greenhouse:point72:8163904002", "skill": "Data Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:point72:8163904002", "skill": "Data Visualization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:point72:8163904002", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:point72:8163904002", "skill": "Scala", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Database Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Git", "ok": "n"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Laravel", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Large Language Models", "ok": "n"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "MariaDB", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "MySQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Observability", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "PHP", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Vue.js", "ok": "y"}
+{"sample": 2, "job": "greenhouse:diligentcorporation:5788915004", "skill": "Tailwind CSS", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "API Testing", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Azure DevOps", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Cypress", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Git", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "GitHub Actions", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Integration Testing", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Jenkins", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Node.js", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Playwright", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Postman", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Selenium", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Site Reliability Engineering", "ok": "n"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Test Automation", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "TypeScript", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/srijan-technologies/jobs/senior-sdet-automation", "skill": "Web Accessibility", "ok": "y"}
+{"sample": 2, "job": "greenhouse:aloyoga:6017831004", "skill": "Excel", "ok": "y"}
+{"sample": 2, "job": "greenhouse:aloyoga:6017831004", "skill": "React", "ok": "n"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Ansible", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Bash", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Computer Networking", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "GDPR", "ok": "n"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Git", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Linux", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:iex:8239802", "skill": "Rust", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "AWS", "ok": "n"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "Integration Testing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "Test Automation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "Observability", "ok": "y"}
+{"sample": 2, "job": "greenhouse:ionq:6143123004", "skill": "Performance Testing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:captivation:5426539008", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:captivation:5426539008", "skill": "Apache Spark", "ok": "y"}
+{"sample": 2, "job": "greenhouse:captivation:5426539008", "skill": "DynamoDB", "ok": "y"}
+{"sample": 2, "job": "greenhouse:captivation:5426539008", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "Computer Vision", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "High-performance Computing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "MLOps", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "Model Deployment", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "Robotics", "ok": "n"}
+{"sample": 2, "job": "greenhouse:latitude:8258507", "skill": "PyTorch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:drweng:7725410", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "greenhouse:drweng:7725410", "skill": "Linux", "ok": "y"}
+{"sample": 2, "job": "greenhouse:drweng:7725410", "skill": "Query Optimization", "ok": "n"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Cryptography", "ok": "n"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Incident Response", "ok": "y"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Network Security", "ok": "n"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "Observability", "ok": "y"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "PowerShell", "ok": "y"}
+{"sample": 2, "job": "greenhouse:keyfactorinc:6231984004", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "Angular", "ok": "y"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "GraphQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "OpenAI API", "ok": "n"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:dept:8023298", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "AWS IAM", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Argo CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Operating Systems", "ok": "n"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Amazon S3", "ok": "y"}
+{"sample": 2, "job": "greenhouse:doordashusa:8180903", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:humeai:4003488008", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:humeai:4003488008", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:humeai:4003488008", "skill": "PyTorch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:humeai:4003488008", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:humeai:4003488008", "skill": "Reinforcement Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Apache Spark", "ok": "n"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Data Lake", "ok": "n"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Databricks", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Detection Engineering", "ok": "n"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Go", "ok": "n"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:databricks:8285949002", "skill": "Quality Assurance", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "API Gateway", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "AWS IAM", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon ECS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon EKS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon Kinesis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon S3", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon SNS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Amazon SQS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "CloudWatch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Database Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "DynamoDB", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Observability", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Query Optimization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "Serverless", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mark43:8325546", "skill": "System Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Algorithms", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "High-performance Computing", "ok": "n"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Performance Testing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Data Analysis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Distributed Systems", "ok": "n"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "JMeter", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rti:8069024", "skill": "Robotics", "ok": "n"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "Git", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "GitHub Actions", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "Object-oriented Programming", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "Swift", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "SwiftUI", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "UI/UX Design", "ok": "n"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "UIKit", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "iOS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:illumiallc:4395846009", "skill": "Web Accessibility", "ok": "y"}
+{"sample": 2, "job": "lever:ciandt:fa720e93-a0b1-41b6-abbc-4b83d8e9dc7b", "skill": ".NET", "ok": "y"}
+{"sample": 2, "job": "lever:ciandt:fa720e93-a0b1-41b6-abbc-4b83d8e9dc7b", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "lever:ciandt:fa720e93-a0b1-41b6-abbc-4b83d8e9dc7b", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Cassandra", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "CloudWatch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Datadog", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Incident Response", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "IoT", "ok": "n"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Linux", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Nginx", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Operating Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "PagerDuty", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Security Operations", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cambridgemobiletelematics:7842934", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Amazon ECS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Amazon S3", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "CloudFormation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "DynamoDB", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "MongoDB", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "MySQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Observability", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "OpenSearch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Android", "ok": "n"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Ansible", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Apache Pulsar", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Apache Spark", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Datadog", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "GraphQL", "ok": "n"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Incident Response", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Java", "ok": "n"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Kotlin", "ok": "n"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Load Balancing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Node.js", "ok": "n"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Prometheus", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "REST APIs", "ok": "n"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "RabbitMQ", "ok": "y"}
+{"sample": 2, "job": "greenhouse:toast:8210638", "skill": "Splunk", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Deep Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Statistics", "ok": "n"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "Natural Language Processing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:vantagescore:4407256009", "skill": "PyTorch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Embedded Linux", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Embedded Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Linux Kernel", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Memory Management", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "C", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:verkada:5242253007", "skill": "Systems Programming", "ok": "y"}
+{"sample": 2, "job": "greenhouse:gotion:8187979002", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:gotion:8187979002", "skill": "ServiceNow", "ok": "y"}
+{"sample": 2, "job": "greenhouse:gotion:8187979002", "skill": "Technical Documentation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Databricks", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Excel", "ok": "n"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "MLOps", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Natural Language Processing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "SageMaker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Snowflake", "ok": "y"}
+{"sample": 2, "job": "greenhouse:stone:8017007003", "skill": "Twilio", "ok": "y"}
+{"sample": 2, "job": "lever:csit:247b882f-bb54-4473-9233-f12f2c5de74a", "skill": "Ansible", "ok": "y"}
+{"sample": 2, "job": "lever:csit:247b882f-bb54-4473-9233-f12f2c5de74a", "skill": "Computer Networking", "ok": "n"}
+{"sample": 2, "job": "lever:csit:247b882f-bb54-4473-9233-f12f2c5de74a", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "lever:csit:247b882f-bb54-4473-9233-f12f2c5de74a", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "lever:csit:247b882f-bb54-4473-9233-f12f2c5de74a", "skill": "Technical Documentation", "ok": "y"}
+{"sample": 2, "job": "lever:csit:247b882f-bb54-4473-9233-f12f2c5de74a", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:inter:4733278005", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:inter:4733278005", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:inter:4733278005", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:avride:4017800009", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:avride:4017800009", "skill": "Quality Assurance", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "CSS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "CockroachDB", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "HTML", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "Hibernate", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "JUnit", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "Kotlin", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "Machine Learning", "ok": "n"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "MySQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "Next.js", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "TypeScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:faire:8806428002", "skill": "Web Accessibility", "ok": "n"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "A/B Testing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Google Analytics", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Salesforce", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Tableau", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "CSS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Data Analysis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "ETL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "HTML", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Query Optimization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "R", "ok": "y"}
+{"sample": 2, "job": "greenhouse:cpisecurity:4717617006", "skill": "Statistics", "ok": "n"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "CSS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "HTML", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "Next.js", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "TypeScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "UI/UX Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "Figma", "ok": "y"}
+{"sample": 2, "job": "greenhouse:accenturefederalservices:4712671006", "skill": "Web Accessibility", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Data Visualization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Embeddings", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Feature Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Model Deployment", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Natural Language Processing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Statistics", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "NumPy", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Pandas", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Power BI", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "SQL Server", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Tableau", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "Time Series", "ok": "y"}
+{"sample": 2, "job": "greenhouse:coderoad:4458093009", "skill": "scikit-learn", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Amazon ECS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Amazon S3", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Amazon SQS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "CSS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Computer Graphics", "ok": "n"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Database Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Git", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "IoT", "ok": "n"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Multithreading", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "MySQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "PHP", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Performance Optimization", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Test-driven Development", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "TypeScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "UI/UX Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:sureify:5376120008", "skill": "Web Accessibility", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Amazon Bedrock", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Data Analysis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "MLOps", "ok": "n"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "OpenAI API", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Pandas", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Reinforcement Learning", "ok": "n"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "gRPC", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "vLLM", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Agile", "ok": "n"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:turing:5985543004", "skill": "GDPR", "ok": "n"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "Agile", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "C", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "Embedded Systems", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "Linux", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "AUTOSAR", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "Android", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "GitHub Actions", "ok": "y"}
+{"sample": 2, "job": "lever:woven-by-toyota:b4e674b1-ba16-4aff-b6c8-3f441f6e9b66", "skill": "Operating Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:figma:6138981004", "skill": "Figma", "ok": "n"}
+{"sample": 2, "job": "greenhouse:figma:6138981004", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:figma:6138981004", "skill": "Recommender Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:nex:5425458008", "skill": "Android", "ok": "y"}
+{"sample": 2, "job": "greenhouse:nex:5425458008", "skill": "Test Automation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:nex:5425458008", "skill": "Unity", "ok": "y"}
+{"sample": 2, "job": "greenhouse:nex:5425458008", "skill": "Computer Vision", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "Algorithms", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "Computer Vision", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "Deep Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "PyTorch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "TensorFlow", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "C", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "Rust", "ok": "y"}
+{"sample": 2, "job": "greenhouse:rocketlab:8002621003", "skill": "TypeScript", "ok": "n"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "C", "ok": "n"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "C++", "ok": "n"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Grafana", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Incident Response", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Observability", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "OpenAI API", "ok": "n"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Rust", "ok": "n"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Salesforce", "ok": "n"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "OpenTelemetry", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "Prometheus", "ok": "y"}
+{"sample": 2, "job": "greenhouse:grafanalabs:6223410004", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "BigQuery", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Data Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Data Lake", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Database Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Go", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Kafka", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Kotlin", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Kubernetes", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Looker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Model Deployment", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Pub/Sub", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "React", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Redis", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Scala", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Swift", "ok": "n"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:takealotcom:8059414", "skill": "dbt", "ok": "y"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "Angular", "ok": "y"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "C#", "ok": "y"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "Git", "ok": "n"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "HTML", "ok": "y"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "REST APIs", "ok": "n"}
+{"sample": 2, "job": "lever:easypost-2:75484f15-1fc3-4399-92c2-5a7c6c176b81", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "Data Visualization", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "LangChain", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "MLOps", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "OpenAI API", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "lever:crypto:104efd49-475b-4e42-8804-5d728db9fe74", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "CSS", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "HTML", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "Jest", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "MongoDB", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "NestJS", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "Node.js", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "React", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "TypeScript", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "lever:brillio-2:a90e4d6c-e03f-47ec-ba5e-ce9d461fa70f", "skill": "GraphQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:isomorphiclabs:5837899004", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:isomorphiclabs:5837899004", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:isomorphiclabs:5837899004", "skill": "Large Language Models", "ok": "n"}
+{"sample": 2, "job": "greenhouse:isomorphiclabs:5837899004", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:isomorphiclabs:5837899004", "skill": "Model Deployment", "ok": "y"}
+{"sample": 2, "job": "greenhouse:isomorphiclabs:5837899004", "skill": "Site Reliability Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Algorithms", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Code Review", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Data Analysis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Deep Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "MLOps", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Model Deployment", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Snowflake", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "Statistics", "ok": "y"}
+{"sample": 2, "job": "greenhouse:justworks:8236883", "skill": "dbt", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/syneos-health-india-private-limited/jobs/sr-statistical-programmer", "skill": "Agile", "ok": "n"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/syneos-health-india-private-limited/jobs/sr-statistical-programmer", "skill": "Database Design", "ok": "n"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/syneos-health-india-private-limited/jobs/sr-statistical-programmer", "skill": "Statistics", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Agile", "ok": "n"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Cloud Security", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "DevSecOps", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "JavaScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "OpenAPI", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Pub/Sub", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "REST APIs", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Redis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "Zero Trust", "ok": "n"}
+{"sample": 2, "job": "greenhouse:zscaler:5267223007", "skill": "gRPC", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mixtiles:8915138002", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mixtiles:8915138002", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:mixtiles:8915138002", "skill": "Statistics", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "AWS CDK", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Amazon Bedrock", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "CloudFormation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Database Design", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "MLOps", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "OpenAI API", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Pandas", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "PyTorch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Retrieval-augmented Generation", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "SageMaker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Statistics", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "TensorFlow", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Amazon S3", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Computer Vision", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Feature Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:exadelinc:6209472004", "skill": "Redshift", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Bash", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Helm", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Web Accessibility", "ok": "n"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Angular", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Argo CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Elasticsearch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Grafana", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Node.js", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "PostgreSQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "Prometheus", "ok": "y"}
+{"sample": 2, "job": "greenhouse:freedomconsulting:5185708007", "skill": "TypeScript", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Distributed Systems", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Java", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Load Balancing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Microservices", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Spring Framework", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Azure", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "BigQuery", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Docker", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Firebase Functions", "ok": "n"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "Pub/Sub", "ok": "y"}
+{"sample": 2, "job": "greenhouse:five9:6177397004", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Amazon Kinesis", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Amazon RDS", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Amazon S3", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Apache Iceberg", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Apache Spark", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Argo CD", "ok": "n"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "CloudWatch", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Data Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Data Lake", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Databricks", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Datadog", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Delta Lake", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "ETL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Event-driven Architecture", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Go", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Infrastructure as Code", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "IoT", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Kafka", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "MLflow", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Model Deployment", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "SQL", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Terraform", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Kubernetes", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "Time Series", "ok": "y"}
+{"sample": 2, "job": "greenhouse:brightai:5590029004", "skill": "gRPC", "ok": "y"}
+{"sample": 2, "job": "greenhouse:kodiak:4062289009", "skill": "AWS", "ok": "n"}
+{"sample": 2, "job": "greenhouse:kodiak:4062289009", "skill": "Quality Assurance", "ok": "y"}
+{"sample": 2, "job": "greenhouse:kodiak:4062289009", "skill": "C++", "ok": "y"}
+{"sample": 2, "job": "greenhouse:kodiak:4062289009", "skill": "MATLAB", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/photon-interactive-uk-limited/jobs/developer-automation-anywhere-chennai", "skill": "UiPath", "ok": "n"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/photon-interactive-uk-limited/jobs/developer-automation-anywhere-chennai", "skill": "AWS", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/photon-interactive-uk-limited/jobs/developer-automation-anywhere-chennai", "skill": "CI/CD", "ok": "y"}
+{"sample": 2, "job": "himalayas:feed:https://himalayas.app/companies/photon-interactive-uk-limited/jobs/developer-automation-anywhere-chennai", "skill": "Google Cloud", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Deep Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Fine-tuning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Large Language Models", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Machine Learning", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Natural Language Processing", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Prompt Engineering", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Python", "ok": "y"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "R", "ok": "n"}
+{"sample": 2, "job": "greenhouse:quintoandar:4023483009", "skill": "Recommender Systems", "ok": "y"}

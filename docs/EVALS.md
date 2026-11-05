@@ -167,7 +167,7 @@ Grades, per (profile, job):
   | Level F1, entry | 0.90 | early-random: 0.50, 2 gold items | **Fails**, set too small to size it |
   | India precision | 0.97 | india-random: 43 of 43 (0.918 to 1.000); all strata 73 of 73 (0.950 to 1.000) | Pass, not proven at 0.97 |
   | Remote-open precision | 0.90 | remote-open: 9 of 17 (0.31 to 0.74) | **Fails** |
-  | Skill extraction precision | 0.90 | Not built until P3 | Not due |
+  | Skill extraction precision | 0.90 | P3: 620 of 692, 0.896, fresh sample (PHASE3.md) | **Fails**, known gap |
 
   The precision failure doesn't depend on the D5 dispute. Reading every low-confidence false
   merge as a true duplicate still gives 256 of 300, 0.853. Taking the owner's audit answer on
@@ -225,6 +225,12 @@ Grades, per (profile, job):
   rounds 1 to 5, each failing on a new kind of one-line difference. Entry recall rests on 5
   missed postings out of 210, so its interval is wide. Labels are in `evals/labels/d5-fresh*-model.jsonl`
   and `d6-entry*-model.jsonl`.
+
+- **D3 results (P3, 2026-11-05).** 20 personas and 438 pooled pairs. sonnet graded every pair
+  and opus regraded the 231 low- and medium-confidence ones. Hybrid nDCG@10 is 0.787 and MRR
+  0.770. The hybrid beats lexical-only by 0.090 (interval 0.023 to 0.159) and vector-only by
+  0.099 (0.023 to 0.189). Recall@200 is 0.985. The full table is in PHASE3.md. The owner audits
+  30 of the grades with `d3-audit`; D3 isn't gold until that is scored.
 
 **Limits:** one grader, who is also the owner and a fresher. D3 reflects that
 perspective. That is stated in every report, not hidden.

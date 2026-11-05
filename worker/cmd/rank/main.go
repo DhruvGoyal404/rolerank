@@ -4,6 +4,8 @@
 //	           every mode into grading items (posting text: write only under evals/private)
 //	rank score <profiles.json> <vectors.jsonl> <grades.jsonl>  metrics per mode and segment, and
 //	           the hybrid's paired bootstrap against each baseline
+//	rank fit   <profiles.json> <vectors.jsonl> <grades.jsonl>  fits the rerank weights, reporting
+//	           a cross-validated nDCG@10 over held-out profiles
 package main
 
 import (
@@ -45,7 +47,7 @@ func main() {
 
 func run(args []string) error {
 	if len(args) != 4 {
-		return errors.New("usage: rank pool|score <profiles.json> <vectors.jsonl> <file>")
+		return errors.New("usage: rank pool|score|fit <profiles.json> <vectors.jsonl> <file>")
 	}
 	ctx := context.Background()
 	pool, err := pgxpool.New(ctx, os.Getenv("ROLERANK_CORPUS_URL"))
@@ -63,8 +65,10 @@ func run(args []string) error {
 		return poolItems(ctx, pool, s, ps, args[3])
 	case "score":
 		return score(ctx, s, ps, args[3])
+	case "fit":
+		return fit(ctx, s, ps, args[3])
 	}
-	return errors.New("usage: rank pool|score")
+	return errors.New("usage: rank pool|score|fit")
 }
 
 type loaded struct {
@@ -160,26 +164,9 @@ func poolItems(ctx context.Context, db *pgxpool.Pool, s *rank.Searcher, ps []loa
 }
 
 func score(ctx context.Context, s *rank.Searcher, ps []loaded, gradesFile string) error {
-	grades := map[string]map[int64]int{}
-	f, err := os.Open(gradesFile)
+	grades, err := loadGrades(gradesFile)
 	if err != nil {
 		return err
-	}
-	defer f.Close()
-	sc := bufio.NewScanner(f)
-	for sc.Scan() {
-		var g struct {
-			Profile string `json:"profile"`
-			Posting int64  `json:"posting"`
-			Grade   int    `json:"grade"`
-		}
-		if err := json.Unmarshal(sc.Bytes(), &g); err != nil {
-			return err
-		}
-		if grades[g.Profile] == nil {
-			grades[g.Profile] = map[int64]int{}
-		}
-		grades[g.Profile][g.Posting] = g.Grade
 	}
 	per := map[rank.Mode][]rank.Metrics{}
 	segs := map[string]map[rank.Mode][]rank.Metrics{}
@@ -190,12 +177,16 @@ func score(ctx context.Context, s *rank.Searcher, ps []loaded, gradesFile string
 				return err
 			}
 			ids := make([]int64, len(got))
+			senior := map[int64]bool{}
 			for i, r := range got {
 				ids[i] = r.ID
+				senior[r.ID] = r.Level == "senior"
 			}
-			// Every pooled job passed the hard filters, so geography and level are measured by
-			// the grade (0 = ineligible), not here.
-			met := rank.Measure(p.profile.Level, ids, grades[p.ID], func(int64) bool { return true }, func(int64) bool { return false })
+			// Geography is a hard filter, so every returned job lists the profile's country or is
+			// remote for anyone; whether the text agrees is in the grade (0 = ineligible). Recall is
+			// over the 200 returned, so it is the retrieval stage's.
+			met := rank.Measure(p.profile.Level, ids, grades[p.ID], func(int64) bool { return true },
+				func(id int64) bool { return senior[id] })
 			per[m] = append(per[m], met)
 			if segs[p.Segment] == nil {
 				segs[p.Segment] = map[rank.Mode][]rank.Metrics{}
@@ -205,7 +196,17 @@ func score(ctx context.Context, s *rank.Searcher, ps []loaded, gradesFile string
 	}
 	for _, m := range modes {
 		sum := rank.Summarise(per[m], 0, 0)
-		fmt.Printf("%-8s nDCG@10 %.3f  MRR %.3f  judged@10 %.2f\n", m, sum.NDCG10, sum.MRR, sum.Judged10)
+		slots, early := 0, 0
+		for i, met := range per[m] {
+			_ = met
+			slots += 10
+			if l := ps[i].profile.Level; l == "intern" || l == "entry" {
+				early += 10
+			}
+		}
+		sum = rank.Summarise(per[m], slots, early)
+		fmt.Printf("%-8s nDCG@10 %.3f  MRR %.3f  Recall@200 %.3f  level-viol@10 %.3f  judged@10 %.2f\n", m, sum.NDCG10, sum.MRR,
+			sum.Recall, sum.LevelViolation, sum.Judged10)
 	}
 	names := make([]string, 0, len(segs))
 	for k := range segs {

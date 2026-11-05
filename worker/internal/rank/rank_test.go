@@ -54,7 +54,7 @@ func TestExplainSplitsRequiredSkills(t *testing.T) {
 }
 
 func TestBands(t *testing.T) {
-	if DefaultBands.Band(0.7) != "strong" || DefaultBands.Band(0.5) != "good" || DefaultBands.Band(0.1) != "stretch" {
+	if DefaultBands.Band(0.6) != "strong" || DefaultBands.Band(0.48) != "good" || DefaultBands.Band(0.1) != "stretch" {
 		t.Fatal("bands")
 	}
 }

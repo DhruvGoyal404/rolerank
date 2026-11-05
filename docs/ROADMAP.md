@@ -148,6 +148,11 @@ harness with the 5 lakh synthetic corpus.
 - Run the bench with `ingest` on and off. If `/api/matches` p95 rises by more than 25% and
   misses 200 ms because of it, split `app` and `corpus` into two clusters, with numbers.
 
+**Exit status (2026-11-05): met except two items,** both in PHASE3.md. Skill extraction
+precision is 0.896 against 0.90, a known gap. p95 with ingestion writes is borderline on the
+laptop (188 to 217 ms) and is measured on the target host in P8. The owner's 30-item D3 audit
+is pending. D2, D3, recall, the comparison rule and reproducibility pass.
+
 **Demo:** type a profile, get ranked jobs with matched and missing skills, then show the
 bench report and eval report side by side.
 

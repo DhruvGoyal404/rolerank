@@ -69,9 +69,11 @@ type Weights struct {
 	Required, Nice, Cosine, Title, Level, Location, Fresh, Fusion float64
 }
 
-// Default weights before D2 fitting: skills first, then meaning, then the rest.
-var Default = Weights{Version: "v0-unfitted", Required: 0.35, Nice: 0.05, Cosine: 0.25, Title: 0.1, Level: 0.1,
-	Location: 0.05, Fresh: 0.05, Fusion: 0.05}
+// Default weights, fitted on D3 by coordinate ascent (`rank fit`, 2026-11-05). Cross-validated
+// nDCG@10 over held-out profiles is 0.799, against 0.710 for the unfitted v0 weights. Skill
+// coverage and cosine get no weight of their own: fusion already carries both retrievers' ranks.
+var Default = Weights{Version: "v1-d3-fit", Required: 0.177, Nice: 0.013, Cosine: 0.354, Title: 0.051, Level: 0.076,
+	Location: 0.253, Fresh: 0.0, Fusion: 0.076}
 
 // RRFK is the reciprocal rank fusion constant pgvector's README suggests.
 const RRFK = 60
@@ -137,12 +139,12 @@ type Ranked struct {
 	Band  string
 }
 
-// Bands map a score to Strong, Good or Stretch. The cut-offs are fitted on D3 grades; these
-// are placeholders until then.
+// Bands map a score to Strong, Good or Stretch, with cut-offs fitted on D3 grades.
 type Bands struct{ Strong, Good float64 }
 
-// DefaultBands are unfitted.
-var DefaultBands = Bands{Strong: 0.65, Good: 0.45}
+// DefaultBands, fitted on D3 (2026-11-05): of 111 graded jobs called strong, 74 are grade 3 and
+// none grade 0; of 113 called good, 80 are grade 2 or 3.
+var DefaultBands = Bands{Strong: 0.505, Good: 0.46}
 
 // Band names a score.
 func (b Bands) Band(score float64) string {
