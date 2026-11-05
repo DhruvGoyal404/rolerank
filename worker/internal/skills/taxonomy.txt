@@ -110,7 +110,7 @@ System Design | architecture | distributed systems design
 Distributed Systems | architecture | distributed computing
 Serverless | architecture | serverless architecture
 Design Patterns | architecture |
-Object-oriented Programming | concepts | oop, object oriented, object-oriented, object oriented programming, ood
+Object-oriented Programming | concepts | oop, object oriented, object-oriented, object oriented programming, ood, =OOPS, =OOPs
 Functional Programming | concepts |
 Data Structures | concepts | data structures and algorithms, dsa
 Algorithms | concepts |
@@ -170,6 +170,7 @@ Qdrant | database |
 Vector Databases | database | vector database, vector db, vector store
 NoSQL | database | nosql databases
 Database Design | database | data modeling, data modelling, schema design
+Database Management Systems | database | dbms, rdbms, database management system
 Query Optimization | database | query tuning, sql tuning, performance tuning
 
 # cloud
@@ -242,7 +243,7 @@ HashiCorp Consul | devops |
 HashiCorp Vault | security |
 Packer | devops |
 Vagrant | devops |
-Computer Networking | infrastructure | tcp/ip, computer networks, network protocols, network engineering
+Computer Networking | infrastructure | tcp/ip, computer networks, network protocols, network engineering, =CN
 Load Balancing | infrastructure | load balancers
 CDN | infrastructure | content delivery network
 
@@ -277,7 +278,15 @@ Debezium | streaming |
 
 # data science and ML
 Machine Learning | ml | ml, machine-learning
-Deep Learning | ml | deep-learning, neural networks
+Deep Learning | ml | deep-learning, neural networks, dnn, dnns
+Graph Neural Networks | ml | gnn, gnns, graph neural network
+Chain-of-Thought Prompting | ml | chain-of-thought, chain of thought, cot prompting
+XLM-RoBERTa | ml | xlm-r, xlmr, xlm roberta
+RoBERTa | ml | roberta
+BERT | ml | =BERT
+Conditional Random Fields | ml | conditional random field, =CRF
+MediaPipe | ml | mediapipe
+TensorRT | ml | tensorrt, nvidia tensorrt
 Natural Language Processing | ml | nlp
 Computer Vision | ml | image processing
 Large Language Models | ml | llm, llms, large language model, generative ai, genai, gen ai
@@ -298,7 +307,7 @@ Pandas | ml | pandas dataframes
 NumPy | ml | numpy
 SciPy | ml |
 Jupyter | ml | jupyter notebooks, jupyter notebook
-Hugging Face | ml | huggingface, transformers
+Hugging Face | ml | huggingface, transformers, hugging face transformers
 LangChain | ml |
 LlamaIndex | ml |
 OpenAI API | ml | openai, gpt-4, chatgpt api
@@ -393,7 +402,7 @@ RTOS | embedded | freertos, real-time operating systems, zephyr
 Embedded Linux | embedded | yocto, buildroot
 Microcontrollers | embedded | arm cortex, stm32, arduino, esp32, mcu
 Linux Kernel | embedded | kernel development, device drivers, linux device drivers
-Operating Systems | systems | os internals
+Operating Systems | systems | os internals, operating system, =OS
 Compilers | systems | llvm, compiler design
 Robotics | embedded | ros, ros2, robot operating system
 Autonomous Systems | embedded | autonomous vehicles, self-driving
@@ -445,3 +454,8 @@ Guidewire | business |
 Pega | business | pegasystems
 UiPath | business | rpa, robotic process automation
 Power Automate | business | power apps, power platform
+
+# security and networking, added from the owner's real resume (2026-11-06)
+Suricata | security | suricata ids
+DPDK | infrastructure | data plane development kit
+Snort | security | snort ids

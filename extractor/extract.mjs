@@ -59,18 +59,36 @@ async function pdf(bytes) {
       }
     }
     const content = await page.getTextContent();
-    const rows = new Map();
+    // Rows by baseline within about half a font size, not exact y: a superscript ("2nd" with
+    // "nd" raised) belongs to its line. The owner's resume lost "nd" to a line of its own.
+    const items = [];
     for (const it of content.items) {
       if (!("str" in it) || !it.str.trim()) continue;
-      const y = Math.round(it.transform[5]);
-      const size = Math.hypot(it.transform[2], it.transform[3]);
-      if (!rows.has(y)) rows.set(y, []);
-      rows.get(y).push({ x: it.transform[4], str: it.str, size });
+      const size = Math.hypot(it.transform[2], it.transform[3]) || 10;
+      items.push({ x: it.transform[4], y: it.transform[5], str: it.str, size, width: it.width || 0 });
     }
-    const ys = [...rows.keys()].sort((a, b) => b - a);
-    for (const y of ys) {
-      const parts = rows.get(y).sort((a, b) => a.x - b.x);
-      const text = parts.map((q) => q.str).join(" ").replace(/\s+/g, " ").trim();
+    items.sort((a, b) => b.size - a.size); // big text sets each row's baseline first
+    const rowsList = [];
+    for (const it of items) {
+      const row = rowsList.find((r) => Math.abs(r.y - it.y) <= 0.5 * Math.max(r.size, it.size));
+      if (row) row.parts.push(it);
+      else rowsList.push({ y: it.y, size: it.size, parts: [it] });
+    }
+    rowsList.sort((a, b) => b.y - a.y);
+    for (const row of rowsList) {
+      const parts = row.parts.sort((a, b) => a.x - b.x);
+      let text = "";
+      let prev = null;
+      for (const q of parts) {
+        // A raised, smaller piece is a superscript: it joins the word before it. Otherwise a
+        // space goes in only where the page leaves a gap.
+        const sup = q.size < 0.8 * row.size && q.y > row.y + 0.15 * row.size;
+        const gap = prev ? q.x - (prev.x + prev.width) : 0;
+        if (prev && !sup && gap > 0.15 * q.size && !text.endsWith(" ")) text += " ";
+        text += q.str;
+        prev = q;
+      }
+      text = text.replace(/\s+/g, " ").trim();
       if (!text) continue;
       const tiny = parts.every((q) => q.size < TINY_PT);
       // Either way round: pdf.js clips text that runs off the page, so a line can be a

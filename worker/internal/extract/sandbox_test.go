@@ -59,6 +59,24 @@ func TestExtractsNumberedLinesAndFlagsHiddenText(t *testing.T) {
 	}
 }
 
+// A superscript belongs to its line: "2nd" with "nd" raised reads "2nd", and two columns keep a
+// space between them.
+func TestSuperscriptStaysOnItsLine(t *testing.T) {
+	res, err := runner().Run(context.Background(), MakeRichPDF([][]Item{{
+		{X: 50, Y: 700, Text: "ML Summer School (2", Font: "serif", Size: 10},
+		{X: 136, Y: 703.5, Text: "nd", Font: "serif", Size: 6},
+		{X: 142, Y: 700, Text: " Consecutive Year)", Font: "serif", Size: 10},
+		{X: 400, Y: 700, Text: "Aug 2025", Font: "serif", Size: 10},
+		{X: 50, Y: 680, Text: "Next line", Font: "serif", Size: 10},
+	}}))
+	if err != nil || res.Error != "" {
+		t.Fatalf("%v %s", err, res.Error)
+	}
+	if len(res.Lines) != 2 || !strings.Contains(res.Lines[0].Text, "(2nd Consecutive Year)") || !strings.HasSuffix(res.Lines[0].Text, " Aug 2025") {
+		t.Fatalf("lines: %+v", res.Lines)
+	}
+}
+
 // Each hostile file is refused before the sandbox or fails inside it, and the host carries on.
 func TestHostileFilesAreRejectedOrContained(t *testing.T) {
 	r := runner()
