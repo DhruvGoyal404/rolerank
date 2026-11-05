@@ -18,7 +18,10 @@ jobs:
           node-version-file: .nvmrc
       - run: node --test "scripts/*.test.mjs"
       - run: node scripts/check-workflows.mjs
-      - run: node scripts/check-deps.mjs api web worker
+      - run: node scripts/check-deps.mjs api web worker extractor
+      - name: Audit the extractor's packages
+        working-directory: extractor
+        run: npm audit --omit=dev
 
   secrets:
     name: Gitleaks
@@ -186,6 +189,12 @@ jobs:
           echo "$inside" | grep -qx 'UID=65534'
           echo "$inside" | grep -qx ROOTFS_READONLY
           echo "$inside" | grep -qx NET_BLOCKED
+      - name: Resume extractor under gVisor (hostile files, isolation)
+        working-directory: worker
+        run: |
+          set -euo pipefail
+          docker build -q --label rolerank.managed=true -t rolerank-extractor:ci ../extractor
+          ROLERANK_EXTRACTOR_IMAGE=rolerank-extractor:ci ROLERANK_SANDBOX_RUNTIME=runsc             go test -count=1 -tags sandbox -v ./internal/extract/
 
           # Control: the same probe under runc must not look like gVisor.
           control=$(sandbox rr-control runc --entrypoint sh "$valkey" -c "$probe")
