@@ -22,7 +22,7 @@ const profile: Profile = {
     { employer: "Zoho", title: "Software Engineer", start: "2023-04", end: "present", lines: [2] },
     { employer: "Google", title: "Software Engineer", start: "2021-01", end: "2022-01", lines: [2] },
   ],
-  education: [{ institution: "IIT Delhi", degree: "B.Tech in Computer Science", grad_year: 2023, score: "", line: 3 }],
+  education: [{ institution: "IIT Delhi", degree: "B.Tech in Computer Science", grad_year: 2023, score: "", lines: [3] }],
   projects: [{ name: "Project: URL Shortener", line: 4 }],
 };
 

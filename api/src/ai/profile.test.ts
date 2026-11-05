@@ -16,7 +16,7 @@ const base: Profile = {
     { name: "PostgreSQL", line: 2 },
   ],
   experience: [{ employer: "Acme Corp", title: "Software Engineer", start: "2022-03", end: "2024-06", lines: [1, 2] }],
-  education: [{ institution: "Thapar Institute", degree: "B.Tech Computer Science", grad_year: 2022, score: "", line: 3 }],
+  education: [{ institution: "Thapar Institute", degree: "B.Tech Computer Science", grad_year: 2022, score: "", lines: [3] }],
   projects: [{ name: "RoleRank job matcher", line: 4 }],
 };
 
@@ -36,7 +36,7 @@ describe("ground", () => {
         { employer: "Google", title: "Software Engineer", start: "2020", end: "2021", lines: [1] },
         { employer: "Acme Corp", title: "Software Engineer", start: "2019-01", end: "present", lines: [1] },
       ],
-      education: [{ institution: "Thapar Institute", degree: "M.Tech", grad_year: 2022, score: "", line: 3 }],
+      education: [{ institution: "Thapar Institute", degree: "M.Tech", grad_year: 2022, score: "", lines: [3] }],
     };
     const g = ground(p, lines);
     expect(g.profile.skills.map((s) => s.name)).toEqual(["Go", "PostgreSQL"]);
@@ -56,6 +56,18 @@ describe("ground", () => {
     expect(ground({ ...base, experience: [role], skills: [], education: [], projects: [] }, awk).profile.experience).toHaveLength(1);
     const wrong = { ...role, start: "2023-03" };
     expect(ground({ ...base, experience: [wrong], skills: [], education: [], projects: [] }, awk).profile.experience).toHaveLength(0);
+  });
+
+  it("grounds an education entry whose values sit on separate lines", () => {
+    const split = [
+      { n: 1, text: "B.Tech in Computer Science" },
+      { n: 2, text: "IIT Delhi" },
+      { n: 3, text: "2024 · CGPA 8.10/10" },
+    ];
+    const e = { institution: "IIT Delhi", degree: "B.Tech in Computer Science", grad_year: 2024, score: "CGPA 8.10/10", lines: [1, 2, 3] };
+    const empty = { ...base, skills: [], experience: [], projects: [] };
+    expect(ground({ ...empty, education: [e] }, split).profile.education).toHaveLength(1);
+    expect(ground({ ...empty, education: [{ ...e, lines: [1] }] }, split).profile.education).toHaveLength(0);
   });
 
   it("refuses malformed dates", () => {

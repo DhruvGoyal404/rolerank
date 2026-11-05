@@ -29,7 +29,8 @@ export const ProfileSchema = z
           degree: z.string(),
           grad_year: z.number().int().nullable(),
           score: z.string(), // "CGPA 8.6/10", "91%", or "" when the resume gives none
-          line: lineRef,
+          // Several lines: real layouts put degree, institute, year and score on separate lines.
+          lines: z.array(lineRef),
         })
         .strict(),
     ),
@@ -74,13 +75,13 @@ export const profileJsonSchema = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["institution", "degree", "grad_year", "score", "line"],
+        required: ["institution", "degree", "grad_year", "score", "lines"],
         properties: {
           institution: { type: "string" },
           degree: { type: "string" },
           grad_year: { anyOf: [{ type: "integer" }, { type: "null" }] },
           score: { type: "string" },
-          line: { type: "integer" },
+          lines: { type: "array", items: { type: "integer" } },
         },
       },
     },
@@ -153,11 +154,10 @@ export function ground(p: Profile, lines: Line[]): Grounded {
       return [e.start, e.end].every((d) => d === "" || d === "present" || c.some((t) => hasYear(t, year(d))));
     }),
     education: keep("education", p.education, (e) => {
-      // A score may sit on the line after the degree, so it may come from the next line too.
-      const c = cite([e.line]);
-      const near = cite([e.line, e.line + 1]) ?? c;
-      if (e.score !== "" && (near === null || !inLines(e.score, near))) return false;
+      // Each value must be in one of the cited lines (D1-hard: layouts split them across lines).
+      const c = cite(e.lines);
       if (c === null || !inLines(e.institution, c) || (e.degree !== "" && !inLines(e.degree, c))) return false;
+      if (e.score !== "" && !inLines(e.score, c)) return false;
       return e.grad_year === null || c.some((t) => t.includes(String(e.grad_year)));
     }),
     projects: keep("projects", p.projects, (pr) => {
