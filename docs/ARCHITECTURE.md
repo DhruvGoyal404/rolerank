@@ -234,6 +234,14 @@ corpus doesn't need its scale.
 - PDF extraction runs pdf.js (`pdfjs-dist`) with scripting and eval off. DOCX runs
   `mammoth` after a zip pre-check: entry count, declared sizes, ratio and a 20 MB
   decompressed cap. Both inside the sandbox, so a bug in either is contained.
+- **As built in P4 (2026-11-05).**
+  - There is no S3 quarantine. The upload waits encrypted in `resumes.file_ct` in `db-app`,
+    and is set to NULL once it has been extracted (Q10).
+  - The extractor is a small Go service on the internal network, and only `aiworker` calls it.
+    Encryption therefore stays in one language.
+  - Hidden and tiny lines are shown to the user but never sent to the LLM, and they can't ground
+    a value.
+  - Parsing runs with thinking disabled at effort `low`.
 - Resume lines are numbered at extraction. Everything downstream cites `L<n>`, which is
   what makes the grounding gate for tailoring possible.
 
@@ -357,7 +365,7 @@ too young on 2026-10-31.
 | Magic bytes | file-type | 22.2.0 | 22.3.0 | Plus our own checks |
 | PDF text | pdfjs-dist | 6.4.299 | | Inside the sandbox |
 | DOCX text | mammoth | 1.13.0 | | Inside the sandbox, after zip checks |
-| LLM SDK | @anthropic-ai/sdk (if Q5 = A) | 0.135.0 | 1.3.0 (2026-10-23), a new major | |
+| LLM SDK | @anthropic-ai/sdk | 1.1.0 (2026-10-21) | 1.5.0 | Newest past the 14-day rule on 2026-11-05 (P4) |
 | AWS SDK | @aws-sdk/client-* | 3.1152.0 | 3.1161.0 | S3, SSM, SES |
 | Web | React / React DOM | 19.3.1 | | |
 | Build | Vite | 8.3.4 | 8.3.5 | |
