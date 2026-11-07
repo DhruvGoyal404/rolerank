@@ -17,7 +17,7 @@ import (
 //   - the employer on its own line above the title-and-dates line (D1-hard-3's experience gap);
 //   - months counted inclusively: "Jun 2025 – Aug 2025" is 3 months, overlaps once;
 //   - a venue line ("SemEval-2026 | ACL 2026 Workshop, Team X | LLMs, NLP  Jun 2026") followed by
-//     bullets whose leading phrase names the paper ("Task 12 - Abductive Event Reasoning: ..."),
+//     bullets whose leading phrase names the paper ("Task 3 - Multilingual Claim Detection: ..."),
 //     and a venue with no such bullet;
 //   - comma-separated skills on research and project lines, and compounds joined by "&" or "/"
 //     ("Generative AI & LLMs", "PyTorch/TensorFlow");
@@ -52,8 +52,8 @@ type gold4 struct {
 }
 
 var (
-	venues4 = []string{"SemEval-2026", "WMT 2026", "BioNLP 2026", "SMM4H–HeaRD 2026", "CLEF eHealth 2026", "FinNLP 2026"}
-	tasks4  = []string{"Task 12 - Abductive Event Reasoning", "Task 5 - Graded Word Sense Plausibility", "Task 3 - Multilingual Claim Detection",
+	venues4 = []string{"SemEval-2026", "WMT 2026", "BioNLP 2026", "BioNLP–ST 2026", "CLEF eHealth 2026", "FinNLP 2026"}
+	tasks4  = []string{"Task 3 - Multilingual Claim Detection", "Task 9 - Temporal Relation Ordering", "Task 3 - Multilingual Claim Detection",
 		"Task 8 - Clinical Entity Linking", "Task 2 - Low-Resource Translation for Indic Languages", "Task 7 - Numerical Reasoning over Tables"}
 	resSkills4 = []string{"LLMs", "Chain-of-Thought", "NLP", "XLM-RoBERTa", "CRF", "Transformers", "BERT", "Hugging Face"}
 	labs4      = []string{"DRDO Centre for AI and Robotics", "Ministry of Electronics and IT, India", "IISc Bangalore AI Lab", "C-DAC Pune", "ISRO Space Applications Centre"}
@@ -135,7 +135,7 @@ func generate4(i int, r *rand.Rand, prefix string) gold4 {
 	appNo := fmt.Sprintf("2026110%05d", r.IntN(100000))
 	enrol := fmt.Sprintf("10%08d", r.IntN(100_000_000))
 	g.Numbers = []string{appNo, enrol}
-	g.Achievements = append([]string{"Indian Patent Application (Published) | Application No. " + appNo + " | Publication No. 32/2026"}, sample(r, hackathons, 1)...)
+	g.Achievements = append([]string{"Indian Patent Application (Published) | Application No. " + appNo + " | Publication No. 41/2026"}, sample(r, hackathons, 1)...)
 	g.Certifications = sample(r, certs, 2)
 	return g
 }
@@ -167,12 +167,12 @@ func renderAcademic4(g gold4, r *rand.Rand) []byte {
 		rows = append(rows, ln{e.Title, dr(e.Periods[0], style)}, ln{"– Built and evaluated models on internal datasets", ""})
 	}
 	rows = append(rows, ln{"Research & Publications", ""},
-		ln{g.Publications[0].Venue + " | ACL 2026 Workshop, Team Paradise | " + strings.Join(res, ", "), "Jun 2026"},
+		ln{g.Publications[0].Venue + " | ACL 2026 Workshop, Team Lotus | " + strings.Join(res, ", "), "Jun 2026"},
 		ln{"– " + g.Publications[0].Title + ": Built an instruction-tuned system with chain-of-thought prompting", ""},
-		ln{"and grounding; achieved an official score of 0.79, ranking 59th out of 221 systems.", ""},
+		ln{"and grounding; achieved an official score of 0.71, ranking 34th out of 140 systems.", ""},
 		ln{"– " + g.Publications[1].Title + ": Explored interpretable features; reported a negative finding.", ""},
 		ln{g.Publications[2].Venue + " | ACL 2026 Workshop | " + res[0] + ", " + res[1] + " | Published Link", "Jun 2026"},
-		ln{"– Fine-tuned models across 3 tasks: ADE detection (macro-F1 0.597), span extraction (0.60).", ""},
+		ln{"– Fine-tuned models across 3 tasks: entity detection (macro-F1 0.64), span extraction (0.58).", ""},
 		ln{"Projects", ""})
 	for k, p := range g.Projects {
 		rows = append(rows, ln{p + " | " + stack[k%3] + ", " + stack[(k+1)%3] + ", " + stack[(k+2)%3], "Dec 2025"},

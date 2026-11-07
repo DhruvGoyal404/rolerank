@@ -14,7 +14,8 @@ import { ground, profileJsonSchema, ProfileSchema, type Grounded } from "./profi
  */
 // v4: periods, kinds, publications, achievements, certifications; skills from any line; verbatim names (owner's resume)
 // v5: employer lines cited, short roles while studying, venue-plus-task publications, list items as skills (2026-11-07)
-export const PARSE_PROMPT_VERSION = "parse-v5";
+// v6: v5 with invented example names in place of ones copied from the owner's resume (not re-measured)
+export const PARSE_PROMPT_VERSION = "parse-v6";
 export const MAX_OUTPUT_TOKENS = 4096;
 
 const SYSTEM = `You extract a structured profile from a resume for a job-matching service.
@@ -55,9 +56,9 @@ A project's name is its title only: leave out its tech stack, links and descript
 
 publications: one entry per paper or shared-task submission. A venue line ("SemEval-2026 | ACL
 2026 Workshop, Team X | LLMs, NLP  Jun 2026") is often followed by bullets whose leading phrase
-names the paper or task ("Task 12 - Abductive Event Reasoning: built ..."). Each such bullet is
+names the paper or task ("Task 3 - Multilingual Claim Detection: built ..."). Each such bullet is
 one publication: venue is the venue's own name, the venue line's first item ("SemEval-2026"), title is
-the bullet's leading phrase before the colon ("Task 12 - Abductive Event Reasoning"), date comes
+the bullet's leading phrase before the colon ("Task 3 - Multilingual Claim Detection"), date comes
 from the venue line, and lines cites the venue line and the bullet. A venue whose bullets name no
 paper or task is one publication with title "". date is YYYY-MM or YYYY, like every date. When a line gives a paper's own title, that is
 the title, without venue, authors or year. A patent is an achievement, not a publication.

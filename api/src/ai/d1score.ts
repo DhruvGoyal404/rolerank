@@ -69,7 +69,7 @@ export type Field =
   | "achievements"
   | "certifications";
 
-/** A publication as one string: "SemEval-2026 Task 12 - Abductive Event Reasoning". */
+/** A publication as one string: "SemEval-2026 Task 3 - Multilingual Claim Detection". */
 export const pubName = (x: { venue?: string; title: string }): string => [x.venue ?? "", x.title].filter(Boolean).join(" ");
 const norm = (s: string): string => s.toLowerCase().replace(/\s+/g, " ").replace(/[.,]+$/g, "").trim();
 /** A list item without its bullet or label ("– Certification: AWS ..." is "AWS ..."). */

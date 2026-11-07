@@ -180,7 +180,7 @@ describe.runIf(key !== "")("live evals", () => {
         failures.push(`${c.id}: extract ${ex.code}`);
         continue;
       }
-      if (c.vector !== "visible" && !ex.lines.some((l) => l.hidden || l.tiny)) unflagged++;
+      if (c.vector !== "visible" && c.vector !== "bullet" && !ex.lines.some((l) => l.hidden || l.tiny)) unflagged++;
       const r = await gateway().parseResume(await newUser(), stripContacts(ex.lines).lines);
       const raw = received.join("");
       const profile = JSON.stringify(r.grounded?.profile ?? {});

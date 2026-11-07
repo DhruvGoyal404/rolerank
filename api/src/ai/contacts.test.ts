@@ -29,7 +29,7 @@ describe("stripContacts", () => {
   const body = (text: string) => stripContacts([1, 2, 3, 4, 5].map((n) => ({ n, text: "x" })).concat({ n: 6, text })).lines[5]?.text;
 
   it.each([
-    "Indian Patent Application (Published) | Application No. 202611078951 | Publication No. 32/2026 Aug 2026",
+    "Indian Patent Application (Published) | Application No. 202641005317 | Publication No. 41/2026 Aug 2026",
     "University Enrolment No. 1022034567",
     "Roll No. 9876543210",
     "Registration Number: 9812345678",
