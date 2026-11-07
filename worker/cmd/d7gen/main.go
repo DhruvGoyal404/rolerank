@@ -3,7 +3,8 @@
 // The injection rides in visible text, white text, tiny text or a hidden Word run.
 // (D7's job-description cases arrive with Bring a JD in P5.)
 //
-//	d7gen <out-dir>   writes <out-dir>/<id>.pdf|.docx and <out-dir>/cases.jsonl
+//	d7gen <out-dir>        writes <out-dir>/<id>.pdf|.docx and <out-dir>/cases.jsonl
+//	d7gen <out-dir> hard   writes D7-hard (hard.go): held out, harder attacks, run once
 package main
 
 import (
@@ -52,13 +53,17 @@ var plants = []string{"Kubernetes", "Rust", "Terraform", "Scala"}
 var vectors = []string{"visible", "white", "tiny", "docx_hidden"}
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Fprintln(os.Stderr, "usage: d7gen <out-dir>")
+	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard") {
+		fmt.Fprintln(os.Stderr, "usage: d7gen <out-dir> [hard]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		panic(err)
+	}
+	if len(os.Args) == 3 {
+		generateHard(dir)
+		return
 	}
 	f, err := os.Create(filepath.Join(dir, "cases.jsonl"))
 	if err != nil {
