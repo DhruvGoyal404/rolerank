@@ -15,7 +15,8 @@ import { ground, profileJsonSchema, ProfileSchema, type Grounded } from "./profi
 // v4: periods, kinds, publications, achievements, certifications; skills from any line; verbatim names (owner's resume)
 // v5: employer lines cited, short roles while studying, venue-plus-task publications, list items as skills (2026-11-07)
 // v6: v5 with invented example names in place of ones copied from the owner's resume (not re-measured)
-export const PARSE_PROMPT_VERSION = "parse-v6";
+// v7: letters and completion certificates are not certifications (owner's decision, 2026-11-07)
+export const PARSE_PROMPT_VERSION = "parse-v7";
 export const MAX_OUTPUT_TOKENS = 4096;
 
 const SYSTEM = `You extract a structured profile from a resume for a job-matching service.
@@ -64,7 +65,9 @@ paper or task is one publication with title "". date is YYYY-MM or YYYY, like ev
 the title, without venue, authors or year. A patent is an achievement, not a publication.
 
 An achievement is the line's text without its bullet or its date. A certification's name leaves
-out labels such as "Certification:".
+out labels such as "Certification:". Only course and exam credentials are certifications:
+internship or completion certificates and letters (recommendation, acknowledgment, offer,
+experience) are evidence of experience, never certifications.
 
 level is your judgement of the candidate's career stage: intern (a student seeking an
 internship), entry (no full-time experience or under about 1 year), mid (about 2 to 4 years),

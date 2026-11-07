@@ -455,6 +455,33 @@ describe("parse-v5 rules", () => {
     expect(new Set(names.map((n) => n.toLowerCase())).size).toBe(names.length);
   });
 
+  // Owner's decision, 2026-11-07: only course and exam credentials are certifications.
+  it("keeps letters and completion certificates out of certifications", () => {
+    const l = [
+      { n: 1, text: "Acme Labs | Internship Completion Certificate | Letter of Recommendation Aug 2025" },
+      { n: 2, text: "Northwind ML School | Acknowledgment Letter 2025" },
+      { n: 3, text: "AWS Certified Cloud Practitioner | Credential" },
+      { n: 4, text: "Machine Learning Specialization by DeepLearning.AI | Certificate" },
+    ];
+    const c = (name: string, n: number) => ({ name, lines: [n] });
+    const g = ground(
+      {
+        ...empty,
+        certifications: [
+          c("Internship Completion Certificate", 1),
+          c("Letter of Recommendation", 1),
+          c("Acknowledgment Letter", 2),
+          c("AWS Certified Cloud Practitioner", 3),
+          c("Machine Learning Specialization by DeepLearning.AI", 4),
+        ],
+      },
+      l,
+    );
+    expect(g.profile.certifications.map((x) => x.name)).toEqual(["AWS Certified Cloud Practitioner", "Machine Learning Specialization by DeepLearning.AI"]);
+    expect(g.letters).toBe(3);
+    expect(g.dropped).toBe(0);
+  });
+
   it("never lists a project's name as a skill", () => {
     const l = [
       { n: 1, text: "Campus Ride Share - Wheels | React, Node.js Dec 2025" },

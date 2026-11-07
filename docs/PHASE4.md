@@ -325,6 +325,20 @@ rewrite and force-push, which CLAUDE.md forbids without the owner's decision. Th
 among them, so the prompt is now `parse-v6`: parse-v5 with invented names in its examples, not
 re-measured.
 
+**The owner's decisions on this report (2026-11-07):**
+- Git history is not rewritten: what leaked is already public (a published patent number,
+  public leaderboards and papers), and no phone, email or address leaked. The incident note
+  and the rule stay: never copy real resume values into the repo, tests or docs; use invented
+  values of the same shape.
+- The research associate role in item 5 was an internship; the general rule stands.
+- Internship or completion certificates and recommendation, acknowledgment, offer or
+  experience letters are evidence of experience, not certifications. Only course and exam
+  credentials count. This is in the prompt (`parse-v7`) and a deterministic filter, `LETTER`
+  in `profile.ts`, with a test; removed rows are counted like school rows.
+- Experience 0.900 on D1-hard-4 is accepted as a recorded v1.1 gap: skills drive matching.
+- A fresh injection set is required before public signup; it is on the signup checklist in
+  QUESTIONS.md.
+
 ## P4 closed (2026-11-07)
 
 P4 closes with this report. Measured on held-out sets, every parsing field passes except the

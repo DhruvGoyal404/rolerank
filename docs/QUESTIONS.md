@@ -27,6 +27,17 @@ of two clusters; D3, D5 and D6 reduced; Bring a JD moved to P4b. The docs reflec
 
 Prices: USD, checked 2026-10-30/31; Rs at the ECB rate of 94.95 per USD (2026-10-30).
 
+## Before public signup (checklist)
+
+v1 is invite-only (Q2). Each item must be done, with its evidence linked, before signup opens
+to the public:
+
+- [ ] P8's security review passes (Q2).
+- [ ] ZDR with Anthropic, or /privacy says plainly why not (Q17).
+- [ ] A fresh held-out injection set, written and committed before it runs, run once and passed.
+  D7 and D7-hard are both in-sample now: their fixes came from seeing them (PHASE4.md,
+  owner's decision 2026-11-07).
+
 ---
 
 ## Q1. What happens while the site is down?

@@ -138,6 +138,14 @@ const hasYear = (text: string, y: string): boolean =>
 /** School results, not degrees: boards, Class X/XII, 10th/12th (the owner's resume, 2026-11-06). */
 export const SCHOOL =
   /\b(ISC|ICSE|CBSE|HSC|SSC|AISSCE|AISSE|PUC|Pre-University|Intermediate|Higher Secondary|Senior Secondary|Secondary School|Matriculation|State Board|Board of (Secondary|School|Higher Secondary|Intermediate)|Class\s*(X|XII|10|12)|Std\.?\s*(X|XII|10|12)|(10|12)th)\b/i;
+/**
+ * Evidence of experience, not a credential: internship or completion certificates, letters of
+ * recommendation, acknowledgment, offer, experience or relieving letters (owner's decision,
+ * 2026-11-07). Only course and exam credentials are certifications.
+ */
+export const LETTER =
+  /\b(completion certificate|certificate of (completion|internship|experience)|internship (completion )?certificate|experience certificate|(letter of )?recommendation( letter)?|lor|acknowledg(e)?ments? letter|letter of acknowledg(e)?ment|offer letter|experience letter|relieving letter|appreciation letter|letter of appreciation)\b/i;
+
 /** Titles that name a programme, whatever kind the model chose: they never count as work. */
 export const PROGRAMME =
   /\b(programmes?|programs?|summer schools?|winter schools?|bootcamps?|courses?|specializations?|specialisations?|workshops?|MOOCs?)\b/i;
@@ -174,6 +182,7 @@ export interface Grounded {
   dropped: number; // entries removed because a value isn't in the lines they cite
   droppedBy: Record<string, number>; // "experience.employer": the field and, for roles, the check that failed
   school: number; // education rows removed as school results (not a grounding failure)
+  letters: number; // certifications removed as letters or completion certificates (likewise)
 }
 
 /**
@@ -329,7 +338,7 @@ export function ground(p: Profile, lines: Line[]): Grounded {
     ),
     certifications: named(
       "certifications",
-      p.certifications,
+      p.certifications.filter((x) => !LETTER.test(x.name)),
       (x) => x.name,
       (x) => x.lines,
     ),
@@ -340,6 +349,7 @@ export function ground(p: Profile, lines: Line[]): Grounded {
     dropped,
     droppedBy,
     school: p.education.length - education.length,
+    letters: p.certifications.filter((x) => LETTER.test(x.name)).length,
   };
 }
 
