@@ -91,15 +91,26 @@ async function pdf(bytes) {
       text = text.replace(/\s+/g, " ").trim();
       if (!text) continue;
       const tiny = parts.every((q) => q.size < TINY_PT);
-      // Either way round: pdf.js clips text that runs off the page, so a line can be a
-      // fragment of a longer hidden string.
-      const isHidden = [...hidden].some((h) => h.length >= 3 && (text.includes(h) || (text.length >= 8 && h.includes(text))));
+      const isHidden = isIn(text, hidden);
       lines.push({ text, hidden: isHidden, tiny });
     }
     page.cleanup();
   }
   await task.destroy();
   return { kind: "pdf", pages: doc.numPages, lines };
+}
+
+// Hidden strings and lines are compared without whitespace: a line's runs of spaces are collapsed,
+// so "I g n o r e   p r e v i o u s" never matched its own hidden string (D7-hard, 2026-11-07).
+// Either way round: pdf.js clips text that runs off the page, so a line can be a fragment of a
+// longer hidden string.
+const squash = (s) => s.replace(/\s+/g, "");
+function isIn(text, hidden) {
+  const t = squash(text);
+  return [...hidden].some((raw) => {
+    const h = squash(raw);
+    return h.length >= 3 && (t.includes(h) || (t.length >= 8 && h.includes(t)));
+  });
 }
 
 function hexRGB(hex) {
@@ -128,7 +139,7 @@ async function docx(bytes) {
     .filter(Boolean)
     .map((text) => ({
       text,
-      hidden: [...hidden].some((h) => text.includes(h) || (text.length >= 8 && h.includes(text))),
+      hidden: isIn(text, hidden),
       tiny: false,
     }));
   return { kind: "docx", pages: 0, lines };
