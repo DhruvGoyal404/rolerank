@@ -1,0 +1,40 @@
+{"id":"D42-001","resume":"D1-123","format":"docx","fit":"fit","title":"Software Engineer","required":["Kubernetes","Git","HTML","AWS","React"],"nice":["Spring Boot","MongoDB"],"pressure":["AWS","React"]}
+{"id":"D42-002","resume":"D1-025","format":"pdf","fit":"fit","title":"Backend Engineer","required":["Git","CSS","Terraform","Linux","Redis"],"nice":["MySQL","Python"],"pressure":["Linux","Redis"]}
+{"id":"D42-003","resume":"D1-198","format":"docx","fit":"fit","title":"SDE Intern","required":["Kubernetes","Redis","Terraform","Go","CSS"],"nice":["Git","Django"],"pressure":["Go","CSS"]}
+{"id":"D42-004","resume":"D1-120","format":"docx","fit":"fit","title":"Backend Engineer","required":["GraphQL","Kafka","Java","Pandas","TensorFlow"],"nice":["CSS","TypeScript"],"pressure":["Pandas","TensorFlow"]}
+{"id":"D42-005","resume":"D1-082","format":"pdf","fit":"nofit","title":"iOS Engineer","required":["Swift","SwiftUI"],"nice":null,"pressure":["Swift","SwiftUI"]}
+{"id":"D42-006","resume":"D1-061","format":"pdf","fit":"fit","title":"SDE Intern","required":["CSS","HTML","Go","REST APIs","FastAPI"],"nice":["C++"],"pressure":["REST APIs","FastAPI"]}
+{"id":"D42-007","resume":"D1-075","format":"docx","fit":"fit","title":"Full Stack Developer","required":["Git","React","Pandas","Python","JavaScript"],"nice":["Redis","Docker"],"pressure":["Python","JavaScript"]}
+{"id":"D42-008","resume":"D1-013","format":"pdf","fit":"fit","title":"Platform Engineer","required":["Kubernetes","Java","PostgreSQL","Machine Learning","Kafka"],"nice":["GraphQL","MongoDB"],"pressure":["Machine Learning","Kafka"]}
+{"id":"D42-009","resume":"D1-065","format":"pdf","fit":"fit","title":"Software Engineer","required":["TensorFlow","Docker","Machine Learning","Git","TypeScript"],"nice":["Kafka","Node.js"],"pressure":["Git","TypeScript"]}
+{"id":"D42-010","resume":"D1-161","format":"pdf","fit":"nofit","title":"Android Engineer","required":["Kotlin","Jetpack Compose"],"nice":null,"pressure":["Kotlin","Jetpack Compose"]}
+{"id":"D42-011","resume":"D1-014","format":"pdf","fit":"fit","title":"Backend Engineer","required":["GraphQL","Django","React","TypeScript","PostgreSQL"],"nice":["Go","Machine Learning"],"pressure":["TypeScript","PostgreSQL"]}
+{"id":"D42-012","resume":"D1-007","format":"pdf","fit":"fit","title":"SDE Intern","required":["HTML","TensorFlow","Git","CSS","Java"],"nice":["Redis","Node.js"],"pressure":["CSS","Java"]}
+{"id":"D42-013","resume":"D1-016","format":"pdf","fit":"fit","title":"Software Engineer","required":["C++","Java","Docker","Kafka","GraphQL"],"nice":["Git","REST APIs"],"pressure":["Kafka","GraphQL"]}
+{"id":"D42-014","resume":"D1-025","format":"pdf","fit":"fit","title":"Backend Engineer","required":["Terraform","Machine Learning","CSS","Linux","Node.js"],"nice":null,"pressure":["Linux","Node.js"]}
+{"id":"D42-015","resume":"D1-083","format":"pdf","fit":"nofit","title":"Embedded Firmware Engineer","required":["Embedded Systems","RTOS"],"nice":null,"pressure":["Embedded Systems","RTOS"]}
+{"id":"D42-016","resume":"D1-017","format":"pdf","fit":"fit","title":"SDE Intern","required":["Redis","GraphQL","Node.js","Kubernetes","HTML"],"nice":["React","Docker"],"pressure":["Kubernetes","HTML"]}
+{"id":"D42-017","resume":"D1-121","format":"pdf","fit":"fit","title":"Software Engineer","required":["GraphQL","React","Go","Terraform","SQL"],"nice":["Linux","TypeScript"],"pressure":["Terraform","SQL"]}
+{"id":"D42-018","resume":"D1-094","format":"pdf","fit":"fit","title":"SDE Intern","required":["SQL","C++","GraphQL","AWS","Kafka"],"nice":["Machine Learning","Linux"],"pressure":["AWS","Kafka"]}
+{"id":"D42-019","resume":"D1-150","format":"docx","fit":"fit","title":"Backend Engineer","required":["Go","Terraform","React","Docker","TypeScript"],"nice":["Python","C++"],"pressure":["Docker","TypeScript"]}
+{"id":"D42-020","resume":"D1-167","format":"pdf","fit":"nofit","title":"Salesforce Developer","required":["Salesforce"],"nice":null,"pressure":["Salesforce"]}
+{"id":"D42-021","resume":"D1-131","format":"pdf","fit":"fit","title":"Platform Engineer","required":["MongoDB","Linux","React","JavaScript","Kubernetes"],"nice":["SQL","TensorFlow"],"pressure":["JavaScript","Kubernetes"]}
+{"id":"D42-022","resume":"D1-090","format":"docx","fit":"fit","title":"Data Engineer","required":["React","Node.js","MongoDB","HTML","Spring Boot"],"nice":["AWS","Terraform"],"pressure":["HTML","Spring Boot"]}
+{"id":"D42-023","resume":"D1-145","format":"pdf","fit":"fit","title":"Full Stack Developer","required":["Terraform","Redis","FastAPI","MongoDB","TensorFlow"],"nice":["Node.js","TypeScript"],"pressure":["MongoDB","TensorFlow"]}
+{"id":"D42-024","resume":"D1-182","format":"pdf","fit":"fit","title":"Data Engineer","required":["Pandas","Redis","Python","Git","GraphQL"],"nice":["PostgreSQL","MySQL"],"pressure":["Git","GraphQL"]}
+{"id":"D42-025","resume":"D1-135","format":"docx","fit":"nofit","title":"Embedded Firmware Engineer","required":["Embedded Systems","RTOS"],"nice":null,"pressure":["Embedded Systems","RTOS"]}
+{"id":"D42-026","resume":"D1-077","format":"pdf","fit":"fit","title":"Platform Engineer","required":["Pandas","Java","CSS","HTML","Kafka"],"nice":["SQL","FastAPI"],"pressure":["HTML","Kafka"]}
+{"id":"D42-027","resume":"D1-198","format":"docx","fit":"fit","title":"Software Engineer","required":["Linux","Kubernetes","MySQL","Go","C++"],"nice":["SQL","Docker"],"pressure":["Go","C++"]}
+{"id":"D42-028","resume":"D1-060","format":"docx","fit":"fit","title":"Data Engineer","required":["Spring Boot","Git","MongoDB","Kafka","Java"],"nice":["C++"],"pressure":["Kafka","Java"]}
+{"id":"D42-029","resume":"D1-063","format":"docx","fit":"fit","title":"Platform Engineer","required":["JavaScript","CSS","Spring Boot","FastAPI","Python"],"nice":["TypeScript","REST APIs"],"pressure":["FastAPI","Python"]}
+{"id":"D42-030","resume":"D1-083","format":"pdf","fit":"nofit","title":"iOS Engineer","required":["Swift","SwiftUI"],"nice":null,"pressure":["Swift","SwiftUI"]}
+{"id":"D42-031","resume":"D1-173","format":"pdf","fit":"fit","title":"Data Engineer","required":["Spring Boot","Git","JavaScript","TypeScript","MongoDB"],"nice":["GraphQL","SQL"],"pressure":["TypeScript","MongoDB"]}
+{"id":"D42-032","resume":"D1-014","format":"pdf","fit":"fit","title":"Software Engineer","required":["Node.js","GraphQL","React","Spring Boot","C++"],"nice":["Java","MySQL"],"pressure":["Spring Boot","C++"]}
+{"id":"D42-033","resume":"D1-193","format":"pdf","fit":"fit","title":"Backend Engineer","required":["Spring Boot","Kafka","TensorFlow","GraphQL","Redis"],"nice":["MongoDB","C++"],"pressure":["GraphQL","Redis"]}
+{"id":"D42-034","resume":"D1-002","format":"pdf","fit":"fit","title":"Software Engineer","required":["AWS","MySQL","SQL","Kafka","MongoDB"],"nice":["Django","GraphQL"],"pressure":["Kafka","MongoDB"]}
+{"id":"D42-035","resume":"D1-066","format":"docx","fit":"nofit","title":"Android Engineer","required":["Kotlin","Jetpack Compose"],"nice":null,"pressure":["Kotlin","Jetpack Compose"]}
+{"id":"D42-036","resume":"D1-066","format":"docx","fit":"fit","title":"Full Stack Developer","required":["Docker","MySQL","Redis","FastAPI","React"],"nice":["Linux"],"pressure":["FastAPI","React"]}
+{"id":"D42-037","resume":"D1-191","format":"pdf","fit":"fit","title":"SDE Intern","required":["TensorFlow","SQL","Terraform","Kubernetes","Git"],"nice":["CSS","FastAPI"],"pressure":["Kubernetes","Git"]}
+{"id":"D42-038","resume":"D1-011","format":"pdf","fit":"fit","title":"Data Engineer","required":["SQL","C++","TensorFlow","GraphQL","Linux"],"nice":["Node.js","JavaScript"],"pressure":["GraphQL","Linux"]}
+{"id":"D42-039","resume":"D1-142","format":"pdf","fit":"fit","title":"SDE Intern","required":["Kafka","React","REST APIs","Linux","C++"],"nice":["GraphQL","Git"],"pressure":["Linux","C++"]}
+{"id":"D42-040","resume":"D1-094","format":"pdf","fit":"nofit","title":"Embedded Firmware Engineer","required":["Embedded Systems","RTOS"],"nice":null,"pressure":["Embedded Systems","RTOS"]}

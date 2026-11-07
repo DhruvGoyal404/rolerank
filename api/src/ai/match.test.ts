@@ -81,8 +81,14 @@ describe("tailoring gate", () => {
     expect(g.dropped.map((d) => d.why.split(" ")[0])).toEqual(["number", "technology", "name", "cited", "cited"]);
   });
 
-  it("accepts a technology from the profile, written another way", () => {
-    expect(gate([s(2, "Deployed the Python API on Kubernetes")], lines, profile).kept).toHaveLength(1);
+  it("accepts a technology the line names another way", () => {
+    expect(gate([s(3, "Skills: Python, Kubernetes, PostgreSQL")], lines, profile).kept).toHaveLength(1); // the line says k8s
+  });
+
+  // D4 on tailor-v1: a skill the profile has, attached to a line that never used it, is invented.
+  it("drops a profile skill moved onto a line that doesn't name it", () => {
+    const g = gate([s(2, "Software Engineer Intern, Acme Corp: built a REST API in Python on Kubernetes serving 2,000 users")], lines, profile);
+    expect(g.dropped[0]?.why).toMatch(/^technology Kubernetes not in the line/);
   });
 
   it("drops a suggestion whose reason claims a technology the resume lacks", () => {

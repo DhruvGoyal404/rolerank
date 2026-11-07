@@ -229,9 +229,9 @@ func render(g gold) []string {
 }
 
 func main() {
-	modes := map[string]bool{"hard": true, "hard2": true, "hard3": true, "hard4": true, "dev3": true, "dev4": true, "d4": true, "d7jd": true}
+	modes := map[string]bool{"hard": true, "hard2": true, "hard3": true, "hard4": true, "dev3": true, "dev4": true, "d4": true, "d4b": true, "d7jd": true}
 	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && !modes[os.Args[2]]) {
-		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3|hard4|dev3|dev4|d4|d7jd]")
+		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3|hard4|dev3|dev4|d4|d4b|d7jd]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
@@ -249,7 +249,10 @@ func main() {
 			generateD7JD(dir)
 			return
 		case "d4": // tailoring cases on D1's resumes (EVALS.md, D4)
-			generateD4(dir)
+			generateD4(dir, 20261108, "D4")
+			return
+		case "d4b": // D4-2: fresh pairings, made after tailor-v1's D4 result and held out for tailor-v2
+			generateD4(dir, 20261110, "D42")
 			return
 		case "dev3": // D1-hard-3's layouts from another seed, to diagnose its experience gap
 			generateHard3(dir, 20261109, "D1D3", 12)

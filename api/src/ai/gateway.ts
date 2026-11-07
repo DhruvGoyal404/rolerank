@@ -98,7 +98,8 @@ export function estimateTokens(text: string, system = SYSTEM): number {
 // taxonomy found in it, so a job description's instructions have no path to the model, and
 // link-only postings (SOURCES.md) keep their text on the server.
 export const EXPLAIN_PROMPT_VERSION = "explain-v1";
-export const TAILOR_PROMPT_VERSION = "tailor-v1";
+// tailor-v2: each rewrite uses only its own line; the profile is context (D4 on tailor-v1, 2026-11-08)
+export const TAILOR_PROMPT_VERSION = "tailor-v2";
 
 const EXPLAIN_SYSTEM = `You write a short explanation of how well a candidate fits one job, for the candidate.
 
@@ -124,8 +125,12 @@ Each suggestion rewrites one resume line: line is that line's number, rewrite is
 and reason says in one sentence which of the job's skills or duties the rewrite makes clearer.
 
 Rules:
-- Use only facts the cited line or the profile states. Never add a skill, tool, number, employer,
-  title, date, team size or result that they don't state.
+- Each rewrite uses only what its own cited line states. The profile and the other lines are
+  context: never move a skill, tool, project name, number or result from them into a line that
+  doesn't state it. A skill the candidate has elsewhere was not necessarily used in this line's
+  work. Never add a team size, purpose or result the line doesn't state.
+- Skip a line that is too thin to improve honestly; better wording is the only improvement
+  allowed. Fewer honest suggestions beat more invented ones.
 - Never claim a skill the job wants and the resume doesn't show. If the job demands something the
   resume lacks, leave it out of every rewrite.
 - Keep the strength of the claim: "helped" stays "helped", never "led"; "worked on" never becomes

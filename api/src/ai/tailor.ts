@@ -4,9 +4,14 @@ import { taxonomy } from "./skills.js";
 
 /**
  * The tailoring grounding gate (CLAUDE.md, AI invariants; EVALS.md, "Tailoring"). A suggestion
- * must cite a resume line that exists and is visible, and every number, year, technology and
- * proper name in its rewrite must appear in that line or in the user's confirmed profile. A
- * suggestion that fails is dropped and counted. Tailoring never invents experience.
+ * must cite a resume line that exists and is visible. Every number and technology in its rewrite
+ * (and every technology in its reason) must appear in that line, and every proper name in that
+ * line or among the profile's employers, titles and institutions. A suggestion that fails is
+ * dropped and counted. Tailoring never invents experience.
+ *
+ * Stricter than CLAUDE.md's "line or profile" on purpose: D4 on tailor-v1 (2026-11-08) showed a
+ * profile skill attached to a line that never used it ("Project: URL Shortener (Python)") passes
+ * a profile-wide check and is still invented. A skill the user has isn't a skill every line used.
  */
 export interface Suggestion {
   line: number;
@@ -27,8 +32,9 @@ const names = (s: string): string[] => s.match(/\b[A-Z][a-zA-Z&.]+(?:\s+[A-Z][a-
 export function gate(suggestions: Suggestion[], lines: Line[], profile: Profile): GateResult {
   const t = taxonomy();
   const visible = new Map(lines.filter((l) => !l.hidden && !l.tiny).map((l) => [l.n, l.text]));
-  const profileText = JSON.stringify(profile).toLowerCase();
-  const profileSkills = new Set(profile.skills.flatMap((s) => [s.name, ...t.find(s.name)]));
+  const profileNames = [...profile.experience.flatMap((e) => [e.employer, e.title]), ...profile.education.map((e) => e.institution)]
+    .map((x) => x.toLowerCase())
+    .filter(Boolean);
   const out: GateResult = { kept: [], dropped: [] };
   for (const s of suggestions) {
     const source = visible.get(s.line);
@@ -37,22 +43,22 @@ export function gate(suggestions: Suggestion[], lines: Line[], profile: Profile)
       continue;
     }
     const src = source.toLowerCase();
-    const known = (v: string) => src.includes(v.toLowerCase()) || profileText.includes(v.toLowerCase());
-    const badNumber = numbers(s.rewrite).find((n) => !known(n));
+    const badNumber = numbers(s.rewrite).find((n) => !src.includes(n.toLowerCase()));
     if (badNumber !== undefined) {
-      out.dropped.push({ suggestion: s, why: `number ${badNumber} not in the line or profile` });
+      out.dropped.push({ suggestion: s, why: `number ${badNumber} not in the line` });
       continue;
     }
     const lineSkills = new Set(t.find(source));
     // The reason is shown too, so it can't claim a technology the resume lacks either.
-    const badSkill = t.find(`${s.rewrite}\n${s.reason}`).find((k) => !lineSkills.has(k) && !profileSkills.has(k));
+    const badSkill = t.find(`${s.rewrite}\n${s.reason}`).find((k) => !lineSkills.has(k));
     if (badSkill !== undefined) {
-      out.dropped.push({ suggestion: s, why: `technology ${badSkill} not in the line or profile` });
+      out.dropped.push({ suggestion: s, why: `technology ${badSkill} not in the line` });
       continue;
     }
+    const known = (n: string) => src.includes(n.toLowerCase()) || profileNames.some((p) => p.includes(n.toLowerCase()));
     const badName = names(s.rewrite).find((n) => !known(n) && t.find(n).length === 0);
     if (badName !== undefined) {
-      out.dropped.push({ suggestion: s, why: `name "${badName}" not in the line or profile` });
+      out.dropped.push({ suggestion: s, why: `name "${badName}" not in the line or the profile's employers, titles and schools` });
       continue;
     }
     out.kept.push(s);

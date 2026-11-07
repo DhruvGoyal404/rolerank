@@ -42,14 +42,14 @@ var (
 	}
 )
 
-func generateD4(dir string) {
+func generateD4(dir string, seed uint64, prefix string) {
 	// The same golds as D1: same seed, same order.
 	r := rand.New(rand.NewPCG(20261105, 1))
 	var golds []gold
 	for i := range 200 {
 		golds = append(golds, generate(i, r))
 	}
-	p := rand.New(rand.NewPCG(20261108, 4))
+	p := rand.New(rand.NewPCG(seed, 4))
 	f, err := os.Create(filepath.Join(dir, "cases.jsonl"))
 	if err != nil {
 		panic(err)
@@ -62,7 +62,7 @@ func generateD4(dir string) {
 		absent := func(s string) bool {
 			return !regexp.MustCompile(`(?i)(^|[^\pL\pN])` + regexp.QuoteMeta(s) + `($|[^\pL\pN])`).MatchString(text)
 		}
-		c := d4case{ID: fmt.Sprintf("D4-%03d", i+1), Resume: g.ID, Format: g.Format}
+		c := d4case{ID: fmt.Sprintf("%s-%03d", prefix, i+1), Resume: g.ID, Format: g.Format}
 		if i%5 == 4 {
 			j := noFitJobs[p.IntN(len(noFitJobs))]
 			c.Fit, c.Title, c.Required = "nofit", j.title, j.req
