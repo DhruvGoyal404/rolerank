@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Gateway } from "./ai/gateway.js";
 import { expireStale } from "./ai/ledger.js";
 import { httpExtractor, processNext } from "./ai/pipeline.js";
+import { createAiServer } from "./aiserver.js";
 import { createLog } from "./log.js";
 import { Vault } from "./vault.js";
 
@@ -19,6 +20,9 @@ const env = z
     EXTRACTOR_URL: z.url(),
     EXTRACTOR_TOKEN: z.string().min(32),
     ANTHROPIC_API_KEY: z.string().min(1),
+    // P5: the internal endpoint the API calls for explanations and tailoring. Off without a token.
+    AIWORKER_TOKEN: z.string().min(32).optional(),
+    AIWORKER_ADDR: z.string().default("127.0.0.1:8093"),
   })
   .safeParse(process.env);
 
@@ -43,6 +47,15 @@ const deps = {
   log,
 };
 
+let server: ReturnType<ReturnType<typeof createAiServer>["listen"]> | undefined;
+if (env.data.AIWORKER_TOKEN) {
+  const [host, port] = env.data.AIWORKER_ADDR.split(/:(?=[0-9]+$)/);
+  const ai = createAiServer({ token: env.data.AIWORKER_TOKEN, gateway: deps.gateway, pool, vault: deps.vault, log });
+  server = ai.listen(Number(port), host ?? "127.0.0.1", () => {
+    log.info({ event: "aiserver_listening", status: Number(port) });
+  });
+}
+
 const state = { stopping: false };
 process.on("SIGTERM", () => (state.stopping = true));
 process.on("SIGINT", () => (state.stopping = true));
@@ -64,5 +77,6 @@ while (!state.stopping) {
     await sleep(5000);
   }
 }
+server?.close();
 await pool.end();
 log.info({ event: "aiworker_stopped" });

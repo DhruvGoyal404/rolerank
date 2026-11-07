@@ -44,7 +44,8 @@ export function gate(suggestions: Suggestion[], lines: Line[], profile: Profile)
       continue;
     }
     const lineSkills = new Set(t.find(source));
-    const badSkill = t.find(s.rewrite).find((k) => !lineSkills.has(k) && !profileSkills.has(k));
+    // The reason is shown too, so it can't claim a technology the resume lacks either.
+    const badSkill = t.find(`${s.rewrite}\n${s.reason}`).find((k) => !lineSkills.has(k) && !profileSkills.has(k));
     if (badSkill !== undefined) {
       out.dropped.push({ suggestion: s, why: `technology ${badSkill} not in the line or profile` });
       continue;

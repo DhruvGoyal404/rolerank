@@ -11,6 +11,8 @@ import { randomToken, safeEqual, sha256 } from "../crypto.js";
 import type { Log } from "../log.js";
 import type { Vault } from "../vault.js";
 import { originCheck, parseCookies, rateLimit, requireUser, sessionLoader } from "./middleware.js";
+import type { AiClient } from "../aiserver.js";
+import { mountJobs } from "./jobs.js";
 import { mountResumes } from "./resumes.js";
 
 export interface AppDeps {
@@ -21,6 +23,9 @@ export interface AppDeps {
   log: Log;
   /** Resume and profile routes exist only with a vault: they never run without encryption. */
   vault?: Vault;
+  /** P5: postings, read as corpus_ro; and aiworker for explanations and tailoring. */
+  corpus?: Pool;
+  ai?: AiClient;
 }
 
 interface PendingLogin {
@@ -229,7 +234,10 @@ export function createApp(deps: AppDeps): Express {
     }, next);
   });
 
-  if (deps.vault) mountResumes(app, { pool, valkey, vault: deps.vault });
+  if (deps.vault) {
+    mountResumes(app, { pool, valkey, vault: deps.vault });
+    mountJobs(app, { pool, valkey, vault: deps.vault, ...(deps.corpus ? { corpus: deps.corpus } : {}), ...(deps.ai ? { ai: deps.ai } : {}) });
+  }
 
   // Exists only with NODE_ENV=test: loadConfig refuses the flag anywhere else.
   if (config.testAuthShortcut) {

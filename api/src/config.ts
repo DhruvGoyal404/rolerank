@@ -21,6 +21,10 @@ const schema = z.object({
   // The key-encryption key for resume data: 32 bytes, base64. Read from SSM in production.
   ROLERANK_KEK: z.string().optional(),
   ROLERANK_KEK_VERSION: z.coerce.number().int().min(1).default(1),
+  // P5: job detail reads postings as corpus_ro; explanations and tailoring call aiworker.
+  CORPUS_DATABASE_URL: z.string().min(1).optional(),
+  AIWORKER_URL: z.url().optional(),
+  AIWORKER_TOKEN: z.string().min(32).optional(),
 });
 
 export interface Config {
@@ -35,6 +39,9 @@ export interface Config {
   secureCookies: boolean;
   /** Absent in development without resume features; required in production. */
   kek: { key: Buffer; version: number } | null;
+  /** Job routes exist only with the corpus; LLM features only with aiworker. */
+  corpusDatabaseUrl: string | null;
+  aiworker: { url: string; token: string } | null;
 }
 
 function databaseName(url: string): string {
@@ -57,6 +64,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
   if (c.NODE_ENV === "test" && !databaseName(c.APP_DATABASE_URL).endsWith("_test")) {
     throw new Error("NODE_ENV=test needs a database whose name ends in _test");
   }
+  if (c.NODE_ENV === "test" && c.CORPUS_DATABASE_URL && !databaseName(c.CORPUS_DATABASE_URL).endsWith("_test")) {
+    throw new Error("NODE_ENV=test needs a corpus database whose name ends in _test");
+  }
+  if (Boolean(c.AIWORKER_URL) !== Boolean(c.AIWORKER_TOKEN)) throw new Error("AIWORKER_URL and AIWORKER_TOKEN go together");
   const kek = c.ROLERANK_KEK ? Buffer.from(c.ROLERANK_KEK, "base64") : null;
   if (kek && kek.length !== 32) throw new Error("ROLERANK_KEK must be 32 bytes, base64");
   if (!kek && c.NODE_ENV === "production") throw new Error("ROLERANK_KEK is required in production");
@@ -93,5 +104,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     testAuthShortcut: shortcut,
     secureCookies: c.NODE_ENV === "production",
     kek: kek ? { key: kek, version: c.ROLERANK_KEK_VERSION } : null,
+    corpusDatabaseUrl: c.CORPUS_DATABASE_URL ?? null,
+    aiworker: c.AIWORKER_URL && c.AIWORKER_TOKEN ? { url: c.AIWORKER_URL.replace(/[/]$/, ""), token: c.AIWORKER_TOKEN } : null,
   };
 }

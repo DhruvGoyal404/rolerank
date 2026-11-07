@@ -39,6 +39,14 @@ describe("loadConfig", () => {
     ).toThrow(/_test/);
   });
 
+  it("refuses tests against a corpus not ending in _test, and aiworker settings apart", () => {
+    expect(() => loadConfig({ ...base, CORPUS_DATABASE_URL: "postgres://u:p@localhost/corpus" })).toThrow(/corpus database/);
+    expect(loadConfig({ ...base, CORPUS_DATABASE_URL: "postgres://u:p@localhost/corpus_test" }).corpusDatabaseUrl).toMatch(/corpus_test$/);
+    expect(() => loadConfig({ ...base, AIWORKER_URL: "http://127.0.0.1:8093" })).toThrow(/go together/);
+    const token = "t".repeat(32);
+    expect(loadConfig({ ...base, AIWORKER_URL: "http://127.0.0.1:8093/", AIWORKER_TOKEN: token }).aiworker).toEqual({ url: "http://127.0.0.1:8093", token });
+  });
+
   it("needs a 32-byte key-encryption key in production", () => {
     expect(loadConfig(production).kek?.key.length).toBe(32);
     expect(() => loadConfig({ ...production, ROLERANK_KEK: undefined })).toThrow(/required in production/);

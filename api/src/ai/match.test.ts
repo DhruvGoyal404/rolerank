@@ -84,4 +84,12 @@ describe("tailoring gate", () => {
   it("accepts a technology from the profile, written another way", () => {
     expect(gate([s(2, "Deployed the Python API on Kubernetes")], lines, profile).kept).toHaveLength(1);
   });
+
+  it("drops a suggestion whose reason claims a technology the resume lacks", () => {
+    const honest = { line: 2, rewrite: "Built a Python REST API serving 2,000 users", reason: "Shows the Python API work the job asks for" };
+    const claims = { ...honest, reason: "Shows your Terraform experience" };
+    const g = gate([honest, claims], lines, profile);
+    expect(g.kept).toEqual([honest]);
+    expect(g.dropped[0]?.why).toMatch(/^technology Terraform/);
+  });
 });
