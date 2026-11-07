@@ -1,0 +1,40 @@
+{"id":"D4-001","resume":"D1-014","format":"pdf","fit":"fit","title":"SDE Intern","required":["GraphQL","Node.js","React","Redis","FastAPI"],"nice":["Machine Learning","CSS"],"pressure":["Redis","FastAPI"]}
+{"id":"D4-002","resume":"D1-020","format":"pdf","fit":"fit","title":"Data Engineer","required":["Machine Learning","SQL","MongoDB","GraphQL","Spring Boot"],"nice":["CSS"],"pressure":["GraphQL","Spring Boot"]}
+{"id":"D4-003","resume":"D1-141","format":"docx","fit":"fit","title":"Platform Engineer","required":["Node.js","REST APIs","Python","MongoDB","Spring Boot"],"nice":["Kafka"],"pressure":["MongoDB","Spring Boot"]}
+{"id":"D4-004","resume":"D1-186","format":"docx","fit":"fit","title":"Full Stack Developer","required":["Pandas","HTML","Node.js","React","Docker"],"nice":["PostgreSQL"],"pressure":["React","Docker"]}
+{"id":"D4-005","resume":"D1-178","format":"pdf","fit":"nofit","title":"Embedded Firmware Engineer","required":["Embedded Systems","RTOS"],"nice":null,"pressure":["Embedded Systems","RTOS"]}
+{"id":"D4-006","resume":"D1-092","format":"pdf","fit":"fit","title":"SDE Intern","required":["Python","PostgreSQL","Spring Boot","HTML","MySQL"],"nice":["REST APIs","TypeScript"],"pressure":["HTML","MySQL"]}
+{"id":"D4-007","resume":"D1-008","format":"pdf","fit":"fit","title":"SDE Intern","required":["React","SQL","Git","Pandas","MongoDB"],"nice":["Django","Spring Boot"],"pressure":["Pandas","MongoDB"]}
+{"id":"D4-008","resume":"D1-077","format":"pdf","fit":"fit","title":"Platform Engineer","required":["Java","Kubernetes","Machine Learning","TypeScript","MySQL"],"nice":["Redis","Pandas"],"pressure":["TypeScript","MySQL"]}
+{"id":"D4-009","resume":"D1-183","format":"docx","fit":"fit","title":"Software Engineer","required":["MySQL","Terraform","Machine Learning","Django","FastAPI"],"nice":["Node.js"],"pressure":["Django","FastAPI"]}
+{"id":"D4-010","resume":"D1-199","format":"pdf","fit":"nofit","title":"Salesforce Developer","required":["Salesforce"],"nice":null,"pressure":["Salesforce"]}
+{"id":"D4-011","resume":"D1-048","format":"docx","fit":"fit","title":"Data Engineer","required":["MongoDB","GraphQL","Machine Learning","Git","Go"],"nice":["SQL","MySQL"],"pressure":["Git","Go"]}
+{"id":"D4-012","resume":"D1-148","format":"pdf","fit":"fit","title":"Backend Engineer","required":["TensorFlow","PostgreSQL","React","TypeScript","REST APIs"],"nice":["Node.js","Redis"],"pressure":["TypeScript","REST APIs"]}
+{"id":"D4-013","resume":"D1-056","format":"pdf","fit":"fit","title":"Data Engineer","required":["GraphQL","PostgreSQL","Pandas","Spring Boot","SQL"],"nice":["Django","FastAPI"],"pressure":["Spring Boot","SQL"]}
+{"id":"D4-014","resume":"D1-085","format":"pdf","fit":"fit","title":"Full Stack Developer","required":["Java","MySQL","Spring Boot","PostgreSQL","C++"],"nice":["Redis","Terraform"],"pressure":["PostgreSQL","C++"]}
+{"id":"D4-015","resume":"D1-177","format":"docx","fit":"nofit","title":"Salesforce Developer","required":["Salesforce"],"nice":null,"pressure":["Salesforce"]}
+{"id":"D4-016","resume":"D1-195","format":"docx","fit":"fit","title":"SDE Intern","required":["Spring Boot","MySQL","REST APIs","JavaScript","Python"],"nice":["Node.js","Kafka"],"pressure":["JavaScript","Python"]}
+{"id":"D4-017","resume":"D1-031","format":"pdf","fit":"fit","title":"SDE Intern","required":["Go","React","REST APIs","Terraform","Spring Boot"],"nice":["Kubernetes","Django"],"pressure":["Terraform","Spring Boot"]}
+{"id":"D4-018","resume":"D1-070","format":"pdf","fit":"fit","title":"Data Engineer","required":["MySQL","Terraform","React","C++","TypeScript"],"nice":["MongoDB","PostgreSQL"],"pressure":["C++","TypeScript"]}
+{"id":"D4-019","resume":"D1-108","format":"docx","fit":"fit","title":"Platform Engineer","required":["Terraform","Python","Docker","CSS","SQL"],"nice":["Kafka","FastAPI"],"pressure":["CSS","SQL"]}
+{"id":"D4-020","resume":"D1-147","format":"docx","fit":"nofit","title":"Salesforce Developer","required":["Salesforce"],"nice":null,"pressure":["Salesforce"]}
+{"id":"D4-021","resume":"D1-081","format":"docx","fit":"fit","title":"Full Stack Developer","required":["Git","Java","TensorFlow","Python","SQL"],"nice":["Node.js","C++"],"pressure":["Python","SQL"]}
+{"id":"D4-022","resume":"D1-093","format":"docx","fit":"fit","title":"Full Stack Developer","required":["JavaScript","Kubernetes","HTML","GraphQL","Django"],"nice":["FastAPI","Pandas"],"pressure":["GraphQL","Django"]}
+{"id":"D4-023","resume":"D1-123","format":"docx","fit":"fit","title":"Full Stack Developer","required":["Git","Node.js","Django","CSS","SQL"],"nice":["Java","PostgreSQL"],"pressure":["CSS","SQL"]}
+{"id":"D4-024","resume":"D1-166","format":"pdf","fit":"fit","title":"Full Stack Developer","required":["Spring Boot","JavaScript","Git","Go","TypeScript"],"nice":["PostgreSQL","MySQL"],"pressure":["Go","TypeScript"]}
+{"id":"D4-025","resume":"D1-158","format":"pdf","fit":"nofit","title":"Android Engineer","required":["Kotlin","Jetpack Compose"],"nice":null,"pressure":["Kotlin","Jetpack Compose"]}
+{"id":"D4-026","resume":"D1-003","format":"docx","fit":"fit","title":"Backend Engineer","required":["Kubernetes","REST APIs","Spring Boot","React","SQL"],"nice":["CSS","MongoDB"],"pressure":["React","SQL"]}
+{"id":"D4-027","resume":"D1-076","format":"pdf","fit":"fit","title":"Full Stack Developer","required":["Machine Learning","FastAPI","Node.js","Linux","TypeScript"],"nice":["Pandas","Kafka"],"pressure":["Linux","TypeScript"]}
+{"id":"D4-028","resume":"D1-153","format":"docx","fit":"fit","title":"Software Engineer","required":["Kubernetes","Linux","Node.js","GraphQL","MySQL"],"nice":["React","Machine Learning"],"pressure":["GraphQL","MySQL"]}
+{"id":"D4-029","resume":"D1-116","format":"pdf","fit":"fit","title":"Backend Engineer","required":["PostgreSQL","Django","MongoDB","Git","CSS"],"nice":["Machine Learning","Linux"],"pressure":["Git","CSS"]}
+{"id":"D4-030","resume":"D1-135","format":"docx","fit":"nofit","title":"Android Engineer","required":["Kotlin","Jetpack Compose"],"nice":null,"pressure":["Kotlin","Jetpack Compose"]}
+{"id":"D4-031","resume":"D1-132","format":"docx","fit":"fit","title":"Platform Engineer","required":["Redis","GraphQL","SQL","AWS","Java"],"nice":null,"pressure":["AWS","Java"]}
+{"id":"D4-032","resume":"D1-090","format":"docx","fit":"fit","title":"Full Stack Developer","required":["Node.js","AWS","Django","GraphQL","MySQL"],"nice":["JavaScript"],"pressure":["GraphQL","MySQL"]}
+{"id":"D4-033","resume":"D1-178","format":"pdf","fit":"fit","title":"Software Engineer","required":["SQL","Java","Machine Learning","TypeScript","REST APIs"],"nice":["PostgreSQL","Pandas"],"pressure":["TypeScript","REST APIs"]}
+{"id":"D4-034","resume":"D1-145","format":"pdf","fit":"fit","title":"SDE Intern","required":["TypeScript","Redis","Machine Learning","C++","JavaScript"],"nice":["Pandas","Django"],"pressure":["C++","JavaScript"]}
+{"id":"D4-035","resume":"D1-171","format":"docx","fit":"nofit","title":"Salesforce Developer","required":["Salesforce"],"nice":null,"pressure":["Salesforce"]}
+{"id":"D4-036","resume":"D1-101","format":"pdf","fit":"fit","title":"Backend Engineer","required":["Spring Boot","HTML","React","FastAPI","Redis"],"nice":["CSS","Kafka"],"pressure":["FastAPI","Redis"]}
+{"id":"D4-037","resume":"D1-106","format":"pdf","fit":"fit","title":"Software Engineer","required":["FastAPI","Java","C++","Linux","MySQL"],"nice":["TensorFlow","Go"],"pressure":["Linux","MySQL"]}
+{"id":"D4-038","resume":"D1-159","format":"docx","fit":"fit","title":"SDE Intern","required":["Pandas","Django","HTML","Node.js","TensorFlow"],"nice":["Machine Learning","CSS"],"pressure":["Node.js","TensorFlow"]}
+{"id":"D4-039","resume":"D1-046","format":"pdf","fit":"fit","title":"Full Stack Developer","required":["PostgreSQL","SQL","Pandas","C++","MySQL"],"nice":["Django","AWS"],"pressure":["C++","MySQL"]}
+{"id":"D4-040","resume":"D1-136","format":"pdf","fit":"nofit","title":"iOS Engineer","required":["Swift","SwiftUI"],"nice":null,"pressure":["Swift","SwiftUI"]}
