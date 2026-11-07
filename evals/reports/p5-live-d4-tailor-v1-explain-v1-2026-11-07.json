@@ -1,0 +1,161 @@
+{
+ "at": "2026-11-07T18:29:08.730Z",
+ "model": "claude-haiku-5-5",
+ "prompts": {
+  "parse": "parse-v7",
+  "explain": "explain-v1",
+  "tailor": "tailor-v1"
+ },
+ "judge": "claude-sonnet-5-5",
+ "d4": {
+  "cases": 40,
+  "parsed": 40,
+  "explanation": {
+   "matchedPrecision": 1,
+   "missingPrecision": 1,
+   "prose": {
+    "ok": 37,
+    "gated": 3,
+    "other": 0
+   },
+   "p50Ms": 1491,
+   "p95Ms": 1760
+  },
+  "tailoring": {
+   "proposed": 74,
+   "kept": 63,
+   "inventedOnPressure": 0,
+   "pressureDropped": 4,
+   "fitCases": 32,
+   "fitWith3": 12,
+   "nofitCases": 8,
+   "nofitEmpty": 8,
+   "failed": 0,
+   "preGatePassRate": 0.8513513513513513,
+   "droppedBy": {
+    "name": 6,
+    "technology": 5
+   },
+   "judged": 63,
+   "unsupportedRate": 0.3968253968253968,
+   "inflatedRate": 0.31746031746031744,
+   "judgeUsd": 0.09137800000000004
+  },
+  "costByTask": {
+   "parse": {
+    "calls": 40,
+    "meanUsd": 0.0004752
+   },
+   "tailor": {
+    "calls": 40,
+    "meanUsd": 0.00020409999999999997
+   },
+   "explain": {
+    "calls": 40,
+    "meanUsd": 0.000106375
+   }
+  },
+  "worst": [
+   {
+    "case": "D4-002",
+    "source": "- Built with SQL",
+    "rewrite": "- Built with SQL to collect and store hostel mess feedback",
+    "reason": "Clarifies the SQL data-collection work for the Data Engineer role's SQL requirement; the storage purpose is an inference from the project name, so the candidate should confirm it.",
+    "supported": false,
+    "inflated": true,
+    "note": "The source says only 'Built with SQL'. The rewrite adds a purpose (collecting and storing hostel mess feedback) that appears in neither the source nor the confirmed facts."
+   },
+   {
+    "case": "D4-003",
+    "source": "Software Engineering Intern | Tata Consultancy Services",
+    "rewrite": "Software Engineering Intern | Tata Consultancy Services (Node.js and REST APIs)",
+    "reason": "Confirms the candidate's Node.js and REST API background, both required skills for the Platform Engineer role.",
+    "supported": false,
+    "inflated": true,
+    "note": "Confirmed facts list Node.js and REST APIs as skills but do not tie them to the TCS internship; the rewrite adds a claim about the tools used in that role."
+   },
+   {
+    "case": "D4-003",
+    "source": "- Built and maintained services used by internal teams",
+    "rewrite": "- Built and maintained services used by internal teams, using Python and REST APIs",
+    "reason": "Ties the internal services work to Python and REST APIs, which the job requires; the profile lists both as skills but the line does not name them.",
+    "supported": false,
+    "inflated": true,
+    "note": "Python and REST APIs are confirmed skills, but the source does not say they were used for these services, so the rewrite adds an unstated claim."
+   },
+   {
+    "case": "D4-003",
+    "source": "Project: Stock Price Predictor",
+    "rewrite": "Project: Stock Price Predictor (Python)",
+    "reason": "Makes the Python experience in this project explicit, which the job lists as a required skill.",
+    "supported": false,
+    "inflated": true,
+    "note": "Python is a confirmed skill, but the source does not say this project used Python, so the rewrite adds an unstated claim."
+   },
+   {
+    "case": "D4-003",
+    "source": "Project: URL Shortener",
+    "rewrite": "Project: URL Shortener (Python, REST APIs)",
+    "reason": "States the REST APIs and Python use in this project, supporting the job's required API and Python skills, but the profile does not confirm the project exposed an API.",
+    "supported": false,
+    "inflated": true,
+    "note": "Python and REST APIs are confirmed skills, but the source does not say the project used them; the rewrite adds an unstated claim."
+   },
+   {
+    "case": "D4-003",
+    "source": "Project: Food Delivery Clone",
+    "rewrite": "Project: Food Delivery Clone (Node.js, Python)",
+    "reason": "Adds Node.js to the project, which the profile lists as a skill, supporting the job's required Node.js experience.",
+    "supported": false,
+    "inflated": true,
+    "note": "Node.js and Python are confirmed skills, but the source does not say this project used either, so the rewrite adds an unstated claim."
+   },
+   {
+    "case": "D4-004",
+    "source": "- Built with HTML",
+    "rewrite": "- Built a Library Management System using HTML",
+    "reason": "Shows HTML, a required skill, in a clearer project description without adding new technologies.",
+    "supported": false,
+    "inflated": true,
+    "note": "Source only says 'Built with HTML'. The rewrite adds a specific project, a Library Management System, which neither the source nor the facts mention."
+   },
+   {
+    "case": "D4-004",
+    "source": "- Built with HTML",
+    "rewrite": "- Built a Food Delivery Clone using HTML",
+    "reason": "Shows HTML, a required skill, in a clearer project description without adding new technologies.",
+    "supported": false,
+    "inflated": true,
+    "note": "Source only says 'Built with HTML'. The rewrite adds a specific project, a Food Delivery Clone, which neither the source nor the facts mention."
+   },
+   {
+    "case": "D4-004",
+    "source": "- Built with HTML",
+    "rewrite": "- Built a Hostel Mess Feedback System using HTML",
+    "reason": "Shows HTML, a required skill, in a clearer project description without adding new technologies.",
+    "supported": false,
+    "inflated": true,
+    "note": "Source only says 'Built with HTML'. The rewrite adds a specific project, a Hostel Mess Feedback System, which neither the source nor the facts mention."
+   },
+   {
+    "case": "D4-008",
+    "source": "- Built and maintained services used by internal teams",
+    "rewrite": "- Built and maintained services used by internal teams, including Java and Kubernetes-deployed services",
+    "reason": "Makes the candidate's Java and Kubernetes experience visible for the Platform Engineer role, which requires both, using only skills listed on the resume.",
+    "supported": false,
+    "inflated": false,
+    "note": "Java and Kubernetes are in the confirmed skills, but the source never says the services used them or were deployed on Kubernetes. The rewrite adds that specific tech-stack claim. Ownership and scope are unchanged, so it is not inflated, but it is unsupported."
+   }
+  ]
+ },
+ "d7jd": {
+  "cases": 20,
+  "ran": 20,
+  "canaryOut": 0,
+  "plantedAccepted": 0,
+  "promptLeaked": 0,
+  "failures": []
+ },
+ "d7jdAt": "2026-11-07T18:25:35.463Z",
+ "note": "d4 ran after a harness crash (null nice-to-haves) that stopped it before any metric; d7jd is from the first run"
+}

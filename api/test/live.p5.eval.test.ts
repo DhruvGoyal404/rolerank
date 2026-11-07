@@ -25,6 +25,8 @@ import { createTestDatabases, urlFor, type TestDatabases } from "./harness.js";
 const root = join(import.meta.dirname, "..", "..");
 const key = process.env.ANTHROPIC_API_KEY ?? "";
 const extractor = httpExtractor(process.env.EXTRACTOR_URL ?? "", process.env.EXTRACTOR_TOKEN ?? "");
+// D4_SET=d4-2 runs the fresh set made for tailor-v2.
+const d4set = process.env.D4_SET ?? "d4";
 const JUDGE = { model: "claude-sonnet-5-5", inputUsd: 2 / 1e6, outputUsd: 10 / 1e6 }; // checked 2026-11-07
 let dbs: TestDatabases;
 let pool: pg.Pool;
@@ -50,7 +52,7 @@ afterAll(async () => {
   if (report.d4 || report.d7jd) {
     mkdirSync(join(root, "evals", "reports"), { recursive: true });
     const day = new Date().toISOString().slice(0, 10);
-    writeFileSync(join(root, "evals", "reports", `p5-live-${TAILOR_PROMPT_VERSION}-${EXPLAIN_PROMPT_VERSION}-${day}.json`), JSON.stringify(report, null, 1) + "\n");
+    writeFileSync(join(root, "evals", "reports", `p5-live-${d4set}-${TAILOR_PROMPT_VERSION}-${EXPLAIN_PROMPT_VERSION}-${day}.json`), JSON.stringify(report, null, 1) + "\n");
   }
   await pool.end();
   await dbs.drop();
@@ -111,9 +113,10 @@ const judgeSchema = {
 
 describe.runIf(key !== "")("live P5 evals", () => {
   it.skipIf(process.env.SKIP_D4 === "1")("D4: explanations and tailoring", { timeout: 3_600_000 }, async () => {
-    const cases = jsonl<{ id: string; resume: string; format: string; fit: string; title: string; required: string[]; nice: string[]; pressure: string[] }>(
-      join(root, "evals", "d4", "cases.jsonl"),
-    );
+    // Go writes an empty list as null (a no-fit job has no nice-to-haves).
+    const cases = jsonl<{ id: string; resume: string; format: string; fit: string; title: string; required: string[]; nice: string[] | null; pressure: string[] }>(
+      join(root, "evals", d4set, "cases.jsonl"),
+    ).map((c) => ({ ...c, nice: c.nice ?? [] }));
     let parsed = 0;
     const exp = { matched: 0, matchedRight: 0, missing: 0, missingRight: 0 };
     const prose = { ok: 0, gated: 0, other: 0, latency: [] as number[] };
@@ -204,13 +207,14 @@ describe.runIf(key !== "")("live P5 evals", () => {
     const step = Math.max(1, Math.floor(rest.length / Math.max(1, 50 - flagged.length)));
     const audit = [...flagged, ...rest.filter((_, i) => i % step === 0)].slice(0, 50);
     mkdirSync(join(root, "evals", "labels"), { recursive: true });
-    writeFileSync(join(root, "evals", "labels", "d4-audit.jsonl"), audit.map((a) => JSON.stringify({ ...a, owner: null })).join("\n") + "\n");
+    writeFileSync(join(root, "evals", "labels", `${d4set}-audit-${TAILOR_PROMPT_VERSION}.jsonl`), audit.map((a) => JSON.stringify({ ...a, owner: null })).join("\n") + "\n");
 
     const { rows } = await pool.query<{ task: string; n: number; usd: number }>(
       `SELECT task, count(*)::int AS n, COALESCE(SUM(cost_usd), 0)::float AS usd FROM llm_calls GROUP BY task`,
     );
     const lat = [...prose.latency].sort((a, b) => a - b);
     report.d4 = {
+      set: d4set,
       cases: cases.length,
       parsed,
       explanation: {
