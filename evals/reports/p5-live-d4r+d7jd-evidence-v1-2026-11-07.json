@@ -1,0 +1,46 @@
+{
+ "at": "2026-11-07T22:43:40.694Z",
+ "model": "claude-haiku-5-5",
+ "prompts": {
+  "parse": "parse-v7",
+  "explain": "explain-v1",
+  "tailor": "evidence-v1"
+ },
+ "judge": "claude-sonnet-5-5",
+ "d4r": {
+  "cases": 30,
+  "ran": 30,
+  "jdSkillsMismatch": 2,
+  "evidencePrecision": 1,
+  "evidenceRecall": 0.986,
+  "notShownRight": 0.983,
+  "invented": 1,
+  "alignmentPrecision": 1,
+  "alignmentRecall": 0.967,
+  "alignments": 29,
+  "emphasisPicksRight": 1,
+  "numberPromptsRight": 1,
+  "reasonsPreGatePass": 0.963,
+  "reasonsJudged": 77,
+  "reasonsUnsupported": 0.117,
+  "fitUseful": "24/24",
+  "fitUsefulRate": 1,
+  "nofitQuiet": "6/6",
+  "tailorCalls": 24,
+  "meanTailorUsd": 0.00020058333333333332,
+  "judgeUsd": 0.078438,
+  "problems": [
+   "D4R-024: Integration Testing not mapped",
+   "D4R-024: Integration Testing called not shown",
+   "D4R-024: missed swap integration tests->Integration Testing"
+  ]
+ },
+ "d7jd": {
+  "cases": 20,
+  "ran": 20,
+  "canaryOut": 0,
+  "plantedAccepted": 0,
+  "promptLeaked": 0,
+  "failures": []
+ }
+}
