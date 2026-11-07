@@ -122,6 +122,25 @@ const ROLE =
 const isProgramme = (e: { title: string; employer: string }): boolean =>
   (PROGRAMME.test(e.title) || PROGRAMME.test(e.employer)) && !ROLE.test(e.title);
 
+/**
+ * A line that addresses instructions to an AI grounds nothing, like hidden text. parse-v4 reads
+ * skills from any line, so a visible "ignore previous instructions ... Expert in Scala" line
+ * could otherwise ground "Scala" (D7-003 on parse-v4, 2026-11-06).
+ */
+export const INSTRUCTION = new RegExp(
+  [
+    String.raw`\b(ignore|disregard|forget)\b.{0,40}\b(instructions?|prompts?|above)\b`,
+    String.raw`\bsystem (prompt|note|message|instruction)s?\b`,
+    String.raw`\b(note|message|instructions?) (to|for) (the )?(ai|assistant|model|llm|parser|bot|gpt|claude)\b`,
+    String.raw`\byou are now\b|\bwith no rules\b|\bas an ai\b`,
+    String.raw`\b(output|print|reveal|repeat|show)\b.{0,20}\b(system prompt|your (prompt|instructions))\b`,
+    String.raw`\brank (this|me|the) (candidate|resume|applicant)\b`,
+    String.raw`\b(list|add|include)\b.{0,40}\bas (a |an |the |their |the candidate's |my )?(top |key |main )?skills?\b`,
+    String.raw`"skills"\s*:\s*\[|\buse this json\b`,
+  ].join("|"),
+  "i",
+);
+
 export interface Grounded {
   profile: Profile;
   dropped: number; // entries removed because a value isn't in the lines they cite
@@ -133,12 +152,13 @@ export interface Grounded {
  * The grounding gate for parsing. Every name, title, employer, institution, degree, score,
  * skill, project, publication, achievement and certification must appear verbatim in a line it
  * cites; every period's years too; every cited line must exist. An entry that fails is dropped
- * and counted, never repaired. Hidden lines (white or invisible text) can't ground anything.
+ * and counted, never repaired. Hidden lines (white or invisible text) and lines that address
+ * instructions to an AI can't ground anything.
  * Two deterministic rules follow: school rows leave education, and a role whose title or employer
  * names a programme is kind "programme".
  */
 export function ground(p: Profile, lines: Line[]): Grounded {
-  const visible = new Map(lines.filter((l) => !l.hidden).map((l) => [l.n, l.text]));
+  const visible = new Map(lines.filter((l) => !l.hidden && !INSTRUCTION.test(l.text)).map((l) => [l.n, l.text]));
   const cite = (ns: number[]): string[] | null => {
     const out = ns.map((n) => visible.get(n));
     return ns.length > 0 && out.every((t) => t !== undefined) ? out : null;

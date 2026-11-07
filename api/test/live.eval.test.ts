@@ -5,7 +5,7 @@ import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { stripContacts } from "../src/ai/contacts.js";
 import { add, normalise, precision, recall, score, type Counts, type Field, type GoldIn } from "../src/ai/d1score.js";
-import { Gateway } from "../src/ai/gateway.js";
+import { Gateway, PARSE_PROMPT_VERSION } from "../src/ai/gateway.js";
 import { httpExtractor } from "../src/ai/pipeline.js";
 import { experienceMonths } from "../src/ai/profile.js";
 import { createTestDatabases, urlFor, type TestDatabases } from "./harness.js";
@@ -17,7 +17,7 @@ import { createTestDatabases, urlFor, type TestDatabases } from "./harness.js";
  * cap applies per resume and the global cap ($1 a day) bounds the run.
  */
 const root = join(import.meta.dirname, "..", "..");
-// D1_SET=d1-hard runs the held-out hard set; SKIP_D7=1 runs D1 alone.
+// D1_SET=d1-hard runs the held-out hard set; SKIP_D7=1 runs D1 alone, SKIP_D1=1 D7 alone.
 const set = process.env.D1_SET ?? "d1";
 const key = process.env.ANTHROPIC_API_KEY ?? "";
 const extractor = httpExtractor(process.env.EXTRACTOR_URL ?? "", process.env.EXTRACTOR_TOKEN ?? "");
@@ -45,7 +45,8 @@ afterAll(async () => {
     mkdirSync(join(root, "evals", "reports"), { recursive: true });
     const name = set === "d1" ? "p4-live" : `${set}-live`;
     const day = new Date().toISOString().slice(0, 10);
-    writeFileSync(join(root, "evals", "reports", `${name}-${day}.json`), JSON.stringify(report, null, 1) + "\n");
+    // The prompt version is in the name, so a later prompt's run never overwrites an earlier report.
+    writeFileSync(join(root, "evals", "reports", `${name}-${PARSE_PROMPT_VERSION}-${day}.json`), JSON.stringify(report, null, 1) + "\n");
   }
   await pool.end();
   await dbs.drop();
@@ -58,11 +59,11 @@ async function newUser(): Promise<string> {
   return rows[0]?.id ?? "";
 }
 
-const report: Record<string, unknown> = { at: new Date().toISOString(), model: "claude-haiku-5-5" };
+const report: Record<string, unknown> = { at: new Date().toISOString(), model: "claude-haiku-5-5", prompt: PARSE_PROMPT_VERSION };
 const lines = (file: string) => readFileSync(file, "utf8").split("\n").filter(Boolean);
 
 describe.runIf(key !== "")("live evals", () => {
-  it("D1: resume parsing", { timeout: 3_600_000 }, async () => {
+  it.skipIf(process.env.SKIP_D1 === "1")("D1: resume parsing", { timeout: 3_600_000 }, async () => {
     const golds = lines(join(root, "evals", set, "gold.jsonl")).map((l) => {
       const raw = JSON.parse(l) as GoldIn & { format: string; email: string; phone: string };
       return { ...raw, ...normalise(raw) };
@@ -76,6 +77,7 @@ describe.runIf(key !== "")("live evals", () => {
     let monthsOK = 0;
     let contactsLeaked = 0;
     let schoolDropped = 0; // education rows the school filter removed
+    const droppedBy: Record<string, number> = {}; // entries the grounding gate removed, by field
     const latency: number[] = [];
     for (const g of golds) {
       const started = Date.now();
@@ -120,6 +122,7 @@ describe.runIf(key !== "")("live evals", () => {
       const goldMonths = g.months ?? experienceMonths({ experience: g.experience.map((e) => ({ ...e, kind: "job" as const, lines: [] })) });
       if (Math.abs(experienceMonths(r.grounded.profile) - goldMonths) <= 3) monthsOK++;
       schoolDropped += r.grounded.school;
+      for (const [k, v] of Object.entries(r.grounded.droppedBy)) droppedBy[k] = (droppedBy[k] ?? 0) + v;
     }
     latency.sort((a, b) => a - b);
     const { rows } = await pool.query<{ n: number; usd: number }>(
@@ -137,6 +140,7 @@ describe.runIf(key !== "")("live evals", () => {
       contactsLeaked,
       monthsWithin3: monthsOK / Math.max(parsed, 1),
       schoolDropped,
+      droppedBy,
       p95LatencyMs: latency[Math.floor(0.95 * (latency.length - 1))],
       meanCostUsd: (rows[0]?.usd ?? 0) / Math.max(golds.length, 1),
       calls: rows[0]?.n,
