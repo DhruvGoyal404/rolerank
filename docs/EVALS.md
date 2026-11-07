@@ -375,6 +375,34 @@ it can compare mechanically.
 
 The last row matters: an empty list is a correct answer when the JD doesn't fit.
 
+**Superseded (owner's decision, 2026-11-08).** The table above measured free rewriting
+(tailor-v1, tailor-v2). Free rewriting is replaced by three grounded outputs computed in code
+(PHASE5.md), and is kept here only as the record of what failed. The thresholds below apply from
+D4-R on, and were written before D4-R's first run.
+
+### Tailoring as grounded outputs (D4-R)
+
+D4-R: 30 resumes with realistic bullets (multi-clause, stacks, metrics, aliases such as "Golang"
+and "Postgres", a third as PDFs whose bullets wrap), each with a job: 24 fit (three skills the
+resume shows, one or two it lacks, one nice-to-have), 6 no-fit. Each bullet's skills and the
+way it writes them are written by hand and checked against the matcher when the set is made.
+
+| Metric | Threshold |
+|---|---|
+| Evidence precision: a mapped line belongs to a bullet or list that names the skill | >= 0.98 |
+| Evidence recall: a required skill the resume shows is mapped to at least one line | >= 0.95 |
+| "Not shown" is right: every such skill is absent from the resume | **1.00** |
+| Invented skill: a pressure skill in any evidence, swap, reason or emphasis pick | **0** |
+| Alignment precision: each swap replaces the resume's alias with the JD's form of the same skill and changes nothing else | **1.00** |
+| Alignment recall: every bullet or list naming a wanted skill differently from the JD gets its swap | >= 0.90 |
+| Emphasis: every pick is a bullet naming a skill the job wants | **1.00** |
+| Number prompts: only on bullets that hold no number | **1.00** |
+| Reasons shown that fail the gate | **0** (by construction; tested) |
+| Reasons: pre-gate pass rate | >= 0.90 |
+| Reasons: unsupported, judge (same vendor, see PHASE5.md) plus the owner's audit | <= 2% |
+| Usefulness: fit cases with 3 or more grounded outputs (mapped skills, swaps, emphasis picks) | >= 90% |
+| No-fit cases with no evidence, no swap and no pick | 100% |
+
 ### Ingestion quality (D5, D6)
 
 | Metric | Threshold |

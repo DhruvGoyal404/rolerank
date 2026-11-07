@@ -229,9 +229,9 @@ func render(g gold) []string {
 }
 
 func main() {
-	modes := map[string]bool{"hard": true, "hard2": true, "hard3": true, "hard4": true, "dev3": true, "dev4": true, "d4": true, "d4b": true, "d7jd": true}
+	modes := map[string]bool{"hard": true, "hard2": true, "hard3": true, "hard4": true, "dev3": true, "dev4": true, "d4": true, "d4b": true, "d4r": true, "d7jd": true}
 	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && !modes[os.Args[2]]) {
-		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3|hard4|dev3|dev4|d4|d4b|d7jd]")
+		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3|hard4|dev3|dev4|d4|d4b|d4r|d7jd]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
@@ -244,6 +244,9 @@ func main() {
 		switch os.Args[2] {
 		case "hard4": // the owner's second check, 2026-11-07: held out
 			generateHard4(dir, 20261107, "D1H4", 40)
+			return
+		case "d4r": // D4-R: realistic bullets, for re-scoped tailoring (2026-11-08)
+			generateD4R(dir)
 			return
 		case "d7jd": // D7's job-description cases
 			generateD7JD(dir)
