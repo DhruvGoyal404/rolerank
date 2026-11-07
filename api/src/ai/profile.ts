@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Line } from "./contacts.js";
+import { taxonomy } from "./skills.js";
 
 /**
  * The parsed profile: what the model returns and what the user confirms. Every value cites the
@@ -40,7 +41,9 @@ export const ProfileSchema = z
         .strict(),
     ),
     projects: z.array(z.object({ name: z.string(), line: lineRef }).strict()),
-    publications: z.array(z.object({ title: z.string(), lines: lineRefs }).strict()),
+    // venue as its line names it ("SemEval-2026"), title as the bullet's leading phrase ("Task 12 -
+    // Abductive Event Reasoning", or "" when the bullets name none), date YYYY-MM, YYYY or "".
+    publications: z.array(z.object({ venue: z.string(), title: z.string(), date: z.string(), lines: lineRefs }).strict()),
     achievements: z.array(z.object({ text: z.string(), lines: lineRefs }).strict()),
     certifications: z.array(z.object({ name: z.string(), lines: lineRefs }).strict()),
   })
@@ -76,7 +79,7 @@ export const profileJsonSchema = obj({
     lines: ints,
   }),
   projects: list({ name: str, line: { type: "integer" } }),
-  publications: list({ title: str, lines: ints }),
+  publications: list({ venue: str, title: str, date: str, lines: ints }),
   achievements: list({ text: str, lines: ints }),
   certifications: list({ name: str, lines: ints }),
 });
@@ -144,7 +147,7 @@ export const INSTRUCTION = new RegExp(
 export interface Grounded {
   profile: Profile;
   dropped: number; // entries removed because a value isn't in the lines they cite
-  droppedBy: Record<string, number>;
+  droppedBy: Record<string, number>; // "experience.employer": the field and, for roles, the check that failed
   school: number; // education rows removed as school results (not a grounding failure)
 }
 
@@ -182,14 +185,28 @@ export function ground(p: Profile, lines: Line[]): Grounded {
     !(pr.start !== "" && pr.end !== "" && pr.end !== "present" && pr.end.padEnd(7, "-99") < pr.start);
 
   const education = p.education.filter((e) => !SCHOOL.test(e.degree) && !SCHOOL.test(e.institution));
-  const profile: Profile = {
-    level: p.level,
-    skills: named("skills", p.skills, (s) => s.name, (s) => [s.line]),
-    experience: keep("experience", p.experience, (e) => {
+  const experience = p.experience
+    .map((e) => {
+      // The employer often has a line of its own above the title, and the model cites only the
+      // title's lines (D1-dev-3, 2026-11-07). Take the employer from one of the two lines just
+      // above, verbatim, and cite it.
       const c = cite(e.lines);
-      if (c === null || !inLines(e.employer, c) || !inLines(e.title, c)) return false;
-      return e.periods.every((pr) => periodOK(c, pr));
-    }).map((e) => (isProgramme(e) ? { ...e, kind: "programme" as const } : e)),
+      if (c === null || inLines(e.employer, c)) return e;
+      const top = Math.min(...e.lines);
+      const above = [top - 1, top - 2].find((n) => {
+        const t = visible.get(n);
+        return t !== undefined && inLines(e.employer, [t]);
+      });
+      return above === undefined ? e : { ...e, lines: [above, ...e.lines] };
+    })
+    .filter((e) => {
+      const c = cite(e.lines);
+      const why =
+        c === null ? "lines" : !inLines(e.employer, c) ? "employer" : !inLines(e.title, c) ? "title" : e.periods.every((pr) => periodOK(c, pr)) ? null : "period";
+      if (why) droppedBy[`experience.${why}`] = (droppedBy[`experience.${why}`] ?? 0) + 1;
+      return why === null;
+    });
+  const kept = {
     education: keep("education", education, (e) => {
       // Each value must be in the cited lines (D1-hard: layouts split them across lines).
       const c = cite(e.lines);
@@ -197,8 +214,24 @@ export function ground(p: Profile, lines: Line[]): Grounded {
       if (e.score !== "" && !inLines(e.score, c)) return false;
       return e.grad_year === null || c.some((t) => t.includes(String(e.grad_year)));
     }),
+  };
+  const gradYears = kept.education.map((e) => e.grad_year).filter((y): y is number => y !== null);
+  const profile: Profile = {
+    level: p.level,
+    skills: splitSkills(named("skills", p.skills, (s) => s.name, (s) => [s.line]), visible),
+    experience: experience.map((e) => {
+      if (isProgramme(e)) return { ...e, kind: "programme" as const };
+      return e.kind === "job" && whileStudying(e, gradYears) ? { ...e, kind: "internship" as const } : e;
+    }),
+    education: kept.education,
     projects: named("projects", p.projects, (x) => x.name, (x) => [x.line]),
-    publications: named("publications", p.publications, (x) => x.title, (x) => x.lines),
+    // The venue and the paper are often on different lines; each must be in the cited ones.
+    publications: keep("publications", p.publications, (x) => {
+      const c = cite(x.lines);
+      if (c === null || (x.venue === "" && x.title === "")) return false;
+      if ((x.venue !== "" && !inLines(x.venue, c)) || (x.title !== "" && !inLines(x.title, c))) return false;
+      return x.date === "" || (dateOK(x.date) && x.date !== "present" && c.some((t) => hasYear(t, year(x.date))));
+    }),
     achievements: named("achievements", p.achievements, (x) => x.text, (x) => x.lines),
     certifications: named("certifications", p.certifications, (x) => x.name, (x) => x.lines),
   };
@@ -206,10 +239,63 @@ export function ground(p: Profile, lines: Line[]): Grounded {
   return { profile, dropped, droppedBy, school: p.education.length - education.length };
 }
 
+/** A run of skill names, as resumes list them: no quotes, brackets or sentence punctuation. */
+const SKILLISH = /^[\p{L}\p{N}][\p{L}\p{N} .+#&/-]*$/u;
+/** A trailing date, as a right-aligned column leaves it on the line: "NLP Jun 2026". */
+const TRAILING_DATE = /\s+(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s*['’]?\d{2,4}|\d{4})$/i;
+
+/** Each part when every part of "A & B" or "A/B" is a known skill, else null. */
+function compound(name: string): string[] | null {
+  const t = taxonomy();
+  if (t.exact(name) !== undefined || !/[&/]/.test(name)) return null;
+  const parts = name.split(/\s*[&/]\s*/).filter(Boolean);
+  return parts.length > 1 && parts.every((x) => t.exact(x) !== undefined) ? parts : null;
+}
+
 /**
- * Months of work experience: the union of every job and internship period, so overlaps and a
- * role held twice count once each month. Programmes don't count. A period with no end counts one
- * month; "present" runs to now.
+ * Two deterministic steps after the gate (owner's resume, 2026-11-07). A compound of known skills
+ * splits into its parts ("Generative AI & LLMs" is Generative AI and LLMs). And on a line the
+ * model already cited for a skill, every comma-separated item that is a known skill is a skill
+ * too ("LLMs, Chain-of-Thought, NLP" gives NLP). Names stay verbatim from the line, so they stay
+ * grounded; lines the gate can't use (hidden, instructions) never add anything.
+ */
+function splitSkills(skills: Profile["skills"], visible: Map<number, string>): Profile["skills"] {
+  const out: Profile["skills"] = [];
+  const seen = new Set<string>();
+  const add = (name: string, line: number) => {
+    const k = fold(name);
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push({ name, line });
+  };
+  for (const s of skills) for (const n of compound(s.name) ?? [s.name]) add(n, s.line);
+  for (const line of new Set(skills.map((s) => s.line))) {
+    for (const raw of (visible.get(line) ?? "").split(/[,;|:]/)) {
+      const item = raw.trim().replace(TRAILING_DATE, "").trim();
+      if (!SKILLISH.test(item)) continue;
+      for (const n of compound(item) ?? (taxonomy().exact(item) !== undefined ? [item] : [])) add(n, line);
+    }
+  }
+  return out;
+}
+
+/**
+ * A "job" held for three months or less, ending before the year the candidate graduates, is an
+ * internship in practice: a student's research associateship or summer role.
+ */
+function whileStudying(e: Profile["experience"][number], gradYears: number[]): boolean {
+  if (gradYears.length === 0 || e.periods.length === 0) return false;
+  const months = experienceMonths({ experience: [{ ...e, kind: "job" }] });
+  const ends = e.periods.map((pr) => pr.end);
+  if (ends.some((d) => d === "" || d === "present")) return false;
+  const lastEnd = Math.max(...ends.map((d) => Number(d.slice(0, 4))));
+  return months <= 3 && lastEnd < Math.max(...gradYears);
+}
+
+/**
+ * Months of work experience: the union of every job and internship period, both end months
+ * included ("Jun 2025 – Aug 2025" is 3), so overlaps and a role held twice count once each month.
+ * Programmes don't count. A period with no end counts one month; "present" runs to this month.
  */
 export function experienceMonths(p: Pick<Profile, "experience">, now = new Date()): number {
   const toMonth = (d: string): number => {
@@ -221,7 +307,7 @@ export function experienceMonths(p: Pick<Profile, "experience">, now = new Date(
     .filter((e) => e.kind !== "programme")
     .flatMap((e) => e.periods)
     .filter((pr) => pr.start !== "")
-    .map((pr) => [toMonth(pr.start), pr.end ? toMonth(pr.end) : toMonth(pr.start) + 1] as const)
+    .map((pr) => [toMonth(pr.start), (pr.end ? toMonth(pr.end) : toMonth(pr.start)) + 1] as const)
     .filter(([a, b]) => b >= a)
     .sort((x, y) => x[0] - y[0]);
   let total = 0;

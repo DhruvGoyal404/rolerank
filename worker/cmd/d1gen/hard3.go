@@ -233,16 +233,17 @@ func renderAcademic(g gold3, school string, r *rand.Rand) []byte {
 	return extract.MakeRichPDF([][]extract.Item{it})
 }
 
-func generateHard3(dir string) {
-	r := rand.New(rand.NewPCG(20261106, 3))
+func generateHard3(dir string, seed uint64, prefix string, count int) {
+	r := rand.New(rand.NewPCG(seed, 3))
 	gf, err := os.Create(filepath.Join(dir, "gold.jsonl"))
 	if err != nil {
 		panic(err)
 	}
 	defer gf.Close()
 	enc := json.NewEncoder(gf)
-	for i := range 40 {
+	for i := range count {
 		g, school := generate3(i, r)
+		g.ID = fmt.Sprintf("%s-%03d", prefix, i+1)
 		if err := os.WriteFile(filepath.Join(dir, g.ID+"."+g.Format), renderAcademic(g, school, r), 0o644); err != nil {
 			panic(err)
 		}
@@ -250,5 +251,5 @@ func generateHard3(dir string) {
 			panic(err)
 		}
 	}
-	fmt.Println("wrote 40 held-out resumes (real-resume patterns) to", dir)
+	fmt.Println("wrote", count, "resumes (real-resume patterns) to", dir)
 }

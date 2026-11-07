@@ -58,6 +58,12 @@ export class Taxonomy {
     });
   }
 
+  /** The canonical skill when the whole of s is one skill's name or alias ("LLMs"), else undefined. */
+  exact(s: string): string | undefined {
+    const key = tokenSpans(s).words.join(" ");
+    return this.sensitive.get(key) ?? this.insensitive.get(key.toLowerCase());
+  }
+
   /** Canonical skills in text, in order of first appearance, longest match first. */
   find(text: string): string[] {
     const { words, spans } = tokenSpans(text);

@@ -13,7 +13,8 @@ import { ground, profileJsonSchema, ProfileSchema, type Grounded } from "./profi
  * reserves its worst case in the ledger first. Prompts, resume text and output are never logged.
  */
 // v4: periods, kinds, publications, achievements, certifications; skills from any line; verbatim names (owner's resume)
-export const PARSE_PROMPT_VERSION = "parse-v4";
+// v5: employer lines cited, short roles while studying, venue-plus-task publications, list items as skills (2026-11-07)
+export const PARSE_PROMPT_VERSION = "parse-v5";
 export const MAX_OUTPUT_TOKENS = 4096;
 
 const SYSTEM = `You extract a structured profile from a resume for a job-matching service.
@@ -30,24 +31,39 @@ names, publication titles, achievements and certifications character for charact
 line writes them: keep ordinals, numbers, punctuation and brackets ("2nd", "(3rd Year)"), and
 never shorten, expand or correct them. Never invent or infer a value the resume does not state.
 
-experience: each role once. kind is "internship" for an internship or traineeship, "programme"
-for a course, programme, summer school, bootcamp, workshop or apprenticeship in a course, and
-"job" otherwise. periods lists every date range the role states: a line like "Aug 2025 – Sep 2025
+experience: each role once. Cite every line the role's values come from: the employer often has
+a line of its own above the title, and that line must be cited too. The employer is the
+organisation's name only, without its location. kind is "internship" for an internship or
+traineeship, "programme" for a course, programme, summer school, bootcamp, workshop or
+apprenticeship in a course, and "job" otherwise. periods lists every date range the role states: a line like "Aug 2025 – Sep 2025
 & Jul 2026 – Aug 2026" is two periods, never one range. Dates are YYYY-MM or YYYY; an end is
 "present" for a current role; use "" when the resume gives none.
 
 skills: every technology, tool, method and subject the resume names, wherever it names it: the
-skills section, project lines and their tech stacks, experience and research lines. Cite the line
-where the name appears.
+skills section, project lines and their tech stacks, experience and research lines. Each item of
+a comma-separated list is its own skill ("LLMs, Chain-of-Thought, NLP" is three), and so is
+each part of a pair joined by "&" or "/" ("Generative AI & LLMs" is two). Cite the line where
+the name appears.
 
 education lists degrees and diplomas from colleges and universities only: leave out school results
 (Class X and XII, 10th and 12th, ISC, ICSE, CBSE, HSC, SSC, state boards, Intermediate, Higher
 Secondary). An education entry cites every line its values come from: the degree, institution,
-year and score are often on separate lines.
+year and score are often on separate lines. An enrolment, roll or registration number is not an
+education entry.
 
-A project's name is its title only: leave out its tech stack, links and description. A
-publication's title leaves out venue, authors and year. An achievement is the line's text without
-its bullet. A certification's name leaves out labels such as "Certification:".
+A project's name is its title only: leave out its tech stack, links and description.
+
+publications: one entry per paper or shared-task submission. A venue line ("SemEval-2026 | ACL
+2026 Workshop, Team X | LLMs, NLP  Jun 2026") is often followed by bullets whose leading phrase
+names the paper or task ("Task 12 - Abductive Event Reasoning: built ..."). Each such bullet is
+one publication: venue is the venue's own name, the venue line's first item ("SemEval-2026"), title is
+the bullet's leading phrase before the colon ("Task 12 - Abductive Event Reasoning"), date comes
+from the venue line, and lines cites the venue line and the bullet. A venue whose bullets name no
+paper or task is one publication with title "". date is YYYY-MM or YYYY, like every date. When a line gives a paper's own title, that is
+the title, without venue, authors or year. A patent is an achievement, not a publication.
+
+An achievement is the line's text without its bullet or its date. A certification's name leaves
+out labels such as "Certification:".
 
 level is your judgement of the candidate's career stage: intern (a student seeking an
 internship), entry (no full-time experience or under about 1 year), mid (about 2 to 4 years),

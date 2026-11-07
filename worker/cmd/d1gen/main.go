@@ -229,9 +229,9 @@ func render(g gold) []string {
 }
 
 func main() {
-	modes := map[string]bool{"hard": true, "hard2": true, "hard3": true, "hard4": true, "dev4": true}
+	modes := map[string]bool{"hard": true, "hard2": true, "hard3": true, "hard4": true, "dev3": true, "dev4": true}
 	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && !modes[os.Args[2]]) {
-		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3|hard4|dev4]")
+		fmt.Fprintln(os.Stderr, "usage: d1gen <out-dir> [hard|hard2|hard3|hard4|dev3|dev4]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
@@ -245,12 +245,15 @@ func main() {
 		case "hard4": // the owner's second check, 2026-11-07: held out
 			generateHard4(dir, 20261107, "D1H4", 40)
 			return
+		case "dev3": // D1-hard-3's layouts from another seed, to diagnose its experience gap
+			generateHard3(dir, 20261109, "D1D3", 12)
+			return
 		case "dev4": // the same layouts from another seed, for diagnosis and tuning
 			generateHard4(dir, 20261108, "D1D4", 12)
 			return
 		}
 		if os.Args[2] == "hard3" {
-			generateHard3(dir) // real-resume patterns, 2026-11-06
+			generateHard3(dir, 20261106, "D1H3", 40) // real-resume patterns, 2026-11-06
 			return
 		}
 		if os.Args[2] == "hard2" {

@@ -1,0 +1,185 @@
+{
+ "at": "2026-11-07T16:54:49.020Z",
+ "model": "claude-haiku-5-5",
+ "prompt": "parse-v5",
+ "d1": {
+  "resumes": 12,
+  "parsed": 12,
+  "parseSuccess": 1,
+  "schemaValidFirstTime": 1,
+  "fabricated": 0,
+  "notInGold": 1,
+  "contactsLeaked": 0,
+  "monthsWithin3": 1,
+  "schoolDropped": 0,
+  "numbersKept": "24/24",
+  "droppedBy": {},
+  "p95LatencyMs": 4358,
+  "meanCostUsd": 0.0007972500000000001,
+  "calls": 12,
+  "fields": {
+   "skills": {
+    "precision": 1,
+    "recall": 1
+   },
+   "projects": {
+    "precision": 1,
+    "recall": 1
+   },
+   "publications": {
+    "precision": 1,
+    "recall": 1
+   },
+   "achievements": {
+    "precision": 1,
+    "recall": 1
+   },
+   "certifications": {
+    "precision": 1,
+    "recall": 1
+   },
+   "employer": {
+    "precision": 0.958,
+    "recall": 0.958
+   },
+   "title": {
+    "precision": 0.958,
+    "recall": 0.958
+   },
+   "dates": {
+    "precision": 0.958,
+    "recall": 0.958
+   },
+   "kind": {
+    "precision": 0.958,
+    "recall": 0.958
+   },
+   "institution": {
+    "precision": 1,
+    "recall": 1
+   },
+   "degree": {
+    "precision": 1,
+    "recall": 1
+   },
+   "grad_year": {
+    "precision": 1,
+    "recall": 1
+   },
+   "score": {
+    "precision": 1,
+    "recall": 1
+   }
+  },
+  "bySegment": {
+   "student": {
+    "skills": {
+     "precision": 1,
+     "recall": 1
+    },
+    "projects": {
+     "precision": 1,
+     "recall": 1
+    },
+    "publications": {
+     "precision": 1,
+     "recall": 1
+    },
+    "achievements": {
+     "precision": 1,
+     "recall": 1
+    },
+    "certifications": {
+     "precision": 1,
+     "recall": 1
+    },
+    "employer": {
+     "precision": 0.944,
+     "recall": 0.944
+    },
+    "title": {
+     "precision": 0.944,
+     "recall": 0.944
+    },
+    "dates": {
+     "precision": 0.944,
+     "recall": 0.944
+    },
+    "kind": {
+     "precision": 0.944,
+     "recall": 0.944
+    },
+    "institution": {
+     "precision": 1,
+     "recall": 1
+    },
+    "degree": {
+     "precision": 1,
+     "recall": 1
+    },
+    "grad_year": {
+     "precision": 1,
+     "recall": 1
+    },
+    "score": {
+     "precision": 1,
+     "recall": 1
+    }
+   },
+   "graduate": {
+    "skills": {
+     "precision": 1,
+     "recall": 1
+    },
+    "projects": {
+     "precision": 1,
+     "recall": 1
+    },
+    "publications": {
+     "precision": 1,
+     "recall": 1
+    },
+    "achievements": {
+     "precision": 1,
+     "recall": 1
+    },
+    "certifications": {
+     "precision": 1,
+     "recall": 1
+    },
+    "employer": {
+     "precision": 1,
+     "recall": 1
+    },
+    "title": {
+     "precision": 1,
+     "recall": 1
+    },
+    "dates": {
+     "precision": 1,
+     "recall": 1
+    },
+    "kind": {
+     "precision": 1,
+     "recall": 1
+    },
+    "institution": {
+     "precision": 1,
+     "recall": 1
+    },
+    "degree": {
+     "precision": 1,
+     "recall": 1
+    },
+    "grad_year": {
+     "precision": 1,
+     "recall": 1
+    },
+    "score": {
+     "precision": 1,
+     "recall": 1
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,135 @@
+{
+ "at": "2026-11-07T16:43:22.274Z",
+ "model": "claude-haiku-5-5",
+ "prompt": "parse-v4",
+ "d1": {
+  "resumes": 12,
+  "parsed": 12,
+  "parseSuccess": 1,
+  "schemaValidFirstTime": 1,
+  "fabricated": 0,
+  "notInGold": 0,
+  "contactsLeaked": 0,
+  "monthsWithin3": 0.3333333333333333,
+  "schoolDropped": 0,
+  "numbersKept": "0/0",
+  "droppedBy": {
+   "skills": 1,
+   "experience.employer": 25,
+   "publications": 2
+  },
+  "p95LatencyMs": 5106,
+  "meanCostUsd": 0.00070675,
+  "calls": 12,
+  "fields": {
+   "skills": {
+    "precision": 0.984,
+    "recall": 0.909
+   },
+   "projects": {
+    "precision": 1,
+    "recall": 1
+   },
+   "publications": {
+    "precision": 1,
+    "recall": 0.833
+   },
+   "achievements": {
+    "precision": 1,
+    "recall": 1
+   },
+   "certifications": {
+    "precision": 1,
+    "recall": 1
+   },
+   "employer": {
+    "precision": 1,
+    "recall": 0.306
+   },
+   "title": {
+    "precision": 0.909,
+    "recall": 0.278
+   },
+   "dates": {
+    "precision": 0.929,
+    "recall": 0.271
+   },
+   "kind": {
+    "precision": 0.545,
+    "recall": 0.167
+   },
+   "institution": {
+    "precision": 1,
+    "recall": 1
+   },
+   "degree": {
+    "precision": 1,
+    "recall": 1
+   },
+   "grad_year": {
+    "precision": 1,
+    "recall": 1
+   },
+   "score": {
+    "precision": 1,
+    "recall": 1
+   }
+  },
+  "bySegment": {
+   "fresher": {
+    "skills": {
+     "precision": 0.984,
+     "recall": 0.909
+    },
+    "projects": {
+     "precision": 1,
+     "recall": 1
+    },
+    "publications": {
+     "precision": 1,
+     "recall": 0.833
+    },
+    "achievements": {
+     "precision": 1,
+     "recall": 1
+    },
+    "certifications": {
+     "precision": 1,
+     "recall": 1
+    },
+    "employer": {
+     "precision": 1,
+     "recall": 0.306
+    },
+    "title": {
+     "precision": 0.909,
+     "recall": 0.278
+    },
+    "dates": {
+     "precision": 0.929,
+     "recall": 0.271
+    },
+    "kind": {
+     "precision": 0.545,
+     "recall": 0.167
+    },
+    "institution": {
+     "precision": 1,
+     "recall": 1
+    },
+    "degree": {
+     "precision": 1,
+     "recall": 1
+    },
+    "grad_year": {
+     "precision": 1,
+     "recall": 1
+    },
+    "score": {
+     "precision": 1,
+     "recall": 1
+    }
+   }
+  }
+ }
+}

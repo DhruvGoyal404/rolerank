@@ -84,7 +84,7 @@ describe("gateway", () => {
     replies = [{ text: good }];
     const r = await gateway().parseResume(await newUser(), lines);
     expect(r.outcome).toBe("ok");
-    expect(r.grounded?.profile.skills.map((s) => s.name)).toEqual(["Go"]); // Kubernetes cited a hidden line
+    expect(r.grounded?.profile.skills.map((s) => s.name)).toEqual(["Go", "PostgreSQL"]); // Kubernetes cited a hidden line; PostgreSQL is on the cited list
     const req = requests[0] ?? {};
     expect(JSON.stringify(req.system)).not.toContain("Acme");
     const content = JSON.stringify(req.messages);

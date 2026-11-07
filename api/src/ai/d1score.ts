@@ -13,7 +13,7 @@ export interface Gold {
   experience: Array<{ employer: string; title: string; kind?: string; periods: Period[] }>;
   education: Array<{ institution: string; degree: string; grad_year: number; score: string }>;
   projects: string[];
-  publications: string[];
+  publications: Array<{ venue: string; title: string }>; // venue "" in gold before D1-hard-4
   achievements: string[];
   certifications: string[];
   months?: number; // D1-hard-3 states it; older sets compute it from the periods
@@ -27,7 +27,7 @@ export type GoldIn = Omit<Gold, "skills" | "education" | "projects" | "experienc
   [K in "skills" | "education" | "projects"]: Gold[K] | null;
 } & {
   experience: Array<{ employer: string; title: string; kind?: string; periods?: Period[]; start?: string; end?: string }> | null;
-  publications?: string[] | null;
+  publications?: Array<string | { venue: string; title: string }> | null; // a string before D1-hard-4
   achievements?: string[] | null;
   certifications?: string[] | null;
 };
@@ -42,7 +42,7 @@ export function normalise(raw: GoldIn): Gold {
     })),
     education: raw.education ?? [],
     projects: raw.projects ?? [],
-    publications: raw.publications ?? [],
+    publications: (raw.publications ?? []).map((x) => (typeof x === "string" ? { venue: "", title: x } : x)),
     achievements: raw.achievements ?? [],
     certifications: raw.certifications ?? [],
   };
@@ -69,6 +69,8 @@ export type Field =
   | "achievements"
   | "certifications";
 
+/** A publication as one string: "SemEval-2026 Task 12 - Abductive Event Reasoning". */
+export const pubName = (x: { venue?: string; title: string }): string => [x.venue ?? "", x.title].filter(Boolean).join(" ");
 const norm = (s: string): string => s.toLowerCase().replace(/\s+/g, " ").replace(/[.,]+$/g, "").trim();
 /** A list item without its bullet or label ("– Certification: AWS ..." is "AWS ..."). */
 const item = (s: string): string => s.replace(/^[\s\-–—•*]+/, "").replace(/^(project|certification|certificate)s?:\s*/i, "");
@@ -104,7 +106,12 @@ export function score(p: Profile, raw: GoldIn): Scored {
     g.skills,
   );
   counts.projects = setCounts(p.projects.map((x) => item(x.name)), g.projects);
-  counts.publications = setCounts(p.publications.map((x) => item(x.title)), g.publications);
+  // Gold before D1-hard-4 names only the paper's own title; from D1-hard-4 it names venue and title.
+  const venues = g.publications.some((x) => x.venue !== "");
+  counts.publications = setCounts(
+    p.publications.map((x) => item(venues ? pubName(x) : x.title || x.venue)),
+    g.publications.map((x) => pubName(x)),
+  );
   counts.achievements = setCounts(p.achievements.map((x) => item(x.text)), g.achievements);
   counts.certifications = setCounts(p.certifications.map((x) => item(x.name)), g.certifications);
   const exp = assign(p.experience, g.experience, (e) => e.employer, (e) => e.employer);

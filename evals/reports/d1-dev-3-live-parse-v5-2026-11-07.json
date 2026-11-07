@@ -1,0 +1,133 @@
+{
+ "at": "2026-11-07T16:53:04.267Z",
+ "model": "claude-haiku-5-5",
+ "prompt": "parse-v5",
+ "d1": {
+  "resumes": 12,
+  "parsed": 12,
+  "parseSuccess": 1,
+  "schemaValidFirstTime": 1,
+  "fabricated": 0,
+  "notInGold": 0,
+  "contactsLeaked": 0,
+  "monthsWithin3": 1,
+  "schoolDropped": 0,
+  "numbersKept": "0/0",
+  "droppedBy": {
+   "publications": 2
+  },
+  "p95LatencyMs": 4420,
+  "meanCostUsd": 0.0007620833333333334,
+  "calls": 12,
+  "fields": {
+   "skills": {
+    "precision": 0.979,
+    "recall": 0.934
+   },
+   "projects": {
+    "precision": 1,
+    "recall": 1
+   },
+   "publications": {
+    "precision": 1,
+    "recall": 0.833
+   },
+   "achievements": {
+    "precision": 1,
+    "recall": 1
+   },
+   "certifications": {
+    "precision": 1,
+    "recall": 1
+   },
+   "employer": {
+    "precision": 1,
+    "recall": 1
+   },
+   "title": {
+    "precision": 1,
+    "recall": 1
+   },
+   "dates": {
+    "precision": 1,
+    "recall": 1
+   },
+   "kind": {
+    "precision": 1,
+    "recall": 1
+   },
+   "institution": {
+    "precision": 1,
+    "recall": 1
+   },
+   "degree": {
+    "precision": 1,
+    "recall": 1
+   },
+   "grad_year": {
+    "precision": 1,
+    "recall": 1
+   },
+   "score": {
+    "precision": 1,
+    "recall": 1
+   }
+  },
+  "bySegment": {
+   "fresher": {
+    "skills": {
+     "precision": 0.979,
+     "recall": 0.934
+    },
+    "projects": {
+     "precision": 1,
+     "recall": 1
+    },
+    "publications": {
+     "precision": 1,
+     "recall": 0.833
+    },
+    "achievements": {
+     "precision": 1,
+     "recall": 1
+    },
+    "certifications": {
+     "precision": 1,
+     "recall": 1
+    },
+    "employer": {
+     "precision": 1,
+     "recall": 1
+    },
+    "title": {
+     "precision": 1,
+     "recall": 1
+    },
+    "dates": {
+     "precision": 1,
+     "recall": 1
+    },
+    "kind": {
+     "precision": 1,
+     "recall": 1
+    },
+    "institution": {
+     "precision": 1,
+     "recall": 1
+    },
+    "degree": {
+     "precision": 1,
+     "recall": 1
+    },
+    "grad_year": {
+     "precision": 1,
+     "recall": 1
+    },
+    "score": {
+     "precision": 1,
+     "recall": 1
+    }
+   }
+  }
+ }
+}
