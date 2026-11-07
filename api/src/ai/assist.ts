@@ -1,6 +1,7 @@
 import type { Pool } from "pg";
 import type { Vault } from "../vault.js";
 import { stripContacts, type Line } from "./contacts.js";
+import { tailoring, type Alignment, type JobSkills } from "./evidence.js";
 import {
   matchBlock,
   tailorBlock,
@@ -10,7 +11,7 @@ import {
 } from "./gateway.js";
 import { proseNamesOnly, type Explanation } from "./match.js";
 import type { Profile } from "./profile.js";
-import { gate, type Suggestion } from "./tailor.js";
+import { gate } from "./tailor.js";
 
 /**
  * P5's LLM features, run inside aiworker (it owns the only LLM client). Both put a gate between
@@ -88,48 +89,76 @@ export async function explainProse(
     : { outcome: "gated", prose: null, extra: g.extra };
 }
 
+export interface ShownLine {
+  n: number;
+  text: string;
+}
 export interface TailorResult {
   outcome: Outcome | "no_profile" | "no_resume";
-  suggestions: Suggestion[];
-  proposed: number; // what the model returned, before the gate
-  dropped: Array<{ line: number; why: string }>; // never the text: only where and why
+  evidence: Array<{ skill: string; lines: Array<ShownLine & { reason: string | null }> }>;
+  notShown: string[];
+  alignments: Alignment[];
+  emphasis: { top: ShownLine[]; addMetric: ShownLine[] };
+  reasons: { proposed: number; kept: number; dropped: Array<{ line: number; why: string }>; outcome: Outcome | "none" };
 }
 
-export async function tailorFor(
-  gw: Gateway,
-  pool: Pool,
-  vault: Vault,
-  userId: string,
-  job: JobFacts,
-): Promise<TailorResult> {
+const empty = (outcome: TailorResult["outcome"]): TailorResult => ({
+  outcome,
+  evidence: [],
+  notShown: [],
+  alignments: [],
+  emphasis: { top: [], addMetric: [] },
+  reasons: { proposed: 0, kept: 0, dropped: [], outcome: "none" },
+});
+
+export async function tailorFor(gw: Gateway, pool: Pool, vault: Vault, userId: string, job: JobSkills): Promise<TailorResult> {
   const c = await latestConfirmed(pool, vault, userId);
-  if (!c)
-    return { outcome: "no_profile", suggestions: [], proposed: 0, dropped: [] };
-  const raw = c.resumeId
-    ? await resumeLines(pool, vault, userId, c.resumeId)
-    : null;
-  if (!raw)
-    return { outcome: "no_resume", suggestions: [], proposed: 0, dropped: [] };
+  if (!c) return empty("no_profile");
+  const raw = c.resumeId ? await resumeLines(pool, vault, userId, c.resumeId) : null;
+  if (!raw) return empty("no_resume");
   return tailorLines(gw, userId, raw, c.profile, job);
 }
 
-/** Contacts are stripped before the model sees the lines, and the gate checks the same lines. */
-export async function tailorLines(
-  gw: Gateway,
-  userId: string,
-  raw: Line[],
-  profile: Profile,
-  job: JobFacts,
-): Promise<TailorResult> {
+/**
+ * The three grounded outputs come from code (evidence.ts). The model only adds a reason per
+ * skill-to-line mapping; each reason must be about a pair the code found and pass the grounding
+ * gate against its own line, or it is dropped. At a cap or on failure, the outputs stand without
+ * reasons. Contacts are stripped first, and only those lines are shown or sent.
+ */
+export async function tailorLines(gw: Gateway, userId: string, raw: Line[], profile: Profile, job: JobSkills): Promise<TailorResult> {
   const lines = stripContacts(raw).lines;
-  const r = await gw.tailor(userId, tailorBlock(lines, profile, job));
-  if (r.outcome !== "ok" || !r.suggestions)
-    return { outcome: r.outcome, suggestions: [], proposed: 0, dropped: [] };
-  const g = gate(r.suggestions, lines, profile);
+  const t = tailoring(lines, job);
+  const text = new Map(lines.map((l) => [l.n, l.text]));
+  const shown = (n: number): ShownLine => ({ n, text: text.get(n) ?? "" });
+  const pairs = t.evidence.flatMap((e) => e.lines.map((line) => ({ skill: e.skill, line })));
+  const reasons = new Map<string, string>();
+  const stats: TailorResult["reasons"] = { proposed: 0, kept: 0, dropped: [], outcome: "none" };
+  if (pairs.length > 0) {
+    const r = await gw.tailor(userId, tailorBlock(lines, pairs));
+    stats.outcome = r.outcome;
+    const found = new Set(pairs.map((x) => `${x.skill}|${x.line}`));
+    for (const x of r.reasons ?? []) {
+      stats.proposed++;
+      const key = `${x.skill}|${x.line}`;
+      if (!found.has(key) || reasons.has(key)) {
+        stats.dropped.push({ line: x.line, why: "not a pair the program found" });
+        continue;
+      }
+      const g = gate([{ line: x.line, rewrite: x.reason, reason: "" }], lines, profile);
+      const d = g.dropped[0];
+      if (d) stats.dropped.push({ line: x.line, why: d.why });
+      else {
+        reasons.set(key, x.reason);
+        stats.kept++;
+      }
+    }
+  }
   return {
     outcome: "ok",
-    suggestions: g.kept,
-    proposed: r.suggestions.length,
-    dropped: g.dropped.map((d) => ({ line: d.suggestion.line, why: d.why })),
+    evidence: t.evidence.map((e) => ({ skill: e.skill, lines: e.lines.map((n) => ({ ...shown(n), reason: reasons.get(`${e.skill}|${n}`) ?? null })) })),
+    notShown: t.notShown,
+    alignments: t.alignments,
+    emphasis: { top: t.emphasis.top.map(shown), addMetric: t.emphasis.addMetric.map(shown) },
+    reasons: stats,
   };
 }

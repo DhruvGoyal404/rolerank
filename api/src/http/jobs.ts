@@ -3,6 +3,7 @@ import type { Redis } from "iovalkey";
 import type { Pool } from "pg";
 import { RateLimiterRedis } from "rate-limiter-flexible";
 import { latestConfirmed } from "../ai/assist.js";
+import { formsIn } from "../ai/evidence.js";
 import type { JobFacts } from "../ai/gateway.js";
 import {
   analyseJD,
@@ -37,6 +38,7 @@ interface Posting {
   closed_at: Date | null;
   skills_required: string[];
   skills_nice: string[];
+  body: string; // read only for the job's own skill wording; never sent or returned
 }
 
 export function mountJobs(
@@ -128,10 +130,15 @@ export function mountJobs(
       res.status(409).json({ error: "confirm_profile_first" });
       return;
     }
-    // Only gated suggestions leave; the deterministic missing list says what the resume lacks.
+    // Grounded outputs only: evidence (with gated reasons), what isn't shown, alias swaps and
+    // emphasis. Why a reason was dropped stays in aiworker's counts, not in the response.
     res.json({
       outcome: r.outcome,
-      suggestions: r.suggestions,
+      evidence: r.evidence,
+      notShown: r.notShown,
+      alignments: r.alignments,
+      emphasis: r.emphasis,
+      reasons: { kept: r.reasons.kept, dropped: r.reasons.dropped.length, outcome: r.reasons.outcome },
       missing: e.missing,
     });
   };
@@ -172,7 +179,7 @@ export function mountJobs(
         await tailorReply(
           res,
           byUser(req),
-          { title: jdTitle(text), required: a.required, nice: a.nice },
+          { title: jdTitle(text), required: a.required, nice: a.nice, forms: formsIn(text) },
           a,
         );
       })().catch(next);
@@ -193,7 +200,7 @@ export function mountJobs(
     }
     const { rows } = await corpus.query<Posting>(
       `SELECT p.id::text AS id, p.title, p.company, p.location_raw, p.level, p.url, p.apply_url, p.excerpt, s.name AS source,
-              p.closed_at, p.skills_required, p.skills_nice
+              p.closed_at, p.skills_required, p.skills_nice, p.body
        FROM postings p JOIN sources s ON s.id = p.source_id WHERE p.id = $1`,
       [key],
     );
@@ -205,6 +212,7 @@ export function mountJobs(
     title: p.title,
     required: p.skills_required,
     nice: p.skills_nice,
+    forms: formsIn(p.body),
   });
   const explained = (
     p: Posting,

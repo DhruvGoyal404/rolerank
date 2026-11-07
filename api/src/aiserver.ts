@@ -21,7 +21,7 @@ import type { Vault } from "./vault.js";
  */
 const skills = z.array(z.string().max(80)).max(200);
 const Job = z
-  .object({ title: z.string().max(400), required: skills, nice: skills })
+  .object({ title: z.string().max(400), required: skills, nice: skills, forms: z.record(z.string().max(80), z.string().max(80)).optional() })
   .strict();
 const UserId = z.uuid();
 const ExplainIn = z
@@ -101,8 +101,8 @@ export function createAiServer(d: {
         d.log.info({
           event: "tailor",
           outcome: r.outcome,
-          count: r.suggestions.length,
-          dropped: r.dropped.length,
+          count: r.evidence.length,
+          dropped: r.reasons.dropped.length,
           ms: Date.now() - started,
         });
         res.json(r);

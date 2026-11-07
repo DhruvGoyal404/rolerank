@@ -66,9 +66,16 @@ export class Taxonomy {
 
   /** Canonical skills in text, in order of first appearance, longest match first. */
   find(text: string): string[] {
+    return [...new Set(this.spans(text).map((m) => m.name))];
+  }
+
+  /**
+   * Every match with where it sits in text and how text writes it ("Postgres" for PostgreSQL), in
+   * order. find() is its distinct names; this is what an alias swap needs.
+   */
+  spans(text: string): Array<{ name: string; start: number; end: number; surface: string }> {
     const { words, spans } = tokenSpans(text);
-    const out: string[] = [];
-    const seen = new Set<string>();
+    const out: Array<{ name: string; start: number; end: number; surface: string }> = [];
     for (let i = 0; i < words.length; ) {
       let matched = 0;
       for (let n = Math.min(this.longest, words.length - i); n > 0 && matched === 0; n--) {
@@ -80,10 +87,9 @@ export class Taxonomy {
         name ??= this.insensitive.get(key.toLowerCase());
         if (name !== undefined) {
           matched = n;
-          if (!seen.has(name)) {
-            seen.add(name);
-            out.push(name);
-          }
+          const start = span?.[0] ?? 0;
+          const end = spans[i + n - 1]?.[1] ?? start;
+          out.push({ name, start, end, surface: text.slice(start, end) });
         }
       }
       i += Math.max(matched, 1);
