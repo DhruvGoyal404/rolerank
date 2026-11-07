@@ -48,6 +48,8 @@ const TailorIn = z.object({ userId: UserId, job: Job }).strict();
 
 export function createAiServer(d: {
   token: string;
+  /** Model-written reasons on tailoring evidence: off in v1 (PHASE5.md). */
+  reasons?: boolean;
   gateway: Gateway;
   pool: Pool;
   vault: Vault;
@@ -96,7 +98,7 @@ export function createAiServer(d: {
       return;
     }
     const started = Date.now();
-    tailorFor(d.gateway, d.pool, d.vault, body.data.userId, body.data.job)
+    tailorFor(d.gateway, d.pool, d.vault, body.data.userId, body.data.job, { reasons: d.reasons ?? false })
       .then((r: TailorResult) => {
         d.log.info({
           event: "tailor",

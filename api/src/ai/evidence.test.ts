@@ -61,8 +61,18 @@ describe("tailoring: evidence, alignment, emphasis", () => {
     expect(t.emphasis.addMetric).toEqual([3]); // line 1's number is on its second line
     expect(t.evidence).toEqual([
       { skill: "React", lines: [1] },
-      { skill: "Redis", lines: [4] },
+      { skill: "Redis", lines: [3] }, // the bullet, named by its first line
     ]);
+  });
+
+  it("finds a skill whose name is split by the wrap", () => {
+    const wrapped = [
+      { n: 1, text: "- Built REST endpoints in Spring Boot for the loan flow and wrote the integration" },
+      { n: 2, text: "tests that run on every merge" },
+    ];
+    const t = tailoring(wrapped, { required: ["Integration Testing"], nice: [] });
+    expect(t.evidence).toEqual([{ skill: "Integration Testing", lines: [1] }]);
+    expect(t.notShown).toEqual([]);
   });
 
   it("finds nothing to say for a job the resume doesn't fit", () => {

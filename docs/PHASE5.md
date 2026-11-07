@@ -15,10 +15,20 @@
     prose passes the gate, two or three sentences of prose.
   - Prose naming any skill outside the matched, missing and nice lists is withheld, not shown.
   - At a spend cap, or without aiworker, the deterministic explanation stands alone.
-- **Tailoring.**
-  - `POST /api/jobs/:key/tailor` returns rewrites of the user's own resume lines.
-  - Every suggestion passes the grounding gate first, and the response lists what the resume
-    lacks.
+- **Tailoring, as grounded outputs** (the owner's re-scope, 2026-11-08; free rewriting is
+  superseded, below). `POST /api/jobs/:key/tailor` and `POST /api/jd/tailor` return three things,
+  all computed in code from the resume's own lines and the taxonomy (`evidence.ts`):
+  - **Evidence map:** for each skill the job requires, the bullets that name it, or "not shown in
+    your resume".
+  - **Terminology alignment:** a bullet naming a skill by a different taxonomy alias than the job
+    does ("Postgres" where the job says "PostgreSQL") gets that one swap, and nothing else in the
+    bullet changes. The job's own wording comes from the pasted JD or the posting's body, read
+    server-side.
+  - **Emphasis:** the three bullets most relevant to the job, to put first, and a prompt to add a
+    number to a relevant bullet that has none, if the user has one. A number is never suggested.
+  - The unit is the whole bullet: a PDF bullet that wraps onto a second line is rejoined.
+  - The model may add a short reason per skill-to-bullet pair, gated like a suggestion. That is
+    **off in v1** (below).
 - **Where the model runs.**
   - aiworker keeps the only LLM client and serves `POST /explain` and `POST /tailor` to the API
     over an internal endpoint with a shared token.
@@ -27,7 +37,8 @@
     instructions have no path to it, and link-only text stays on the server.
 - **Tests.** `api/test/jobs.int.test.ts` runs the API, aiworker's endpoint and a fake model on
   isolated databases. It proves:
-  - a suggestion that fails the gate never reaches the response;
+  - a reason that fails the gate, or is about a pair the code didn't find, never reaches the
+    response;
   - gated prose is withheld;
   - a pasted JD writes no row anywhere;
   - JD text and job bodies never reach the model, and contacts are stripped first;
@@ -53,6 +64,11 @@ Sonnet 5.5.
 
 The p95 is for the whole answer, unstreamed; that already meets the streaming-start target of
 1 s for the deterministic part, which needs no model.
+
+### Superseded: free rewriting
+
+Kept as the record of what failed. The owner replaced free rewriting with grounded outputs after
+these results (2026-11-08).
 
 **Tailoring, first run** (tailor-v1 on D4, 40 cases, committed in `59fc004` before it ran):
 
@@ -97,11 +113,51 @@ whole profile*, as CLAUDE.md words the rule. A skill the user has isn't a skill 
   - D4 is built on D1's synthetic resumes, whose lines are thin ("Built with SQL", "Built and
     maintained services used by internal teams"). There's little to rephrase honestly, so D4
     can't show whether tailoring helps.
-- Not chased, per the lean plan. Next (v1.1):
-  - a D4 built on resumes with real bullet points (the D1-hard-4 layout);
-  - a prompt that rephrases a line around the skills it already names, or says nothing.
 
-**Injection through a JD** (D7-JD, 20 held-out cases, injections in the title or the body):
+### Tailoring as grounded outputs (D4-R, held out)
+
+D4-R: 30 resumes with realistic bullets (multi-clause, stacks, metrics, aliases; a third as PDFs
+whose bullets wrap) and a job each: 24 fit, 6 no-fit. Generator and thresholds were committed in
+`2afc6ad`, the code in `dc4e551`, before the single run. Report:
+`evals/reports/p5-live-d4r+d7jd-evidence-v1-2026-11-07.json`.
+
+| Criterion | Measured | Threshold | Verdict |
+|---|---|---|---|
+| Usefulness: fit cases with 3 or more grounded outputs | 24 of 24 | ≥ 90% | Pass |
+| No-fit cases with nothing claimed | 6 of 6 | 100% | Pass |
+| Evidence precision / recall | 1.000 / 0.986 | ≥ 0.98 / ≥ 0.95 | Pass |
+| "Not shown" right | 0.983 (1 miss) | 1.00 | **Fails** |
+| Invented skill | 1 reported, 0 real (below) | 0 | Pass after correction |
+| Alignment precision / recall | 1.000 / 0.967 (29 swaps) | 1.00 / ≥ 0.90 | Pass |
+| Emphasis picks / number prompts right | 1.000 / 1.000 | 1.00 / 1.00 | Pass |
+| Reasons: pre-gate pass | 0.963 | ≥ 0.90 | Pass |
+| Reasons: unsupported, judge | 11.7% of 77 | ≤ 2% | **Fails** |
+| Mean cost per tailoring run | $0.0002 | within budget | Pass |
+
+What the misses are:
+- **The "invented" skill is a gold error.** The generator chose "REST APIs" as a skill D4R-016
+  lacks, but one of its bullets says "REST". The absence check lowercased the text, and that alias
+  matches only in its own case. Tailoring mapped the skill correctly. The committed gold is left as
+  it was; the generator is fixed for future sets.
+- **The "not shown" miss and most unsupported reasons share a cause: wrapped PDF bullets.**
+  - In D4R-024, "integration / tests" is split across two lines, so line-by-line matching missed
+    it and called the skill not shown.
+  - The model read the whole wrapped bullet and wrote a reason true of the whole bullet, but the
+    reason cited only its first line. That is what the judge, and the gate, compared it with:
+    "per minute", "transactions daily" and "the final model" were all on the second line.
+  - One reason was genuinely inflated ("Pandas used to prepare the data").
+- **The fix, after the run:** the whole bullet is now the unit for evidence, swaps, emphasis and
+  the reason gate, with unit tests for both wrap cases. Because it came from seeing D4-R, it is
+  not re-measured on D4-R.
+- **Reasons are off in v1.** The three outputs met every usefulness threshold without them, and
+  with reasons off the model plays no part in tailoring. They return only after a fresh held-out
+  run on whole bullets passes the 2% bar.
+
+The JD injection cases, re-run on the new tailoring as a regression (in-sample now): 0 canaries,
+0 planted skills, 0 prompt leaks.
+
+**Injection through a JD** (D7-JD, 20 cases, held out on its first run; injections in the title
+or the body):
 0 canaries, 0 planted skills in shown suggestions, 0 prompt leaks. The body never reaches the
 model; titles do, truncated to 120 characters and delimited as data.
 
@@ -109,10 +165,10 @@ model; titles do, truncated to 120 characters and delimited as data.
 
 | Criterion (ROADMAP.md, P4b and P5) | State |
 |---|---|
-| All tailoring thresholds pass; zero invented skills on pressure cases | Zero invented skills: met. The other thresholds fail (above) |
-| A test proves a suggestion failing the gate can't reach the API response | Met (`jobs.int.test.ts`) |
+| All tailoring thresholds pass; zero invented skills on pressure cases | Re-scoped tailoring on D4-R: zero invented skills; usefulness, evidence, alignment and emphasis pass; one "not shown" miss and the reasons fail (reasons are off in v1) |
+| A test proves a suggestion failing the gate can't reach the API response | Met for reasons (`jobs.int.test.ts`) |
 | Pasted JD treated as untrusted (D7 cases) and never joins the index | Met: D7-JD clean; a test shows no row is written |
-| Human audit of 50 suggestions | **Owner**: `evals/labels/d4-audit-tailor-v1.jsonl` (50, judge flags first) and `d4-2-audit-tailor-v2.jsonl` (all 12) |
+| Human audit of suggestions | **Owner**, re-scoped to 32: `evals/labels/d4-audit.jsonl` (20 judge-flagged from tailor-v1, all 12 from tailor-v2). D4-R's judge-flagged reasons are in `evals/labels/d4r-flagged-evidence-v1.jsonl` |
 | Mean cost per tailoring run, within budget | $0.00018 to $0.00020: met |
 | e2e of the whole flow on an isolated DB, axe-checked | Moved to P6: it needs the UI, which P6 builds |
 | All explanation thresholds pass | Met |
@@ -122,7 +178,8 @@ model; titles do, truncated to 120 characters and delimited as data.
 
 **Demo, as far as P5 goes:**
 - A pasted JD demanding Kubernetes returns matched and missing skills. "Kubernetes" is listed
-  as missing, and tailoring never claims it.
+  as not shown; the bullets that prove the other skills are mapped, aliases are aligned and the
+  three strongest bullets are picked.
 - A job's detail comes with its explanation.
 
 The ranked matches list is not an API route yet. The ranker is the Go worker (P3), and P6 decides
@@ -130,9 +187,9 @@ how the UI gets matches.
 
 ## Deviations, recorded
 
-- **The claim judge is Claude Sonnet 5.5**, a different model from the suggester but the same
-  vendor. EVALS.md asks for a different model family; only an Anthropic key is available. The
-  owner's audit covers the gap.
+- **The judge is Claude Sonnet 5.5**, a different model from the Claude Haiku 5.5 it audits but
+  **the same vendor**. EVALS.md asks for a different model family; only an Anthropic key is
+  available. The owner's audit covers the gap.
 - **No streaming.** The whole explanation arrives within 2.1 s at p95, under the 3 s limit.
 - **The D4 run on tailor-v1 crashed once in the eval harness** before computing any metric (Go
   writes an empty nice-to-have list as null). It was fixed and re-run; nothing was seen before.
@@ -142,7 +199,8 @@ how the UI gets matches.
 
 | Item | Next |
 |---|---|
-| Tailoring fails the pre-gate, claim and suggestions-per-case thresholds | v1.1: D4 on richer resumes, then the prompt |
+| Free rewriting failed its thresholds | Superseded by grounded outputs |
+| Reasons on tailoring evidence: 11.7% unsupported on D4-R | Off in v1; a fresh held-out set on whole bullets before turning them on |
 | Owner's audit of tailoring suggestions | Owner |
 | `GET /api/matches` | P6 |
 | e2e and axe for the whole flow | P6 |
@@ -150,4 +208,4 @@ how the UI gets matches.
 
 ## Spend
 
-P5's live runs cost about $0.08 on the model (parse, explanation and tailoring for 120 cases) and $0.11 on the judge.
+P5's live runs cost about $0.10 on the model and $0.19 on the judge.

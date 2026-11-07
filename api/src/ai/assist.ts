@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 import type { Vault } from "../vault.js";
 import { stripContacts, type Line } from "./contacts.js";
-import { tailoring, type Alignment, type JobSkills } from "./evidence.js";
+import { tailoring, units, type Alignment, type JobSkills } from "./evidence.js";
 import {
   matchBlock,
   tailorBlock,
@@ -111,29 +111,41 @@ const empty = (outcome: TailorResult["outcome"]): TailorResult => ({
   reasons: { proposed: 0, kept: 0, dropped: [], outcome: "none" },
 });
 
-export async function tailorFor(gw: Gateway, pool: Pool, vault: Vault, userId: string, job: JobSkills): Promise<TailorResult> {
+export async function tailorFor(gw: Gateway, pool: Pool, vault: Vault, userId: string, job: JobSkills, opts: { reasons: boolean }): Promise<TailorResult> {
   const c = await latestConfirmed(pool, vault, userId);
   if (!c) return empty("no_profile");
   const raw = c.resumeId ? await resumeLines(pool, vault, userId, c.resumeId) : null;
   if (!raw) return empty("no_resume");
-  return tailorLines(gw, userId, raw, c.profile, job);
+  return tailorLines(gw, userId, raw, c.profile, job, opts);
 }
 
 /**
- * The three grounded outputs come from code (evidence.ts). The model only adds a reason per
- * skill-to-line mapping; each reason must be about a pair the code found and pass the grounding
- * gate against its own line, or it is dropped. At a cap or on failure, the outputs stand without
- * reasons. Contacts are stripped first, and only those lines are shown or sent.
+ * The three grounded outputs come from code (evidence.ts), over whole bullets. With reasons on,
+ * the model adds a reason per skill-to-bullet pair; each must be about a pair the code found and
+ * pass the grounding gate against that whole bullet, or it is dropped. At a cap or on failure, the
+ * outputs stand without reasons. Contacts are stripped first, and only those lines are shown or sent.
+ *
+ * Reasons are off in v1: on D4-R 11.7% of shown reasons were unsupported against a 2% bar, mostly
+ * because a reason described a whole wrapped bullet while citing its first line. Bullets are units
+ * now, but that fix is unmeasured; reasons return after a fresh held-out run (PHASE5.md).
  */
-export async function tailorLines(gw: Gateway, userId: string, raw: Line[], profile: Profile, job: JobSkills): Promise<TailorResult> {
+export async function tailorLines(
+  gw: Gateway,
+  userId: string,
+  raw: Line[],
+  profile: Profile,
+  job: JobSkills,
+  opts: { reasons: boolean } = { reasons: false },
+): Promise<TailorResult> {
   const lines = stripContacts(raw).lines;
   const t = tailoring(lines, job);
-  const text = new Map(lines.map((l) => [l.n, l.text]));
+  const bullets = units(lines);
+  const text = new Map(bullets.map((u) => [u.n, u.text]));
   const shown = (n: number): ShownLine => ({ n, text: text.get(n) ?? "" });
   const pairs = t.evidence.flatMap((e) => e.lines.map((line) => ({ skill: e.skill, line })));
   const reasons = new Map<string, string>();
   const stats: TailorResult["reasons"] = { proposed: 0, kept: 0, dropped: [], outcome: "none" };
-  if (pairs.length > 0) {
+  if (opts.reasons && pairs.length > 0) {
     const r = await gw.tailor(userId, tailorBlock(lines, pairs));
     stats.outcome = r.outcome;
     const found = new Set(pairs.map((x) => `${x.skill}|${x.line}`));
@@ -144,7 +156,7 @@ export async function tailorLines(gw: Gateway, userId: string, raw: Line[], prof
         stats.dropped.push({ line: x.line, why: "not a pair the program found" });
         continue;
       }
-      const g = gate([{ line: x.line, rewrite: x.reason, reason: "" }], lines, profile);
+      const g = gate([{ line: x.line, rewrite: x.reason, reason: "" }], bullets, profile);
       const d = g.dropped[0];
       if (d) stats.dropped.push({ line: x.line, why: d.why });
       else {

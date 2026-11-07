@@ -106,7 +106,7 @@ beforeAll(async () => {
     new Anthropic({ apiKey: "k", baseURL: `http://127.0.0.1:${(llm.address() as AddressInfo).port}`, maxRetries: 0 }),
     pool,
   );
-  ai = createAiServer({ token: TOKEN, gateway, pool, vault, log: quiet }).listen(0, "127.0.0.1");
+  ai = createAiServer({ token: TOKEN, gateway, pool, vault, log: quiet, reasons: true }).listen(0, "127.0.0.1");
   await new Promise<void>((ok) => ai.once("listening", ok));
   const config = loadConfig({
     NODE_ENV: "test",

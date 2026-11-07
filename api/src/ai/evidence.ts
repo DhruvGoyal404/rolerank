@@ -68,70 +68,76 @@ export function formsIn(text: string): Record<string, string> {
   return out;
 }
 
+/**
+ * Units: each whole bullet, with the lines a wrapped bullet continues on (no marker of their own,
+ * right after a line that had one), and every other line on its own. A unit is named by its first
+ * line. Matching runs on the joined text, so "integration" + "tests" across a wrap is one skill
+ * (D4-R, 2026-11-08), and a reason is checked against the whole bullet it describes.
+ */
+export function units(lines: Line[]): Array<{ n: number; text: string }> {
+  const visible = lines.filter((l) => !l.hidden && !l.tiny);
+  const out: Array<{ n: number; text: string; open: boolean }> = [];
+  let prev = -1;
+  for (const l of visible) {
+    const last = out.at(-1);
+    if (last?.open && l.n === prev + 1 && !BULLET.test(l.text) && !isList(l.text)) last.text += ` ${l.text.trim()}`;
+    else out.push({ n: l.n, text: l.text, open: BULLET.test(l.text) });
+    prev = l.n;
+  }
+  return out.map(({ n, text }) => ({ n, text }));
+}
+
 export function tailoring(lines: Line[], job: JobSkills): Tailoring {
   const t = taxonomy();
   const required = canonical(job.required);
   const nice = canonical(job.nice).filter((s) => !required.includes(s));
-  const visible = lines
-    .filter((l) => !l.hidden && !l.tiny)
-    .map((l) => {
-      const spans = t.spans(l.text);
-      return { ...l, spans, names: new Set(spans.map((s) => s.name)), list: isList(l.text) };
-    });
+  const all = units(lines).map((u) => {
+    const spans = t.spans(u.text);
+    return { ...u, spans, names: new Set(spans.map((s) => s.name)), list: isList(u.text) };
+  });
 
   const evidence: Evidence[] = [];
   const notShown: string[] = [];
   for (const skill of required) {
-    const hits = visible.filter((l) => l.names.has(skill));
+    const hits = all.filter((u) => u.names.has(skill));
     if (hits.length === 0) notShown.push(skill);
     else
       evidence.push({
         skill,
-        lines: [...hits.filter((l) => !l.list), ...hits.filter((l) => l.list)].slice(0, MAX_LINES_PER_SKILL).map((l) => l.n),
+        lines: [...hits.filter((u) => !u.list), ...hits.filter((u) => u.list)].slice(0, MAX_LINES_PER_SKILL).map((u) => u.n),
       });
   }
 
-  // One swap per (line, skill): the line's own words for that skill become the job's.
+  // One swap per (unit, skill): the unit's own words for that skill become the job's.
   const alignments: Alignment[] = [];
   const wanted = new Set([...required, ...nice]);
-  for (const l of visible) {
+  for (const u of all) {
     const done = new Set<string>();
-    for (const m of l.spans) {
+    for (const m of u.spans) {
       if (!wanted.has(m.name) || done.has(m.name)) continue;
       const to = job.forms?.[m.name] ?? m.name;
       if (m.surface.toLowerCase() === to.toLowerCase()) continue;
       done.add(m.name);
-      alignments.push({ line: l.n, from: m.surface, to, rewrite: l.text.slice(0, m.start) + to + l.text.slice(m.end) });
+      alignments.push({ line: u.n, from: m.surface, to, rewrite: u.text.slice(0, m.start) + to + u.text.slice(m.end) });
     }
   }
 
-  let lastLine = -1;
-  // Whole bullets: a line that continues a wrapped bullet (no marker of its own, after a line that
-  // had one) belongs to it, so its skills and numbers count for the bullet, named by its first line.
-  const bullets: Array<{ n: number; text: string; names: Set<string> }> = [];
-  for (const l of visible) {
-    const last = bullets.at(-1);
-    if (last && !BULLET.test(l.text) && !l.list && BULLET.test(visible.find((v) => v.n === last.n)?.text ?? "") && l.n === lastLine + 1) {
-      last.text += ` ${l.text}`;
-      for (const s of l.names) last.names.add(s);
-    } else if (!l.list && l.text.length >= 30) bullets.push({ n: l.n, text: l.text, names: new Set(l.names) });
-    lastLine = l.n;
-  }
-  // Ranked by the job's skills they name: required ones count double.
-  const scored = bullets
-    .map((b) => ({ b, score: 2 * required.filter((s) => b.names.has(s)).length + nice.filter((s) => b.names.has(s)).length }))
+  // Bullets, not lists or short headings, ranked by the job's skills they name: required count double.
+  const scored = all
+    .filter((u) => !u.list && u.text.length >= 30)
+    .map((u) => ({ u, score: 2 * required.filter((s) => u.names.has(s)).length + nice.filter((s) => u.names.has(s)).length }))
     .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || a.b.n - b.b.n);
+    .sort((a, b) => b.score - a.score || a.u.n - b.u.n);
   return {
     evidence,
     notShown,
     alignments,
     emphasis: {
-      top: scored.slice(0, TOP).map((x) => x.b.n),
+      top: scored.slice(0, TOP).map((x) => x.u.n),
       addMetric: scored
-        .filter((x) => !/\d/.test(x.b.text))
+        .filter((x) => !/\d/.test(x.u.text))
         .slice(0, MAX_METRIC_PROMPTS)
-        .map((x) => x.b.n),
+        .map((x) => x.u.n),
     },
   };
 }

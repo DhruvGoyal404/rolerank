@@ -137,7 +137,9 @@ func generateD4R(dir string) {
 			}
 		}
 		slices.Sort(have)
-		text := strings.ToLower(strings.Join(lineTexts(c.Lines), "\n"))
+		// Not lowercased: some aliases match only in their own case ("REST"). D4-R as committed
+		// had this bug, and one case (D4R-016) lists "REST APIs" as absent though a bullet says REST.
+		text := strings.Join(lineTexts(c.Lines), "\n")
 		absent := func(s string) bool { return len(t.Find(text+" "+s)) > len(t.Find(text)) }
 		c.JDForms = map[string]string{}
 		if i%5 == 4 {
