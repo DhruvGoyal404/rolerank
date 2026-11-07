@@ -9,7 +9,6 @@ daily scheduled run catches a lapse when nothing was pushed.
 
 | Ecosystem | Package | Version | Published | Advisory | Recorded | Expires |
 |---|---|---|---|---|---|---|
-| npm | body-parser | 2.4.0 | 2026-10-22 | GHSA-27r3-jxmh-p828 | 2026-10-31 | 2026-11-05 |
 | npm | minimatch | 11.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
 | npm | @isaacs/nonrecursive-glob-match | 1.0.3 | 2026-10-28 | GHSA-g3hv-75wg-m249 | 2026-10-31 | 2026-11-11 |
 | go | golang.org/x/net | v0.62.0 | 2026-10-27 | GO-2026-6866, GO-2026-6860 | 2026-10-31 | 2026-11-10 |
