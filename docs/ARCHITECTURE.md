@@ -247,6 +247,11 @@ corpus doesn't need its scale.
 
 ## LLM gateway
 
+Since P5, the API reaches the gateway through aiworker's internal endpoint (`POST /explain`,
+`POST /tailor` on `AIWORKER_ADDR`, bearer `AIWORKER_TOKEN`), as aiworker reaches the extractor.
+The API sends a user id and job facts; aiworker reads that user's own rows. Explanations and
+tailoring never see job text: only the job's title and the skills the taxonomy found in it.
+
 One module in `aiworker`, used for parse, explain and tailor.
 
 - **Inputs** are delimited data blocks, after a system prompt that says the blocks are
@@ -338,7 +343,8 @@ the caller return 404.
 | `GET /api/jobs/:key` | Posting detail, attribution | |
 | `POST /api/jobs/:key/explain` | LLM explanation (streams) | Ledger + 30/day |
 | `POST /api/jobs/:key/tailor` | Tailoring suggestions | Ledger + 10/day |
-| `POST /api/jd` | Bring a JD: analyse pasted text (<= 20 KB) | Ledger + 20/day |
+| `POST /api/jd` | Bring a JD: analyse pasted text (<= 20 KB), deterministic, nothing stored | 20/day |
+| `POST /api/jd/explain`, `POST /api/jd/tailor` | The LLM features on a pasted JD | Ledger + 30/day, + 10/day |
 | `GET /api/gaps?profile=` | Skill-gap analysis | |
 | `GET/POST/PATCH/DELETE /api/tracker[/:id]` | Tracker | |
 | `GET/PUT /api/alerts` | Alert settings | |

@@ -1,0 +1,72 @@
+{
+ "at": "2026-11-07T18:39:57.731Z",
+ "model": "claude-haiku-5-5",
+ "prompts": {
+  "parse": "parse-v7",
+  "explain": "explain-v1",
+  "tailor": "tailor-v2"
+ },
+ "judge": "claude-sonnet-5-5",
+ "d4": {
+  "set": "d4-2",
+  "cases": 40,
+  "parsed": 40,
+  "explanation": {
+   "matchedPrecision": 1,
+   "missingPrecision": 1,
+   "prose": {
+    "ok": 35,
+    "gated": 5,
+    "other": 0
+   },
+   "p50Ms": 1492,
+   "p95Ms": 2086
+  },
+  "tailoring": {
+   "proposed": 38,
+   "kept": 12,
+   "inventedOnPressure": 0,
+   "pressureDropped": 2,
+   "fitCases": 32,
+   "fitWith3": 0,
+   "nofitCases": 8,
+   "nofitEmpty": 8,
+   "failed": 0,
+   "preGatePassRate": 0.3157894736842105,
+   "droppedBy": {
+    "technology": 15,
+    "number": 1,
+    "name": 10
+   },
+   "judged": 12,
+   "unsupportedRate": 0.08333333333333333,
+   "inflatedRate": 0.08333333333333333,
+   "judgeUsd": 0.023176
+  },
+  "costByTask": {
+   "parse": {
+    "calls": 40,
+    "meanUsd": 0.00047722499999999996
+   },
+   "tailor": {
+    "calls": 40,
+    "meanUsd": 0.00018085
+   },
+   "explain": {
+    "calls": 40,
+    "meanUsd": 0.000107675
+   }
+  },
+  "worst": [
+   {
+    "case": "D42-022",
+    "source": "- Built and maintained services used by internal teams",
+    "rewrite": "- Built and maintained services used by internal teams at Paytm, supporting internal users across the organization",
+    "reason": "The line's existing claim is kept; wording is clarified but no skill from the job's list is added, since line 8 names no technology.",
+    "supported": false,
+    "inflated": true,
+    "note": "Paytm as employer is confirmed in the facts, but \"across the organization\" expands the scope beyond \"internal teams\" in the source, implying organization-wide reach the source doesn't state."
+   }
+  ]
+ }
+}
