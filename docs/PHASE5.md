@@ -168,7 +168,7 @@ model; titles do, truncated to 120 characters and delimited as data.
 | All tailoring thresholds pass; zero invented skills on pressure cases | Re-scoped tailoring on D4-R: zero invented skills; usefulness, evidence, alignment and emphasis pass; one "not shown" miss and the reasons fail (reasons are off in v1) |
 | A test proves a suggestion failing the gate can't reach the API response | Met for reasons (`jobs.int.test.ts`) |
 | Pasted JD treated as untrusted (D7 cases) and never joins the index | Met: D7-JD clean; a test shows no row is written |
-| Human audit of suggestions | **Owner**, re-scoped to 32: `evals/labels/d4-audit.jsonl` (20 judge-flagged from tailor-v1, all 12 from tailor-v2). D4-R's judge-flagged reasons are in `evals/labels/d4r-flagged-evidence-v1.jsonl` |
+| Human audit of suggestions | **Not needed (superseded)**, by the owner's decision (2026-11-08): it would audit the free-rewriting path, which is gone, and model reasons are off in v1. Turning reasons on later needs a fresh held-out run and a small audit then. The file `evals/labels/d4-audit.jsonl` stays as a record |
 | Mean cost per tailoring run, within budget | $0.00018 to $0.00020: met |
 | e2e of the whole flow on an isolated DB, axe-checked | Moved to P6: it needs the UI, which P6 builds |
 | All explanation thresholds pass | Met |
@@ -201,7 +201,6 @@ how the UI gets matches.
 |---|---|
 | Free rewriting failed its thresholds | Superseded by grounded outputs |
 | Reasons on tailoring evidence: 11.7% unsupported on D4-R | Off in v1; a fresh held-out set on whole bullets before turning them on |
-| Owner's audit of tailoring suggestions | Owner |
 | `GET /api/matches` | P6 |
 | e2e and axe for the whole flow | P6 |
 | A fresh held-out injection set (resumes and JDs) | Before public signup (QUESTIONS.md) |
