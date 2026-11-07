@@ -12,6 +12,7 @@ import {
   type Level,
 } from "../ai/match.js";
 import type { AiClient } from "../aiserver.js";
+import { rankQuery, type Ranker } from "../ranker.js";
 import type { Vault } from "../vault.js";
 import { rateLimit, requireUser } from "./middleware.js";
 
@@ -43,7 +44,7 @@ interface Posting {
 
 export function mountJobs(
   app: Express,
-  d: { pool: Pool; valkey: Redis; vault: Vault; corpus?: Pool; ai?: AiClient },
+  d: { pool: Pool; valkey: Redis; vault: Vault; corpus?: Pool; ai?: AiClient; ranker?: Ranker },
 ): void {
   const { pool, vault } = d;
   const limiter = (name: string, points: number) =>
@@ -240,6 +241,39 @@ export function mountJobs(
     source: p.source,
     closed: p.closed_at !== null,
   });
+
+  // Ranked matches for the confirmed profile, each with its deterministic explanation and fit
+  // band (never a percentage). Postings are read as corpus_ro; their bodies never leave.
+  const ranker = d.ranker;
+  if (ranker) {
+    const matchLimit = new RateLimiterRedis({ storeClient: d.valkey, keyPrefix: "rl:matches:m", points: 60, duration: 60 });
+    app.get("/api/matches", requireUser, rateLimit(matchLimit, byUser), (req, res, next) => {
+      (async () => {
+        const c = await profileFor(res, byUser(req));
+        if (!c) return;
+        const country = typeof req.query.country === "string" && /^[A-Z]{2}$/.test(req.query.country) ? req.query.country : "IN";
+        const remote = req.query.remote !== "0";
+        const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 50);
+        const hits = await ranker.search(rankQuery(c.profile, { country, remote, limit }));
+        if (!hits) {
+          res.status(503).json({ error: "search_unavailable" });
+          return;
+        }
+        const { rows } = await corpus.query<Posting>(
+          `SELECT p.id::text AS id, p.title, p.company, p.location_raw, p.level, p.url, p.apply_url, p.excerpt, s.name AS source,
+                  p.closed_at, p.skills_required, p.skills_nice, '' AS body
+           FROM postings p JOIN sources s ON s.id = p.source_id WHERE p.id = ANY($1::bigint[])`,
+          [hits.map((h) => h.id)],
+        );
+        const byId = new Map(rows.map((r) => [r.id, r]));
+        const matches = hits.flatMap((h) => {
+          const p = byId.get(String(h.id));
+          return p ? [{ job: card(p), band: h.band, explanation: explained(p, c.profile) }] : [];
+        });
+        res.json({ matches, country, remote });
+      })().catch(next);
+    });
+  }
 
   app.get("/api/jobs/:key", requireUser, (req, res, next) => {
     (async () => {

@@ -11,6 +11,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { Gateway } from "../src/ai/gateway.js";
 import type { Profile } from "../src/ai/profile.js";
 import { aiClient, createAiServer } from "../src/aiserver.js";
+import type { RankQuery, Ranker } from "../src/ranker.js";
 import { githubProvider, googleProvider } from "../src/auth/providers.js";
 import { loadConfig } from "../src/config.js";
 import { createApp } from "../src/http/app.js";
@@ -36,6 +37,15 @@ let vault: Vault;
 let llm: Server;
 let ai: Server;
 let replies: string[];
+// The fake ranker: records what search was asked, answers with the seeded posting.
+const rankAsked: RankQuery[] = [];
+let rankDown = false;
+const ranker: Ranker = {
+  search: (q) => {
+    rankAsked.push(q);
+    return Promise.resolve(rankDown ? null : [{ id: Number(jobKey), band: "Strong" }, { id: 999999, band: "Good" }]);
+  },
+};
 let sent: string[];
 let jobKey: string;
 
@@ -126,6 +136,7 @@ beforeAll(async () => {
     vault,
     corpus,
     ai: aiClient(`http://127.0.0.1:${(ai.address() as AddressInfo).port}`, TOKEN),
+    ranker,
     log: quiet,
     providers: { google: googleProvider(config.google), github: githubProvider(config.github) },
   });
@@ -207,6 +218,31 @@ describe("Bring a JD", () => {
     expect(out).not.toContain("Ignore all previous");
     expect(out).not.toContain("asha@example.com"); // contacts stripped before tailoring
     expect(out).toContain("Python: L2"); // the pairs the program found, nothing of the JD
+  });
+});
+
+describe("matches", () => {
+  it("ranks for the confirmed profile, with a band and an explanation, and never sends resume text", async () => {
+    const { agent } = await user("m1");
+    rankAsked.length = 0;
+    const res = await agent.get("/api/matches?limit=5").expect(200);
+    const body = res.body as { matches: Array<{ job: { key: string; title: string }; band: string; explanation: { missing: string[] } }> };
+    expect(body.matches).toHaveLength(1); // a hit with no posting is skipped
+    expect(body.matches[0]).toMatchObject({ job: { key: jobKey, title: "Backend Engineer" }, band: "Strong", explanation: { missing: ["Kubernetes"] } });
+    expect(JSON.stringify(body)).not.toContain(BODY_CANARY);
+    expect(rankAsked[0]).toMatchObject({ level: "entry", country: "IN", remote: true, limit: 5 });
+    expect(JSON.stringify(rankAsked[0])).not.toContain("asha@example.com");
+    expect(JSON.stringify(rankAsked[0])).not.toContain("Software Engineer Intern, Acme Corp:"); // no resume lines
+  });
+
+  it("needs a confirmed profile, and says when search is down", async () => {
+    const { agent: draft } = await user("m2", false);
+    await draft.get("/api/matches").expect(409);
+    const { agent } = await user("m3");
+    rankDown = true;
+    await agent.get("/api/matches").expect(503);
+    rankDown = false;
+    await request(app).get("/api/matches").expect(401);
   });
 });
 

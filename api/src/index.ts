@@ -3,6 +3,7 @@ import pg from "pg";
 import { githubProvider, googleProvider } from "./auth/providers.js";
 import { loadConfig } from "./config.js";
 import { aiClient } from "./aiserver.js";
+import { rankerClient } from "./ranker.js";
 import { createApp } from "./http/app.js";
 import { createLog } from "./log.js";
 import { Vault } from "./vault.js";
@@ -29,6 +30,7 @@ try {
     ...(config.kek ? { vault: new Vault(config.kek.key, config.kek.version) } : {}),
     ...(corpus ? { corpus } : {}),
     ...(config.aiworker ? { ai: aiClient(config.aiworker.url, config.aiworker.token) } : {}),
+    ...(config.ranker ? { ranker: rankerClient(config.ranker.url, config.ranker.token) } : {}),
   });
   const server = app.listen(config.port, "0.0.0.0", () => {
     log.info({ event: "listening", status: config.port });

@@ -100,6 +100,34 @@ services:
       - gocache:/root/.cache/go-build
       - gomod:/go/pkg/mod
 
+  # P6: job search for the API (worker/cmd/ranker). It embeds profile text, so it runs where ONNX
+  # Runtime is, like embed. Opt in: docker compose --profile ranker up -d ranker
+  ranker:
+    image: golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+    labels: *labels
+    profiles: ["ranker"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /src/worker
+    command: go run -tags onnx ./cmd/ranker
+    environment:
+      CGO_ENABLED: "1"
+      GOFLAGS: -buildvcs=false
+      GOTOOLCHAIN: auto
+      ROLERANK_CORPUS_URL: postgres://corpus_ro:${ROLERANK_PW_CORPUS_RO:?set in .env}@postgres:5432/corpus?sslmode=disable
+      ROLERANK_ORT_LIB: /models/onnxruntime/onnxruntime-linux-x64-1.31.0/lib/libonnxruntime.so.1.31.0
+      ROLERANK_EMBED_MODEL: /models/bge-small-en-v1.5/model.onnx
+      ROLERANK_RANKER_TOKEN: ${ROLERANK_RANKER_TOKEN:-}
+      ROLERANK_RANKER_ADDR: 0.0.0.0:8094
+    ports:
+      - "127.0.0.1:8094:8094"
+    volumes:
+      - ./worker:/src/worker:ro
+      - ./models:/models:ro
+      - gocache:/root/.cache/go-build
+      - gomod:/go/pkg/mod
+
 volumes:
   pg:
     labels: *labels

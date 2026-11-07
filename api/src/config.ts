@@ -25,6 +25,9 @@ const schema = z.object({
   CORPUS_DATABASE_URL: z.string().min(1).optional(),
   AIWORKER_URL: z.url().optional(),
   AIWORKER_TOKEN: z.string().min(32).optional(),
+  // P6: ranked matches come from the ranker service.
+  RANKER_URL: z.url().optional(),
+  RANKER_TOKEN: z.string().min(32).optional(),
 });
 
 export interface Config {
@@ -42,6 +45,7 @@ export interface Config {
   /** Job routes exist only with the corpus; LLM features only with aiworker. */
   corpusDatabaseUrl: string | null;
   aiworker: { url: string; token: string } | null;
+  ranker: { url: string; token: string } | null;
 }
 
 function databaseName(url: string): string {
@@ -68,6 +72,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     throw new Error("NODE_ENV=test needs a corpus database whose name ends in _test");
   }
   if (Boolean(c.AIWORKER_URL) !== Boolean(c.AIWORKER_TOKEN)) throw new Error("AIWORKER_URL and AIWORKER_TOKEN go together");
+  if (Boolean(c.RANKER_URL) !== Boolean(c.RANKER_TOKEN)) throw new Error("RANKER_URL and RANKER_TOKEN go together");
   const kek = c.ROLERANK_KEK ? Buffer.from(c.ROLERANK_KEK, "base64") : null;
   if (kek && kek.length !== 32) throw new Error("ROLERANK_KEK must be 32 bytes, base64");
   if (!kek && c.NODE_ENV === "production") throw new Error("ROLERANK_KEK is required in production");
@@ -106,5 +111,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     kek: kek ? { key: kek, version: c.ROLERANK_KEK_VERSION } : null,
     corpusDatabaseUrl: c.CORPUS_DATABASE_URL ?? null,
     aiworker: c.AIWORKER_URL && c.AIWORKER_TOKEN ? { url: c.AIWORKER_URL.replace(/[/]$/, ""), token: c.AIWORKER_TOKEN } : null,
+    ranker: c.RANKER_URL && c.RANKER_TOKEN ? { url: c.RANKER_URL.replace(/[/]$/, ""), token: c.RANKER_TOKEN } : null,
   };
 }

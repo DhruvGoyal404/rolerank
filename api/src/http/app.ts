@@ -12,6 +12,7 @@ import type { Log } from "../log.js";
 import type { Vault } from "../vault.js";
 import { originCheck, parseCookies, rateLimit, requireUser, sessionLoader } from "./middleware.js";
 import type { AiClient } from "../aiserver.js";
+import type { Ranker } from "../ranker.js";
 import { mountJobs } from "./jobs.js";
 import { mountResumes } from "./resumes.js";
 
@@ -26,6 +27,7 @@ export interface AppDeps {
   /** P5: postings, read as corpus_ro; and aiworker for explanations and tailoring. */
   corpus?: Pool;
   ai?: AiClient;
+  ranker?: Ranker;
 }
 
 interface PendingLogin {
@@ -236,7 +238,7 @@ export function createApp(deps: AppDeps): Express {
 
   if (deps.vault) {
     mountResumes(app, { pool, valkey, vault: deps.vault });
-    mountJobs(app, { pool, valkey, vault: deps.vault, ...(deps.corpus ? { corpus: deps.corpus } : {}), ...(deps.ai ? { ai: deps.ai } : {}) });
+    mountJobs(app, { pool, valkey, vault: deps.vault, ...(deps.corpus ? { corpus: deps.corpus } : {}), ...(deps.ai ? { ai: deps.ai } : {}), ...(deps.ranker ? { ranker: deps.ranker } : {}) });
   }
 
   // Exists only with NODE_ENV=test: loadConfig refuses the flag anywhere else.
