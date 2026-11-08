@@ -236,6 +236,15 @@ describe("resume upload to confirmed profile", () => {
     expect(llmBodies).toHaveLength(0);
   });
 
+  it("fails a resume visibly when something unexpected breaks, instead of leaving it busy", async () => {
+    const { agent } = await signedIn("u5");
+    const up = await agent.post("/api/resumes").set("Origin", ORIGIN).set("content-type", "application/pdf").send(pdf);
+    const broken = { ...deps(), extractor: { extract: () => Promise.reject(new Error("boom")) } };
+    expect(await processNext(broken)).toBe("internal");
+    const s = await agent.get(`/api/resumes/${(up.body as { id: string }).id}`).expect(200);
+    expect(s.body).toMatchObject({ status: "failed", error: "internal" });
+  });
+
   it("refuses an upload without a session or from another origin", async () => {
     await request(app).post("/api/resumes").set("Origin", ORIGIN).send(pdf).expect(401);
     const { agent } = await signedIn("u4");

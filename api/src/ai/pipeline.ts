@@ -74,9 +74,10 @@ export async function processNext(d: Deps): Promise<string | null> {
     client.release();
   }
   if (!job) return null;
-  const outcome = await run(d, job.id, job.user_id).catch((error: unknown) => {
+  // An unexpected error fails the resume, so the user is told; it never sits in a busy state.
+  const outcome = await run(d, job.id, job.user_id).catch(async (error: unknown) => {
     d.log.error({ event: "resume_failed", resume_id: job.id, type: error instanceof Error ? error.name : "unknown" });
-    return "internal";
+    return fail(d, job.id, "internal").catch(() => "internal");
   });
   d.log.info({ event: "resume_processed", resume_id: job.id, outcome });
   return outcome;
