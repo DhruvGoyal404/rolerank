@@ -48,3 +48,6 @@ graphify-out/
 
 # The web e2e suite's compiled test API (api/tsconfig.e2e.json)
 api/.e2e/
+
+# scripts/dev-up.sh: process ids, logs and the local invite
+.dev/

@@ -4,12 +4,23 @@ RoleRank ranks real job postings from legal, public sources against your resume 
 explains every match: which skills fit, which are missing, and whether the role suits
 your level and location. It's built first for freshers and interns in India.
 
-**Status: Phase 1 (foundation).** It isn't usable yet. Plan and dates:
+**Status: Phase 6 done (product UI); deployment (P8) next.** Plan and dates:
 [docs/ROADMAP.md](docs/ROADMAP.md). Project rules: [CLAUDE.md](CLAUDE.md).
 
 ## Local development
 
 Needs Docker, Node 24.22.0 and Go.
+
+**Everything at once**, against your local corpus (Postgres, Valkey, the extractor, aiworker,
+the ranker service, the API and the built site):
+
+```sh
+bash scripts/dev-up.sh      # prints http://localhost:5173 and, the first time, your invite code
+bash scripts/dev-down.sh    # stops all of it; data stays in the compose volumes
+```
+
+Logs are in `.dev/logs/`. The ranker compiles in its container on first start, so allow a
+minute or two. Piece by piece:
 
 ```sh
 cp .env.example .env                 # fill the values; ROLERANK_* are hex
