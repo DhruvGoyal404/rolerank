@@ -45,3 +45,6 @@ graphify-out/
 # Your own resumes, for scripts/parse-resume.sh: never committed
 /my-resumes/
 /worker/.bin/
+
+# The web e2e suite's compiled test API (api/tsconfig.e2e.json)
+api/.e2e/

@@ -81,7 +81,9 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: |
+            web/package-lock.json
+            api/package-lock.json
       - run: npm ci
       - run: npm audit
       - run: npm run typecheck
@@ -89,7 +91,20 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run e2e
+      # The e2e API (api/test/e2e-server.ts) runs the real app on throwaway _test databases.
+      - name: API dependencies for the e2e server
+        working-directory: api
+        run: npm ci
+      - name: Start Postgres and Valkey
+        working-directory: .
+        run: |
+          bash scripts/gen-env.sh
+          docker compose up -d --wait
+      - name: End-to-end tests
+        run: |
+          set -o pipefail
+          . ../scripts/test-env.sh
+          npm run e2e
 
   worker:
     name: Worker

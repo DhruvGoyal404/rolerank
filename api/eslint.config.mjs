@@ -1,7 +1,7 @@
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist/**", "*.mjs"] },
+  { ignores: ["dist/**", ".e2e/**", "*.mjs"] },
   ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {

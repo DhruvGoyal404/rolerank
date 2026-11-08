@@ -14,7 +14,8 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "invite": "node dist/cli/invite.js",
-    "aiworker": "node dist/aiworker.js"
+    "aiworker": "node dist/aiworker.js",
+    "e2e:server": "tsc -p tsconfig.e2e.json && node .e2e/test/e2e-server.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.1.0",

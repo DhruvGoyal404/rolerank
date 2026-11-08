@@ -1,12 +1,22 @@
 import { createSign, generateKeyPairSync, randomBytes } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { Redis } from "iovalkey";
 import pg from "pg";
 
-const repoRoot = join(import.meta.dirname, "..", "..");
+// The repo root: the nearest directory up that holds db/provision. This file also runs compiled,
+// from api/.e2e/test, for the web e2e suite's API (test/e2e-server.ts).
+const repoRoot = (() => {
+  let dir = import.meta.dirname;
+  while (!existsSync(join(dir, "db", "provision"))) {
+    const up = dirname(dir);
+    if (up === dir) throw new Error("repo root not found");
+    dir = up;
+  }
+  return dir;
+})();
 
 function required(name: string): string {
   const value = process.env[name];

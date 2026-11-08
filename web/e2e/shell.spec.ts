@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-const pages = ["/", "/signin", "/signin?error=state", "/about/bot", "/sources", "/no-such-page"];
+const pages = ["/", "/signin", "/signin?error=state", "/about/bot", "/sources", "/privacy", "/no-such-page"];
 
 for (const path of pages) {
   test(`${path} has no accessibility, console or CSP problems`, async ({ page }) => {
@@ -13,12 +13,15 @@ for (const path of pages) {
 
     await page.goto(path);
     await expect(page.locator("h1")).toBeVisible();
-    const results = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-      .analyze();
-
-    expect(results.violations).toEqual([]);
-    expect(problems).toEqual([]);
+    for (const scheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme: scheme });
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      expect(results.violations, scheme).toEqual([]);
+    }
+    // Signed out, /api/me answers 401: that's the page asking, not a problem.
+    expect(problems.filter((p) => !/status of 401/.test(p))).toEqual([]);
   });
 }
 

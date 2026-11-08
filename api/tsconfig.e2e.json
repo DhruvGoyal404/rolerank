@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": false, "rootDir": ".", "outDir": ".e2e", "sourceMap": false },
+  "include": ["src", "test/e2e-server.ts", "test/harness.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

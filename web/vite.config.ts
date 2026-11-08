@@ -24,6 +24,8 @@ export default defineConfig({
     proxy: { "/api": "http://127.0.0.1:8080" },
   },
   preview: {
+    // The e2e suite's API (api/test/e2e-server.ts); /test exists only there, with NODE_ENV=test.
+    proxy: { "/api": "http://127.0.0.1:8080", "/test": "http://127.0.0.1:8080" },
     headers: {
       "Content-Security-Policy": CSP,
       "X-Content-Type-Options": "nosniff",
