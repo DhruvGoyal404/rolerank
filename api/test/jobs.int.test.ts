@@ -300,6 +300,36 @@ describe("tracker and /api/me", () => {
     expect(theirs).not.toContain(body.account.id);
   });
 
+  it("keeps a tracked job's details after its posting closes, and after it is purged", async () => {
+    const rw = new pg.Pool({ connectionString: urlFor(dbs.roles.corpusRw, dbs.passwords.CORPUS_RW ?? "", dbs.corpusDb) });
+    try {
+      const { rows } = await rw.query<{ id: string }>(
+        `INSERT INTO postings (source_id, source_job_id, title, company, url, level, body, excerpt, content_hash)
+         VALUES ((SELECT id FROM sources WHERE name = 'greenhouse'), 'closing-1', 'Site Reliability Intern', 'Umbrella Corp',
+                 'https://example.com/closing-1', 'intern', '', '', '\\x01')
+         RETURNING id::text AS id`,
+      );
+      const key = rows[0]?.id ?? "";
+      const { agent } = await user("t4");
+      await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key }).expect(201);
+      const saved = { key, title: "Site Reliability Intern", company: "Umbrella Corp", url: "https://example.com/closing-1", status: "saved" };
+
+      // The posting closes: the job page says so, and the tracker still reads the same.
+      await rw.query(`UPDATE postings SET closed_at = now() WHERE id = $1`, [key]);
+      expect(((await agent.get(`/api/jobs/${key}`).expect(200)).body as { job: { closed: boolean } }).job.closed).toBe(true);
+      expect(((await agent.get("/api/tracker").expect(200)).body as { items: unknown[] }).items).toEqual([expect.objectContaining(saved)]);
+
+      // The posting is purged from the corpus altogether: the tracker still keeps its details.
+      await rw.query(`DELETE FROM postings WHERE id = $1`, [key]);
+      await agent.get(`/api/jobs/${key}`).expect(404);
+      const items = ((await agent.get("/api/tracker").expect(200)).body as { items: Array<{ id: string }> }).items;
+      expect(items).toEqual([expect.objectContaining(saved)]);
+      await agent.patch(`/api/tracker/${items[0]?.id ?? ""}`).set("Origin", ORIGIN).send({ status: "rejected" }).expect(200);
+    } finally {
+      await rw.end();
+    }
+  });
+
   it("removes tracker items with the account", async () => {
     const { agent, userId } = await user("t3");
     await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: jobKey }).expect(201);

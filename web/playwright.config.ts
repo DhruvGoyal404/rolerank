@@ -10,6 +10,8 @@ export default defineConfig({
   workers: 1,
   // Whole journeys: sign in, upload, parse, several pages, each checked with axe twice.
   timeout: 120_000,
+  // A busy machine can take a few seconds to save and navigate; 5 s flaked under the gate.
+  expect: { timeout: 15_000 },
   use: { baseURL: "http://localhost:5173", trace: "retain-on-failure" },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
