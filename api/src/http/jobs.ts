@@ -26,6 +26,9 @@ import { rateLimit, requireUser } from "./middleware.js";
  */
 const MAX_JD_BYTES = 20 * 1024;
 const KEY = /^[1-9]\d{0,17}$/;
+/** The ranker names bands in lower case (worker/internal/rank); the API names them for people. */
+const BANDS: Record<string, string> = { strong: "Strong", good: "Good", stretch: "Stretch" };
+export const bandName = (b: string): string => BANDS[b.toLowerCase()] ?? "Stretch";
 
 interface Posting {
   id: string;
@@ -274,7 +277,7 @@ export function mountJobs(
         const byId = new Map(rows.map((r) => [r.id, r]));
         const matches = hits.flatMap((h) => {
           const p = byId.get(String(h.id));
-          return p ? [{ job: card(p), band: h.band, explanation: explained(p, c.profile) }] : [];
+          return p ? [{ job: card(p), band: bandName(h.band), explanation: explained(p, c.profile) }] : [];
         });
         res.json({ matches, country, remote });
       })().catch(next);

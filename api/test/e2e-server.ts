@@ -69,7 +69,7 @@ const POSTINGS = [
   { source: "himalayas", title: "Frontend Developer", company: "Acme Remote", level: "entry", location: "Remote, India", req: ["React", "TypeScript"], nice: [], posted: days(0), apply: "https://himalayas.app/companies/acme/jobs/frontend?ref=himalayas&x=1", body: "React and TypeScript." },
   { source: "remoteok", title: "Platform Engineering Intern", company: "Globex", level: "intern", location: "Remote", req: ["Docker", "Redis", "Kubernetes"], nice: [], posted: days(5), apply: null, body: "Docker, Redis, k8s." },
 ];
-const BANDS = ["Strong", "Stretch", "Good", "Good"];
+const BANDS = ["strong", "stretch", "good", "good"]; // as the real ranker names them
 
 async function main(): Promise<void> {
   const dbs = await createTestDatabases();

@@ -43,7 +43,8 @@ let rankDown = false;
 const ranker: Ranker = {
   search: (q) => {
     rankAsked.push(q);
-    return Promise.resolve(rankDown ? null : [{ id: Number(jobKey), band: "Strong" }, { id: 999999, band: "Good" }]);
+    // Lower case, as the real ranker names them; the API capitalises.
+    return Promise.resolve(rankDown ? null : [{ id: Number(jobKey), band: "strong" }, { id: 999999, band: "good" }]);
   },
 };
 let sent: string[];
