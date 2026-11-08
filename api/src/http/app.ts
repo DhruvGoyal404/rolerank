@@ -15,6 +15,7 @@ import type { AiClient } from "../aiserver.js";
 import type { Ranker } from "../ranker.js";
 import { mountJobs } from "./jobs.js";
 import { mountResumes } from "./resumes.js";
+import { mountAccount } from "./account.js";
 import { mountTracker } from "./tracker.js";
 
 export interface AppDeps {
@@ -229,10 +230,10 @@ export function createApp(deps: AppDeps): Express {
   // Where the user is: their latest resume and profile, so the UI knows what to show next.
   app.get("/api/me", requireUser, (req, res, next) => {
     pool
-      .query<{ resume_id: string | null; resume_status: string | null; profile_id: string | null; confirmed: boolean | null }>(
-        `SELECT r.id AS resume_id, r.status AS resume_status, p.id AS profile_id, p.confirmed_at IS NOT NULL AS confirmed
+      .query<{ resume_id: string | null; resume_status: string | null; resume_error: string | null; profile_id: string | null; confirmed: boolean | null }>(
+        `SELECT r.id AS resume_id, r.status AS resume_status, r.error AS resume_error, p.id AS profile_id, p.confirmed_at IS NOT NULL AS confirmed
          FROM users u
-         LEFT JOIN LATERAL (SELECT id, status FROM resumes WHERE user_id = u.id ORDER BY created_at DESC LIMIT 1) r ON true
+         LEFT JOIN LATERAL (SELECT id, status, error FROM resumes WHERE user_id = u.id ORDER BY created_at DESC LIMIT 1) r ON true
          LEFT JOIN LATERAL (SELECT id, confirmed_at FROM profiles WHERE user_id = u.id ORDER BY version DESC LIMIT 1) p ON true
          WHERE u.id = $1`,
         [req.userId],
@@ -241,7 +242,7 @@ export function createApp(deps: AppDeps): Express {
         const r = rows[0];
         res.json({
           id: req.userId,
-          resume: r?.resume_id ? { id: r.resume_id, status: r.resume_status } : null,
+          resume: r?.resume_id ? { id: r.resume_id, status: r.resume_status, error: r.resume_error } : null,
           profile: r?.profile_id ? { id: r.profile_id, confirmed: r.confirmed === true } : null,
         });
       }, next);
@@ -256,6 +257,7 @@ export function createApp(deps: AppDeps): Express {
 
   if (deps.vault) {
     mountResumes(app, { pool, valkey, vault: deps.vault });
+    mountAccount(app, { pool, valkey, vault: deps.vault });
     if (deps.corpus) mountTracker(app, { pool, valkey, corpus: deps.corpus });
     mountJobs(app, { pool, valkey, vault: deps.vault, ...(deps.corpus ? { corpus: deps.corpus } : {}), ...(deps.ai ? { ai: deps.ai } : {}), ...(deps.ranker ? { ranker: deps.ranker } : {}) });
   }

@@ -67,10 +67,41 @@ export function Privacy() {
         </li>
       </ul>
 
+      <h2>Matches, explanations and tailoring</h2>
+      <ul>
+        <li>
+          Matching runs on our own servers. Our search service receives your confirmed skills, level,
+          the role titles on your profile or in your preferences, and where you can work. Never your
+          resume&apos;s text or contact details.
+        </li>
+        <li>
+          When you ask for a match explained in words, Anthropic&apos;s Claude API receives the job&apos;s
+          title, the lists of skills you have and lack, and the level fit. Not your resume.
+        </li>
+        <li>
+          Tailoring is worked out on our servers from your own resume lines and our skills list. No AI
+          model is used for it.
+        </li>
+        <li>
+          A job description you paste is read in memory to give your breakdown. It is never stored, and
+          only its title and the skills we recognise in it reach an AI model.
+        </li>
+      </ul>
+
+      <h2>Your data</h2>
+      <ul>
+        <li>
+          Your preferences (where you can work, remote, target roles) are kept with your account.
+        </li>
+        <li>
+          On the Account page you can download everything we keep about you as one JSON file.
+        </li>
+      </ul>
+
       <h2>Deleting your account</h2>
       <p>
-        Deleting your account removes your resumes, profiles, encryption key and spend records
-        straight away. We keep only a note that an account with that ID was deleted. That note is
+        Deleting your account removes your resumes, profiles, tracker, preferences, encryption key
+        and spend records straight away. We keep only a note that an account with that ID was deleted. That note is
         how a deletion survives a restore from a backup.
       </p>
       <p>

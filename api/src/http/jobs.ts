@@ -13,6 +13,7 @@ import {
 } from "../ai/match.js";
 import type { AiClient } from "../aiserver.js";
 import { rankQuery, type Ranker } from "../ranker.js";
+import { preferencesOf } from "./account.js";
 import type { Vault } from "../vault.js";
 import { rateLimit, requireUser } from "./middleware.js";
 
@@ -37,6 +38,7 @@ interface Posting {
   excerpt: string;
   source: string;
   closed_at: Date | null;
+  posted_at: Date; // when the source says it was posted, else when we first saw it
   skills_required: string[];
   skills_nice: string[];
   body: string; // read only for the job's own skill wording; never sent or returned
@@ -201,7 +203,7 @@ export function mountJobs(
     }
     const { rows } = await corpus.query<Posting>(
       `SELECT p.id::text AS id, p.title, p.company, p.location_raw, p.level, p.url, p.apply_url, p.excerpt, s.name AS source,
-              p.closed_at, p.skills_required, p.skills_nice, p.body
+              p.closed_at, COALESCE(p.posted_at, p.first_seen_at) AS posted_at, p.skills_required, p.skills_nice, p.body
        FROM postings p JOIN sources s ON s.id = p.source_id WHERE p.id = $1`,
       [key],
     );
@@ -240,6 +242,7 @@ export function mountJobs(
     excerpt: p.excerpt,
     source: p.source,
     closed: p.closed_at !== null,
+    postedAt: p.posted_at,
   });
 
   // Ranked matches for the confirmed profile, each with its deterministic explanation and fit
@@ -251,17 +254,20 @@ export function mountJobs(
       (async () => {
         const c = await profileFor(res, byUser(req));
         if (!c) return;
-        const country = typeof req.query.country === "string" && /^[A-Z]{2}$/.test(req.query.country) ? req.query.country : "IN";
-        const remote = req.query.remote !== "0";
+        // Saved preferences decide, and the query string can override them for one search.
+        const prefs = await preferencesOf(pool, byUser(req));
+        const country = typeof req.query.country === "string" && /^[A-Z]{2}$/.test(req.query.country) ? req.query.country : prefs.country;
+        const remote = req.query.remote === undefined ? prefs.remote : req.query.remote !== "0";
         const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 50);
-        const hits = await ranker.search(rankQuery(c.profile, { country, remote, limit }));
+        const q = rankQuery(c.profile, { country, remote, limit });
+        const hits = await ranker.search(prefs.targetTitles ? { ...q, titles: prefs.targetTitles } : q);
         if (!hits) {
           res.status(503).json({ error: "search_unavailable" });
           return;
         }
         const { rows } = await corpus.query<Posting>(
           `SELECT p.id::text AS id, p.title, p.company, p.location_raw, p.level, p.url, p.apply_url, p.excerpt, s.name AS source,
-                  p.closed_at, p.skills_required, p.skills_nice, '' AS body
+                  p.closed_at, COALESCE(p.posted_at, p.first_seen_at) AS posted_at, p.skills_required, p.skills_nice, '' AS body
            FROM postings p JOIN sources s ON s.id = p.source_id WHERE p.id = ANY($1::bigint[])`,
           [hits.map((h) => h.id)],
         );

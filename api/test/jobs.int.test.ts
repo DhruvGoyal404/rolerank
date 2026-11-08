@@ -272,6 +272,33 @@ describe("tracker and /api/me", () => {
     await agent.delete(`/api/tracker/${item.id}`).set("Origin", ORIGIN).expect(404);
   });
 
+  it("keeps preferences, and matches use them", async () => {
+    const { agent } = await user("p1");
+    expect((await agent.get("/api/preferences").expect(200)).body).toEqual({ country: "IN", remote: true, targetTitles: "" });
+    await agent.put("/api/preferences").set("Origin", ORIGIN).send({ country: "IN", remote: false, targetTitles: "Data Engineer" }).expect(200);
+    await agent.put("/api/preferences").set("Origin", ORIGIN).send({ country: "India", remote: true }).expect(400);
+    rankAsked.length = 0;
+    await agent.get("/api/matches").expect(200);
+    expect(rankAsked[0]).toMatchObject({ remote: false, titles: "Data Engineer" });
+    await agent.get("/api/matches?remote=1").expect(200);
+    expect(rankAsked[1]).toMatchObject({ remote: true });
+  });
+
+  it("exports everything kept about the user, decrypted for them alone", async () => {
+    const { agent } = await user("x1");
+    await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: jobKey }).expect(201);
+    const res = await agent.get("/api/me/export").expect(200);
+    const body = res.body as { account: { id: string }; resumes: Array<{ lines: Array<{ text: string }> }>; profiles: Array<{ data: { profile: { skills: unknown[] } } }>; tracker: unknown[] };
+    expect(body.resumes[0]?.lines[1]?.text).toContain("Acme Corp");
+    expect(body.profiles[0]?.data.profile.skills).toHaveLength(3);
+    expect(body.tracker).toHaveLength(1);
+    expect(res.headers["content-disposition"]).toContain("rolerank-export.json");
+    // Someone else's export holds none of it.
+    const { agent: other } = await user("x2");
+    const theirs = JSON.stringify((await other.get("/api/me/export").expect(200)).body);
+    expect(theirs).not.toContain(body.account.id);
+  });
+
   it("removes tracker items with the account", async () => {
     const { agent, userId } = await user("t3");
     await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: jobKey }).expect(201);
