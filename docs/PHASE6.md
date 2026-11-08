@@ -62,8 +62,8 @@ the real corpus.
 ## Stories not in v1
 
 - The skill-gap page and the admin metrics page: v1.1, by the owner's decision of 2026-11-04.
-- Keeping a job in the tracker after its posting closes is built (the tracker copies the job's
-  details), but no e2e closes a posting.
+- Keeping a job in the tracker after its posting closes: tested since (closed, then purged), in
+  `api/test/jobs.int.test.ts`.
 
 ## Deviations, recorded
 
@@ -74,6 +74,16 @@ the real corpus.
   internship filter on Matches, and the graduation year is read from the resume.
 - **Sign-out reloads the page**, so nothing from the session stays in memory and no page's
   redirect can race it.
+
+## Notes for the walkthrough
+
+- A live end-to-end pass on the local stack (2026-11-08): a synthetic D1 resume through the real
+  extractor and model, then real matches from the real ranker over 21,279 postings. All five top
+  matches came back Strong, including some where the resume shows one required skill and lacks
+  four. The P3 band cut-offs (Strong at 0.505) may be generous on real profiles; left for the
+  owner's walkthrough notes.
+- The first matches call took 1.25 s, which includes the ranker's cold start. The SPEC asks for
+  under a second; warm calls to the ranker took 70 to 90 ms.
 
 ## What surprised us
 
