@@ -34,6 +34,10 @@ export function Privacy() {
           For each AI request: its cost, its size and a fingerprint of its input. Never the resume or
           the answer.
         </li>
+        <li>
+          The jobs you save to your tracker, with each job&apos;s title, company, link and the status
+          you set, so they stay readable after a posting closes.
+        </li>
       </ul>
       <p>Our logs never contain resume content, profile details, email addresses or tokens.</p>
 

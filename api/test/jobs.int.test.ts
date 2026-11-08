@@ -246,6 +246,41 @@ describe("matches", () => {
   });
 });
 
+describe("tracker and /api/me", () => {
+  it("saves a job, sets its status, removes it, and keeps each user's items apart", async () => {
+    const { agent } = await user("t1");
+    const me = await agent.get("/api/me").expect(200);
+    expect(me.body).toMatchObject({ resume: { status: "ready" }, profile: { confirmed: true } });
+
+    const saved = await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: jobKey }).expect(201);
+    const item = saved.body as { id: string; status: string; title: string };
+    expect(item).toMatchObject({ status: "saved", title: "Backend Engineer" });
+    await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: jobKey }).expect(201); // saving twice keeps one
+    await agent.patch(`/api/tracker/${item.id}`).set("Origin", ORIGIN).send({ status: "applied" }).expect(200);
+    await agent.patch(`/api/tracker/${item.id}`).set("Origin", ORIGIN).send({ status: "hired!" }).expect(400);
+    const list = await agent.get("/api/tracker").expect(200);
+    expect((list.body as { items: Array<{ status: string }> }).items).toEqual([expect.objectContaining({ status: "applied", key: jobKey })]);
+    await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: "999999" }).expect(404);
+
+    // Another user can't see, change or remove it: 404, not 403.
+    const { agent: other } = await user("t2");
+    expect(((await other.get("/api/tracker").expect(200)).body as { items: unknown[] }).items).toEqual([]);
+    await other.patch(`/api/tracker/${item.id}`).set("Origin", ORIGIN).send({ status: "offer" }).expect(404);
+    await other.delete(`/api/tracker/${item.id}`).set("Origin", ORIGIN).expect(404);
+
+    await agent.delete(`/api/tracker/${item.id}`).set("Origin", ORIGIN).expect(204);
+    await agent.delete(`/api/tracker/${item.id}`).set("Origin", ORIGIN).expect(404);
+  });
+
+  it("removes tracker items with the account", async () => {
+    const { agent, userId } = await user("t3");
+    await agent.post("/api/tracker").set("Origin", ORIGIN).send({ key: jobKey }).expect(201);
+    await agent.delete("/api/me").set("Origin", ORIGIN).expect(204);
+    const { rows } = await admin.query<{ n: number }>(`SELECT count(*)::int AS n FROM tracker_items WHERE user_id = $1`, [userId]);
+    expect(rows[0]?.n).toBe(0);
+  });
+});
+
 describe("jobs", () => {
   it("shows a posting with its deterministic explanation, never its body", async () => {
     const { agent } = await user("j1");
