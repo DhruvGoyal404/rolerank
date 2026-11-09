@@ -14,6 +14,13 @@ export interface Caps {
 
 export const DEFAULT_CAPS: Caps = { userUsd: 0.05, globalUsd: 1.0 };
 
+/**
+ * Operations' own scope (rolerank-up.sh's model check), with its own tiny daily cap on top of
+ * the global one. It belongs to no user, so its calls carry user_id NULL and scope 'ops'.
+ */
+export const OPS_SCOPE = "ops";
+export const OPS_CAP_USD = 0.01;
+
 /** Claude Haiku 5.5, prompts of 100K tokens or fewer, USD per token (checked 2026-11-05). */
 export const HAIKU_55 = { model: "claude-haiku-5-5", inputUsd: 0.1 / 1e6, outputUsd: 0.5 / 1e6, maxPromptTokens: 100_000 };
 
@@ -48,9 +55,10 @@ export async function reserve(
       [day, call.userId],
     );
     const used = new Map(rows.map((r) => [r.scope, Number(r.used)]));
+    const ops = call.userId === OPS_SCOPE;
     if (
       (used.get("global") ?? 0) + call.maxUsd > caps.globalUsd ||
-      (used.get(call.userId) ?? 0) + call.maxUsd > caps.userUsd
+      (used.get(call.userId) ?? 0) + call.maxUsd > (ops ? OPS_CAP_USD : caps.userUsd)
     ) {
       await client.query("ROLLBACK");
       return null;
@@ -60,9 +68,9 @@ export async function reserve(
       [day, call.userId, call.maxUsd],
     );
     const { rows: ins } = await client.query<{ id: string }>(
-      `INSERT INTO llm_calls (day, user_id, task, model, prompt_version, reserved_usd, input_hash)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [day, call.userId, call.task, call.model, call.promptVersion, call.maxUsd, call.inputHash ?? null],
+      `INSERT INTO llm_calls (day, user_id, scope, task, model, prompt_version, reserved_usd, input_hash)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      [day, ops ? null : call.userId, ops ? OPS_SCOPE : null, call.task, call.model, call.promptVersion, call.maxUsd, call.inputHash ?? null],
     );
     await client.query("COMMIT");
     return { id: ins[0]?.id ?? "", reservedUsd: call.maxUsd };
@@ -88,7 +96,7 @@ export async function settle(pool: Pool, id: string, o: Outcome): Promise<void> 
   try {
     await client.query("BEGIN");
     const { rows } = await client.query<{ day: string; user_id: string | null; reserved: string }>(
-      `SELECT day::text, user_id, reserved_usd::text AS reserved FROM llm_calls
+      `SELECT day::text, COALESCE(scope, user_id::text) AS user_id, reserved_usd::text AS reserved FROM llm_calls
        WHERE id = $1 AND settled_at IS NULL FOR UPDATE`,
       [id],
     );

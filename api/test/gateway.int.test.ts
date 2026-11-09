@@ -117,3 +117,23 @@ describe("gateway", () => {
     expect(requests).toHaveLength(0);
   });
 });
+
+describe("the ops model check", () => {
+  it("goes through the ledger under the ops scope, with no user and no user data", async () => {
+    replies = [{ text: '{"ok": true}' }];
+    expect(await gateway({ userUsd: 0.05, globalUsd: 1 }).check()).toBe("ok");
+    expect(requests).toHaveLength(1);
+    const { rows } = await pool.query<{ user_id: string | null; scope: string; outcome: string; settled: boolean }>(
+      `SELECT user_id, scope, outcome, settled_at IS NOT NULL AS settled FROM llm_calls WHERE task = 'ops-check'`,
+    );
+    expect(rows).toEqual([{ user_id: null, scope: "ops", outcome: "ok", settled: true }]);
+    const ledger = await pool.query<{ spent: number }>(`SELECT spent_usd::float AS spent FROM llm_ledger WHERE scope = 'ops'`);
+    expect(ledger.rows[0]?.spent).toBeGreaterThan(0);
+  });
+
+  it("stops at the ops cap without calling the model", async () => {
+    await pool.query(`UPDATE llm_ledger SET spent_usd = 0.01 WHERE scope = 'ops'`);
+    expect(await gateway({ userUsd: 1, globalUsd: 1 }).check()).toBe("capped");
+    expect(requests).toHaveLength(0);
+  });
+});

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import type { Pool } from "pg";
 import type { Line } from "./contacts.js";
-import { cost, DEFAULT_CAPS, HAIKU_55, reserve, settle, type Caps } from "./ledger.js";
+import { cost, DEFAULT_CAPS, HAIKU_55, OPS_SCOPE, reserve, settle, type Caps } from "./ledger.js";
 import { z } from "zod";
 import { ground, profileJsonSchema, ProfileSchema, type Grounded } from "./profile.js";
 
@@ -186,6 +186,10 @@ export function tailorBlock(lines: Line[], pairs: Array<{ skill: string; line: n
 
 export type Outcome = "ok" | "invalid" | "refused" | "capped" | "error";
 
+const OPS_SYSTEM = 'You answer a health check. Reply with the JSON object {"ok": true}.';
+const OpsOut = z.object({ ok: z.literal(true) }).strict();
+const opsJsonSchema = { type: "object", properties: { ok: { type: "boolean" } }, required: ["ok"], additionalProperties: false };
+
 export class Gateway {
   constructor(
     private readonly client: Anthropic,
@@ -273,6 +277,15 @@ export class Gateway {
   async explain(userId: string, block: string): Promise<{ outcome: Outcome; text?: string }> {
     const r = await this.structured(userId, "explain", EXPLAIN_PROMPT_VERSION, EXPLAIN_SYSTEM, block, explainJsonSchema, ExplainOut, 400);
     return r.value ? { outcome: "ok", text: r.value.explanation } : { outcome: r.outcome };
+  }
+
+  /**
+   * rolerank-up.sh's proof that the model answers: a fixed prompt with no user data, under the
+   * ledger's ops scope and its own daily cap, like every other call.
+   */
+  async check(): Promise<Outcome> {
+    const r = await this.structured(OPS_SCOPE, "ops-check", "ops-check-v1", OPS_SYSTEM, data("check", "ping"), opsJsonSchema, OpsOut, 32);
+    return r.outcome;
   }
 
   /** Raw reasons; the caller runs the grounding gate before anyone sees them. */

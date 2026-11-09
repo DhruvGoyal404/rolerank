@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { expireStale, reserve, settle } from "../src/ai/ledger.js";
+import { expireStale, OPS_CAP_USD, OPS_SCOPE, reserve, settle } from "../src/ai/ledger.js";
 import { Vault } from "../src/vault.js";
 import { createTestDatabases, urlFor, type TestDatabases } from "./harness.js";
 
@@ -87,5 +87,21 @@ describe("vault keys", () => {
     // Another user's key can't open it.
     const other = await newUser();
     await expect(vault.decrypt(pool, other, "resumes.lines_ct", "r1", sealed)).rejects.toThrow();
+  });
+});
+
+describe("the ops scope", () => {
+  it("has its own daily cap, separate from any user's, and settles to its own row", async () => {
+    const results = await Promise.all(Array.from({ length: 5 }, () => reserve(pool, call(OPS_SCOPE, 0.004))));
+    expect(results.filter((r) => r !== null)).toHaveLength(Math.floor(OPS_CAP_USD / 0.004));
+    const first = results.find((r) => r !== null);
+    await settle(pool, first?.id ?? "", { costUsd: 0.001, outcome: "ok" });
+    const { rows } = await pool.query<{ r: number; s: number }>(
+      `SELECT reserved_usd::float AS r, spent_usd::float AS s FROM llm_ledger WHERE scope = 'ops'`,
+    );
+    expect(rows[0]?.s).toBeCloseTo(0.001, 6);
+    expect(rows[0]?.r).toBeCloseTo(0.004, 6);
+    const calls = await pool.query<{ n: number }>(`SELECT count(*)::int AS n FROM llm_calls WHERE scope = 'ops' AND user_id IS NULL`);
+    expect(calls.rows[0]?.n).toBe(2);
   });
 });
