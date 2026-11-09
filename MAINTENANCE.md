@@ -67,7 +67,7 @@ P8 replaces these with Pricing API numbers and the first real bill.
 | Up for a month (down forgotten) | ~$93 (~Rs 8,800) | the budget's 50% email arrives within about a day |
 | Down, per month | ~$0.30 (~Rs 28), to confirm | ECR ~1.5 GB, S3 backup sets, SSM, SNS, one alarm, the budget |
 
-**Budget:** `rolerank-monthly`, $5.27 (Rs 500), emails at 50, 80 and 100% of actual spend and
+**Budget:** `rolerank-monthly-<hash of the email>` (a new email replaces it), $5.27 (Rs 500), emails at 50, 80 and 100% of actual spend and
 at 100% forecast. It is an alert, not a cap: AWS keeps billing past it.
 
 ## Backups

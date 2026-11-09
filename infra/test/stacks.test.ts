@@ -65,6 +65,7 @@ test("the budget is Rs 500 in USD, filtered to this project, alerting at 50/80/1
     Properties: { Budget: { BudgetLimit: { Amount: number }; CostFilters: { TagKeyValue: string[] } }; NotificationsWithSubscribers: Array<{ Notification: { NotificationType: string; Threshold: number } }> };
   };
   assert.equal(b.Properties.Budget.BudgetLimit.Amount, BUDGET_USD);
+  assert.match((b.Properties.Budget as unknown as { BudgetName: string }).BudgetName, /^rolerank-monthly-[0-9a-f]{8}$/);
   assert.deepEqual(b.Properties.Budget.CostFilters.TagKeyValue, ["user:rolerank:project$rolerank"]);
   assert.deepEqual(
     b.Properties.NotificationsWithSubscribers.map((n) => `${n.Notification.NotificationType}:${String(n.Notification.Threshold)}`),

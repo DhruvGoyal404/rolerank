@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 
 import { CfnOutput, Duration, RemovalPolicy, Stack, Tags, type StackProps } from "aws-cdk-lib";
@@ -107,10 +108,13 @@ export class RoleRankProdStack extends Stack {
     // --- Budget: an alert, not a cap -------------------------------------------------------
     // Filtered to this project's cost-allocation tag, which must be active in Billing
     // (rolerank-up.sh checks): the account also holds CodeJudge (QUESTIONS.md, Q15).
-    const email = [{ subscriptionType: "EMAIL", address: props.budgetEmail ?? props.alarmEmail }];
+    const address = props.budgetEmail ?? props.alarmEmail;
+    const email = [{ subscriptionType: "EMAIL", address }];
+    // A subscriber change replaces the budget, and a replacement can't reuse the old name.
+    const suffix = createHash("sha256").update(address).digest("hex").slice(0, 8);
     new budgets.CfnBudget(this, "MonthlyBudget", {
       budget: {
-        budgetName: "rolerank-monthly",
+        budgetName: `rolerank-monthly-${suffix}`,
         budgetType: "COST",
         timeUnit: "MONTHLY",
         budgetLimit: { amount: BUDGET_USD, unit: "USD" },
