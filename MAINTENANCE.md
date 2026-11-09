@@ -77,6 +77,8 @@ spend and at 100% forecast; alerts, not caps: AWS keeps billing past them):
 
 The hash changes with the email, because a new subscriber makes CloudFormation replace a budget.
 
+The `rolerank:project` cost-allocation tag was activated in Billing on 2026-11-10, so the project budget counts RoleRank's spend from then on (AWS applies it to new cost data only).
+
 ## Backups
 
 - Nightly at 21:30 UTC while up (`rolerank-backup.timer`), plus the final one at every down.
