@@ -61,7 +61,7 @@ test("the deploy role trusts only this repository's main branch", () => {
 });
 
 test("the budget is Rs 500 in USD, filtered to this project, alerting at 50/80/100% and forecast", () => {
-  const b = Object.values(prod.findResources("AWS::Budgets::Budget"))[0] as {
+  const b = Object.values(prod.findResources("AWS::Budgets::Budget")).find((r) => (r as { Properties: { Budget: { BudgetName: string } } }).Properties.Budget.BudgetName.startsWith("rolerank-monthly-")) as {
     Properties: { Budget: { BudgetLimit: { Amount: number }; CostFilters: { TagKeyValue: string[] } }; NotificationsWithSubscribers: Array<{ Notification: { NotificationType: string; Threshold: number } }> };
   };
   assert.equal(b.Properties.Budget.BudgetLimit.Amount, BUDGET_USD);
@@ -71,6 +71,18 @@ test("the budget is Rs 500 in USD, filtered to this project, alerting at 50/80/1
     b.Properties.NotificationsWithSubscribers.map((n) => `${n.Notification.NotificationType}:${String(n.Notification.Threshold)}`),
     ["ACTUAL:50", "ACTUAL:80", "ACTUAL:100", "FORECASTED:100"],
   );
+});
+
+test("an account-wide safety budget covers the time before the project tag is active", () => {
+  const all = Object.values(prod.findResources("AWS::Budgets::Budget")) as Array<{
+    Properties: { Budget: { BudgetName: string; BudgetLimit: { Amount: number }; CostFilters?: unknown }; NotificationsWithSubscribers: unknown[] };
+  }>;
+  assert.equal(all.length, 2);
+  const safety = all.find((b) => b.Properties.Budget.BudgetName.startsWith("rolerank-account-safety-"));
+  assert.ok(safety);
+  assert.equal(safety.Properties.Budget.BudgetLimit.Amount, BUDGET_USD);
+  assert.equal(safety.Properties.Budget.CostFilters, undefined);
+  assert.equal(safety.Properties.NotificationsWithSubscribers.length, 4);
 });
 
 test("the deploy document runs this checkout's deploy.sh, and its manifest can't break quoting", () => {

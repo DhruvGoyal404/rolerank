@@ -105,31 +105,32 @@ export class RoleRankProdStack extends Stack {
     });
     backupMissing.addAlarmAction(new cwActions.SnsAction(topic));
 
-    // --- Budget: an alert, not a cap -------------------------------------------------------
-    // Filtered to this project's cost-allocation tag, which must be active in Billing
-    // (rolerank-up.sh checks): the account also holds CodeJudge (QUESTIONS.md, Q15).
+    // --- Budgets: alerts, not caps -----------------------------------------------------------
+    // The project budget is filtered to this project's cost-allocation tag, which counts nothing
+    // until the tag is active in Billing: the account also holds CodeJudge (QUESTIONS.md, Q15).
+    // The safety budget is account-wide, so it covers that gap (and CodeJudge's spend too).
     const address = props.budgetEmail ?? props.alarmEmail;
     const email = [{ subscriptionType: "EMAIL", address }];
-    // A subscriber change replaces the budget, and a replacement can't reuse the old name.
+    // A subscriber change replaces a budget, and a replacement can't reuse the old name.
     const suffix = createHash("sha256").update(address).digest("hex").slice(0, 8);
-    new budgets.CfnBudget(this, "MonthlyBudget", {
-      budget: {
-        budgetName: `rolerank-monthly-${suffix}`,
-        budgetType: "COST",
-        timeUnit: "MONTHLY",
-        budgetLimit: { amount: BUDGET_USD, unit: "USD" },
-        costFilters: { TagKeyValue: [`user:${PROJECT_TAG.key}$${PROJECT_TAG.value}`] },
+    const notifications = [
+      ...[50, 80, 100].map((threshold) => ({
+        notification: { notificationType: "ACTUAL", comparisonOperator: "GREATER_THAN", threshold, thresholdType: "PERCENTAGE" },
+        subscribers: email,
+      })),
+      {
+        notification: { notificationType: "FORECASTED", comparisonOperator: "GREATER_THAN", threshold: 100, thresholdType: "PERCENTAGE" },
+        subscribers: email,
       },
-      notificationsWithSubscribers: [
-        ...[50, 80, 100].map((threshold) => ({
-          notification: { notificationType: "ACTUAL", comparisonOperator: "GREATER_THAN", threshold, thresholdType: "PERCENTAGE" },
-          subscribers: email,
-        })),
-        {
-          notification: { notificationType: "FORECASTED", comparisonOperator: "GREATER_THAN", threshold: 100, thresholdType: "PERCENTAGE" },
-          subscribers: email,
-        },
-      ],
+    ];
+    const budget = { budgetType: "COST", timeUnit: "MONTHLY", budgetLimit: { amount: BUDGET_USD, unit: "USD" } };
+    new budgets.CfnBudget(this, "MonthlyBudget", {
+      budget: { ...budget, budgetName: `rolerank-monthly-${suffix}`, costFilters: { TagKeyValue: [`user:${PROJECT_TAG.key}$${PROJECT_TAG.value}`] } },
+      notificationsWithSubscribers: notifications,
+    });
+    new budgets.CfnBudget(this, "AccountBudget", {
+      budget: { ...budget, budgetName: `rolerank-account-safety-${suffix}` },
+      notificationsWithSubscribers: notifications,
     });
 
     // --- Registries: the current and the previous release ------------------------------------

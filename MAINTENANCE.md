@@ -65,10 +65,17 @@ P8 replaces these with Pricing API numbers and the first real bill.
 |---|---|---|
 | Up, per hour | ~$0.127 (~Rs 12) | m7g.xlarge $0.1166 + 40 GB gp3 $0.0050 + public IPv4 $0.005; LLM use capped at $1/day |
 | Up for a month (down forgotten) | ~$93 (~Rs 8,800) | the budget's 50% email arrives within about a day |
-| Down, per month | ~$0.30 (~Rs 28), to confirm | ECR ~1.5 GB, S3 backup sets, SSM, SNS, one alarm, the budget |
+| Down, per month | ~$0.30 (~Rs 28), to confirm | ECR ~1.5 GB, S3 backup sets, SSM, SNS, one alarm, two budgets (the first two are free) |
 
-**Budget:** `rolerank-monthly-<hash of the email>` (a new email replaces it), $5.27 (Rs 500), emails at 50, 80 and 100% of actual spend and
-at 100% forecast. It is an alert, not a cap: AWS keeps billing past it.
+**Budgets** (both $5.27, about Rs 500; emails to the alarm address at 50, 80 and 100% of actual
+spend and at 100% forecast; alerts, not caps: AWS keeps billing past them):
+
+| Budget | Counts | Why |
+|---|---|---|
+| `rolerank-monthly-<hash of the email>` | spend tagged `rolerank:project=rolerank` | RoleRank's own cost; counts nothing until that cost-allocation tag is active in Billing |
+| `rolerank-account-safety-<hash of the email>` | the whole account, CodeJudge included | the safety net until the tag is active, and after |
+
+The hash changes with the email, because a new subscriber makes CloudFormation replace a budget.
 
 ## Backups
 
