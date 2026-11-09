@@ -188,3 +188,80 @@ func fitBands(w rank.Weights, ex []example) {
 		fmt.Printf("  %-7s %3d jobs, grades 3/2/1/0: %d/%d/%d/%d\n", b.name, n, g[3], g[2], g[1], g[0])
 	}
 }
+
+// bands prints what each band holds among D3's graded jobs, under the score-only rule of P3 and
+// under the rule that also holds bands to required-skill coverage.
+func bands(ctx context.Context, s *rank.Searcher, ps []loaded, gradesFile string) error {
+	grades, err := loadGrades(gradesFile)
+	if err != nil {
+		return err
+	}
+	type tally struct{ n, g3, g2, g1, g0 int }
+	old, now := map[string]*tally{}, map[string]*tally{}
+	for _, b := range []string{"strong", "good", "stretch"} {
+		old[b], now[b] = &tally{}, &tally{}
+	}
+	add := func(t *tally, g int) {
+		t.n++
+		switch g {
+		case 3:
+			t.g3++
+		case 2:
+			t.g2++
+		case 1:
+			t.g1++
+		default:
+			t.g0++
+		}
+	}
+	cov := map[string]*tally{}
+	b := rank.DefaultBands
+	for _, p := range ps {
+		cs, err := s.Search(ctx, p.Profile, rank.Hybrid, 1000)
+		if err != nil {
+			return err
+		}
+		for _, c := range cs {
+			g, ok := grades[p.ID][c.ID]
+			if !ok {
+				continue
+			}
+			scoreOnly := b.Band(c.Score, 1, 1) // full coverage: only the score decides, as in P3
+			add(old[scoreOnly], g)
+			add(now[c.Band], g)
+			bucket := "none read"
+			switch {
+			case len(c.Required) == 0:
+			case c.RequiredCoverage < 0.25:
+				bucket = "under 1/4"
+			case c.RequiredCoverage < 0.5:
+				bucket = "1/4 to 1/2"
+			case c.RequiredCoverage <= 0.5:
+				bucket = "exactly 1/2"
+			default:
+				bucket = "over 1/2"
+			}
+			if cov[bucket] == nil {
+				cov[bucket] = &tally{}
+			}
+			add(cov[bucket], g)
+		}
+	}
+	fmt.Println("by required-skill coverage:")
+	for _, name := range []string{"none read", "under 1/4", "1/4 to 1/2", "exactly 1/2", "over 1/2"} {
+		if t := cov[name]; t != nil {
+			fmt.Printf("  %-11s %3d jobs, grades 3/2/1/0: %d/%d/%d/%d\n", name, t.n, t.g3, t.g2, t.g1, t.g0)
+		}
+	}
+	for _, rule := range []struct {
+		name string
+		t    map[string]*tally
+	}{{"score only (P3)", old}, {"score and required coverage", now}} {
+		fmt.Println(rule.name + ":")
+		for _, name := range []string{"strong", "good", "stretch"} {
+			t := rule.t[name]
+			fmt.Printf("  %-7s %3d jobs, grades 3/2/1/0: %d/%d/%d/%d\n", name, t.n, t.g3, t.g2, t.g1, t.g0)
+		}
+	}
+	return nil
+}

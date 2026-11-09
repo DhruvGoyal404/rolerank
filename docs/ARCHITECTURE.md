@@ -177,8 +177,11 @@ features.
    required-skill coverage, nice-to-have coverage, cosine, title similarity, level fit,
    location fit, freshness decay. Weights are fitted on D2 and checked on D3; they're a
    short list of numbers in config, versioned with the eval report that produced them.
-4. **Fit band:** Strong, Good or Stretch, from score thresholds fitted on D3 grades. The
-   UI shows the band and its reasons, never a percentage that implies false precision.
+4. **Fit band:** Strong, Good or Stretch, from score thresholds fitted on D3 grades and held to
+   required-skill coverage: Strong also needs more than half of the job's required skills,
+   under a quarter is Stretch whatever the score, and a job with no required skills read stops
+   at Good (PHASE6.md, 2026-11-09). The UI shows the band and its reasons, never a percentage
+   that implies false precision.
 5. **Explanation without an LLM:** matched skills = required ∩ profile; missing =
    required − profile; plus level and location verdicts. The optional LLM paragraph may
    only rephrase these lists; a gate rejects any skill it names that isn't in them.

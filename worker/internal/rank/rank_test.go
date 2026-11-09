@@ -54,7 +54,7 @@ func TestExplainSplitsRequiredSkills(t *testing.T) {
 }
 
 func TestBands(t *testing.T) {
-	if DefaultBands.Band(0.6) != "strong" || DefaultBands.Band(0.48) != "good" || DefaultBands.Band(0.1) != "stretch" {
+	if DefaultBands.Band(0.6, 1, 4) != "strong" || DefaultBands.Band(0.48, 1, 4) != "good" || DefaultBands.Band(0.1, 1, 4) != "stretch" {
 		t.Fatal("bands")
 	}
 }
@@ -66,5 +66,27 @@ func TestEligibleWritesOnlyAnISOCode(t *testing.T) {
 	got, err := Eligible(Profile{Country: "IN", Remote: true})
 	if err != nil || got != "level = ANY($1) AND ('IN' = ANY(countries) OR 'remote_global' = ANY(remote_scopes))" {
 		t.Fatalf("%q %v", got, err)
+	}
+}
+
+// Bands respect required-skill coverage (owner's walkthrough, 2026-11-08).
+func TestBandsHoldToRequiredSkills(t *testing.T) {
+	for _, c := range []struct {
+		score, coverage float64
+		required        int
+		want            string
+	}{
+		{0.80, 0.2, 5, "stretch"}, // a high score with 1 of 5 required skills is a stretch
+		{0.80, 0.4, 5, "good"},    // 2 of 5: good at best
+		{0.80, 0.5, 4, "good"},    // half isn't most: not strong
+		{0.80, 0.6, 5, "strong"},  // most of them, and the score
+		{0.48, 0.75, 4, "good"},   // coverage never lifts a band above its score
+		{0.10, 1.0, 3, "stretch"},
+		{0.80, 0.0, 0, "good"}, // no required skills read: can't be shown to be strong
+		{0.10, 0.0, 0, "stretch"},
+	} {
+		if got := DefaultBands.Band(c.score, c.coverage, c.required); got != c.want {
+			t.Errorf("Band(%.2f, %.2f, %d) = %s, want %s", c.score, c.coverage, c.required, got, c.want)
+		}
 	}
 }

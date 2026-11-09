@@ -47,7 +47,7 @@ func main() {
 
 func run(args []string) error {
 	if len(args) != 4 {
-		return errors.New("usage: rank pool|score|fit <profiles.json> <vectors.jsonl> <file>")
+		return errors.New("usage: rank pool|score|fit|bands <profiles.json> <vectors.jsonl> <file>")
 	}
 	ctx := context.Background()
 	pool, err := pgxpool.New(ctx, os.Getenv("ROLERANK_CORPUS_URL"))
@@ -67,8 +67,10 @@ func run(args []string) error {
 		return score(ctx, s, ps, args[3])
 	case "fit":
 		return fit(ctx, s, ps, args[3])
+	case "bands":
+		return bands(ctx, s, ps, args[3])
 	}
-	return errors.New("usage: rank pool|score|fit")
+	return errors.New("usage: rank pool|score|fit|bands")
 }
 
 type loaded struct {

@@ -146,15 +146,26 @@ type Bands struct{ Strong, Good float64 }
 // none grade 0; of 113 called good, 80 are grade 2 or 3.
 var DefaultBands = Bands{Strong: 0.505, Good: 0.46}
 
-// Band names a score.
-func (b Bands) Band(score float64) string {
+// Band names a score, held to the job's required skills (owner's walkthrough, 2026-11-08: a
+// job showed Strong with 1 of 5 required skills). Strong also needs more than half of the
+// required skills; three quarters or more missing is Stretch, whatever the score (on D3 these
+// are the jobs least often graded a fit). A job with no required skills read from it can't be
+// shown to fit strongly, so it stops at Good.
+func (b Bands) Band(score, coverage float64, required int) string {
+	band := "stretch"
 	switch {
 	case score >= b.Strong:
-		return "strong"
+		band = "strong"
 	case score >= b.Good:
+		band = "good"
+	}
+	switch {
+	case required > 0 && coverage < 0.25:
+		return "stretch"
+	case band == "strong" && (required == 0 || coverage <= 0.5):
 		return "good"
 	}
-	return "stretch"
+	return band
 }
 
 // Rerank orders candidates by score, ties broken by ID, so the order is reproducible.
@@ -163,7 +174,7 @@ func Rerank(p Profile, cs []Candidate, w Weights, b Bands, now time.Time) []Rank
 	for i, c := range cs {
 		f := Score(p, c, now)
 		s := w.Total(f)
-		out[i] = Ranked{Candidate: c, Features: f, Score: s, Band: b.Band(s)}
+		out[i] = Ranked{Candidate: c, Features: f, Score: s, Band: b.Band(s, f.RequiredCoverage, len(c.Required))}
 	}
 	sort.SliceStable(out, func(i, j int) bool {
 		if out[i].Score != out[j].Score {

@@ -51,7 +51,8 @@ or five profiles per segment, neither difference is sized.
 - **Weights v1, fitted on D3.** Fitted on D3 alone, the weights gave skill coverage no weight
   and failed D2 (0.721). A floor on the required-skill weight, scaled to sum to 1, passes both.
   Weights: required 0.177, nice 0.013, cosine 0.354, title 0.051, level 0.076, location 0.253,
-  fresh 0, fusion 0.076. Bands: strong ≥ 0.505, good ≥ 0.46.
+  fresh 0, fusion 0.076. Bands: strong ≥ 0.505, good ≥ 0.46. These turned out generous: in P6
+  the bands were also held to required-skill coverage (PHASE6.md, "Fit bands").
 - **Two plans by corpus size.** The numbers that forced this are in ARCHITECTURE.md.
 
 ## D3 audit (owner, 2026-11-05)

@@ -81,7 +81,32 @@ the real corpus.
   extractor and model, then real matches from the real ranker over 21,279 postings. All five top
   matches came back Strong, including some where the resume shows one required skill and lacks
   four. The P3 band cut-offs (Strong at 0.505) may be generous on real profiles; left for the
-  owner's walkthrough notes.
+  owner's walkthrough notes. The owner confirmed it; fixed below under "Fit bands".
+
+## Fit bands (2026-11-09)
+
+The owner's walkthrough found Strong on a job where the resume shows 1 of 5 required skills.
+Measured on D3's 436 graded pairs (`bash scripts/rank.sh bands evals/d3/profiles.json
+evals/d3/vectors-prefix.jsonl evals/labels/d3-grades.jsonl`, read-only on the corpus):
+
+| Rule | Strong (grades 3/2/1/0) | Good | Stretch |
+|---|---|---|---|
+| Score only (P3) | 436 (150/90/159/37) | 0 | 0 |
+| Score and required coverage (now) | 43 (18/8/11/6) | 200 (86/34/64/16) | 193 (46/48/84/15) |
+
+Every graded job clears the P3 Strong cut-off, so the old band said nothing. The new rule:
+Strong needs the score and more than half of the required skills; under a quarter of them is
+Stretch whatever the score; a job with no required skills read stops at Good. By coverage alone,
+grade 3 is 24% of jobs under a quarter, 45% from a quarter to a half and 42% over a half, so
+"Stretch below a half" would have demoted the best-graded group; the cut is at a quarter.
+
+What this does and doesn't buy: the band now states something a user can check against the
+chips (Strong never shows with most required skills missing), and Stretch holds the jobs least
+often graded a fit (mean grade 1.65 against 1.95 for Good). Strong and Good are not separated by
+the grades (mean 1.88 and 1.95): on these pooled top results, coverage beyond a half doesn't
+predict a better human grade. Bands are labels only, so ranking is unchanged: D2 hybrid
+(prefix) is still nDCG@10 0.860, MRR 1.000, recall 1.000 (`go test -tags integration -run TestD2
+./internal/rank/`). Open for v1.1: re-fit the score cut-offs, which no graded job falls below.
 - The first matches call took 1.25 s, which includes the ranker's cold start. The SPEC asks for
   under a second; warm calls to the ranker took 70 to 90 ms.
 
