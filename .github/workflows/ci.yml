@@ -22,6 +22,8 @@ jobs:
       - name: Audit the extractor's packages
         working-directory: extractor
         run: npm audit --omit=dev
+      - name: Shellcheck the deploy and up/down scripts
+        run: shellcheck -x deploy/host/*.sh deploy/backup/*.sh scripts/models.sh $(ls rolerank-*.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh 2>/dev/null)
 
   secrets:
     name: Gitleaks
@@ -239,3 +241,27 @@ jobs:
         run: |
           go test ./...
           go build ./...
+
+  images:
+    name: Production images (arm64 build, no push)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build the images the Deploy workflow pushes
+        run: |
+          set -euo pipefail
+          docker build -q --label rolerank.managed=true -t rolerank-api-ci -f deploy/api.Dockerfile .
+          docker build -q --label rolerank.managed=true -t rolerank-web-ci -f deploy/web.Dockerfile .
+          docker build -q --label rolerank.managed=true -t rolerank-worker-ci -f deploy/worker.Dockerfile .
+      - name: The images hold what the host expects
+        run: |
+          set -euo pipefail
+          docker run --rm -e ROLERANK_DOMAIN=rolerank.example.invalid -e ACME_EMAIL=ci@example.invalid --entrypoint caddy rolerank-web-ci validate --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -n 1
+          docker run --rm --entrypoint sh rolerank-web-ci -c 'test -s /srv/web/index.html && test -s /srv/web/manifest.webmanifest'
+          docker run --rm rolerank-api-ci node -e "import('/app/dist/config.js').then(()=>console.log('api modules load'))"
+          cid=$(docker create rolerank-worker-ci)
+          docker cp "$cid:/app/deploy/compose.prod.yaml" - >/dev/null
+          docker cp "$cid:/usr/local/bin/extractor" ./extractor-bin && file ./extractor-bin | grep -q 'ARM aarch64'
+          docker rm "$cid" >/dev/null
+          # ONNX Runtime and the cgo ranker must find every shared library on the slim base.
+          docker run --rm --entrypoint sh rolerank-worker-ci -c '! ldd /models/libonnxruntime.so.1.31.0 /usr/local/bin/ranker /usr/local/bin/embed | grep "not found"'

@@ -1,0 +1,21 @@
+# The resume extractor service: starts one gVisor sandbox per file (worker/internal/extract).
+# Bound to Docker's bridge address, so only containers reach it (aiworker, via host-gateway).
+[Unit]
+Description=RoleRank resume extractor
+After=docker.service
+Requires=docker.service
+
+[Service]
+EnvironmentFile=/etc/rolerank/extractor.env
+ExecStart=/opt/rolerank/current/extractor
+DynamicUser=yes
+SupplementaryGroups=docker
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

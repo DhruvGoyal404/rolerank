@@ -548,6 +548,23 @@ Compose, and `ingest` and `extractor` under systemd (gVisor needs the host runti
 alarm after 26 hours without a success while up. All timers started with `enable --now`
 and verified active by the deploy.
 
+**As built in P8 prep (2026-11-09; not yet deployed):**
+
+- Four images, built for arm64 by `.github/workflows/deploy.yml` from the commit, never locally:
+  `api` (API and aiworker, `deploy/api.Dockerfile`), `web` (Caddy with the built site and
+  `deploy/Caddyfile`), `worker` (ranker, ingest, embed and the extractor binary, plus the pinned
+  model, ONNX Runtime, `deploy/` and `db/`), and `sandbox` (`extractor/Dockerfile`). CI builds
+  the first three on every push (`images` job) without pushing.
+- `deploy/compose.prod.yaml` runs Caddy, api, aiworker, ranker, ingest, Postgres and Valkey on an
+  internal network with no route out; api, aiworker and ingest also join an egress network. The
+  extractor runs under systemd on the host (gVisor), bound to Docker's bridge address only.
+  `rolerank-embed.timer` embeds new postings hourly; `rolerank-backup.timer` backs up nightly.
+- The production CSP lives in `deploy/Caddyfile` and must equal `web/vite.config.ts`'s, which
+  the e2e suite runs under (including `manifest-src 'self'`); `scripts/csp.test.mjs` enforces it.
+- Backups are `pg_dump` custom-format files of both databases, `age`-encrypted to a public key
+  in SSM, with each file's SHA-256 in its S3 metadata. The drill restores into scratch
+  databases and must reproduce every app table's row count recorded at backup time.
+
 ## Cost (ap-south-1, on-demand, USD; Rs at 94.95)
 
 Prices from the AWS public price files on 2026-10-31: m7g.xlarge $0.1166/h, gp3

@@ -3,7 +3,8 @@
 # every file's SHA-256. Safe to re-run: a file that already matches isn't fetched again.
 set -euo pipefail
 export MSYS_NO_PATHCONV=1
-cd "$(git rev-parse --show-toplevel)"
+# ROLERANK_ROOT: the image build (deploy/worker.Dockerfile) has no git checkout.
+cd "${ROLERANK_ROOT:-$(git rev-parse --show-toplevel)}"
 UA="RoleRankBot/0.1 (+https://rolerank.dhruvgoyal.tech/about/bot; bot@dhruvgoyal.tech)"
 REV=5c38ec7c405ec4b44b94cc5a9bb96e735b38267a
 ORT=1.31.0

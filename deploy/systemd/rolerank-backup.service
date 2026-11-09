@@ -1,0 +1,10 @@
+# One encrypted backup of both databases to S3 (deploy/backup/pg-backup.sh).
+[Unit]
+Description=RoleRank database backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/rolerank/backup.env
+ExecStart=/opt/rolerank/current/app/deploy/backup/pg-backup.sh

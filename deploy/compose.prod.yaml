@@ -1,0 +1,217 @@
+# Production services on the host (docs/ARCHITECTURE.md, "Deployment design"). Run by
+# deploy/host/deploy.sh as:
+#   docker compose -f compose.prod.yaml --env-file /etc/rolerank/prod.env --env-file release.env ...
+# prod.env holds the secrets, rendered from SSM at deploy time (mode 0600, never printed);
+# release.env holds the image references, pinned by digest. The extractor service runs on the
+# host under systemd (gVisor), bound to Docker's bridge address only.
+name: rolerank-prod
+
+x-labels: &labels
+  rolerank.managed: "true"
+x-app: &app
+  labels: *labels
+  restart: unless-stopped
+  networks: [internal]
+  logging:
+    driver: json-file
+    options: { max-size: 10m, max-file: "3" }
+
+services:
+  caddy:
+    <<: *app
+    image: ${WEB_IMAGE:?release.env}
+    environment:
+      ROLERANK_DOMAIN: ${ROLERANK_DOMAIN:?prod.env}
+      ACME_EMAIL: ${ACME_EMAIL:?prod.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [internal, edge]
+
+  api:
+    <<: *app
+    image: ${API_IMAGE:?release.env}
+    environment:
+      NODE_ENV: production
+      PUBLIC_ORIGIN: https://${ROLERANK_DOMAIN}
+      APP_DATABASE_URL: postgres://app_rw:${ROLERANK_PW_APP_RW:?prod.env}@postgres:5432/app
+      CORPUS_DATABASE_URL: postgres://corpus_ro:${ROLERANK_PW_CORPUS_RO:?prod.env}@postgres:5432/corpus
+      VALKEY_URL: redis://:${ROLERANK_VALKEY_PASSWORD:?prod.env}@valkey:6379
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?prod.env}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?prod.env}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:?prod.env}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:?prod.env}
+      ROLERANK_KEK: ${ROLERANK_KEK:?prod.env}
+      AIWORKER_URL: http://aiworker:8093
+      AIWORKER_TOKEN: ${AIWORKER_TOKEN:?prod.env}
+      RANKER_URL: http://ranker:8094
+      RANKER_TOKEN: ${ROLERANK_RANKER_TOKEN:?prod.env}
+    networks: [internal, egress] # OAuth token exchange and Google's JWKS
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  aiworker:
+    <<: *app
+    image: ${API_IMAGE:?release.env}
+    command: ["node", "dist/aiworker.js"]
+    environment:
+      APP_DATABASE_URL: postgres://app_rw:${ROLERANK_PW_APP_RW:?prod.env}@postgres:5432/app
+      ROLERANK_KEK: ${ROLERANK_KEK:?prod.env}
+      EXTRACTOR_URL: http://host.docker.internal:8090
+      EXTRACTOR_TOKEN: ${ROLERANK_EXTRACTOR_TOKEN:?prod.env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?prod.env}
+      AIWORKER_TOKEN: ${AIWORKER_TOKEN:?prod.env}
+      AIWORKER_ADDR: 0.0.0.0:8093
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [internal, egress] # the model API, and the extractor on the host
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ranker:
+    <<: *app
+    image: ${WORKER_IMAGE:?release.env}
+    environment:
+      ROLERANK_CORPUS_URL: postgres://corpus_ro:${ROLERANK_PW_CORPUS_RO:?prod.env}@postgres:5432/corpus
+      ROLERANK_RANKER_TOKEN: ${ROLERANK_RANKER_TOKEN:?prod.env}
+      ROLERANK_RANKER_ADDR: 0.0.0.0:8094
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Catch-up ingestion while up (Q1): fetches until stopped, obeying robots.txt and the shared
+  # per-host limiter in Valkey.
+  ingest:
+    <<: *app
+    image: ${WORKER_IMAGE:?release.env}
+    command: ["/usr/local/bin/ingest", "run"]
+    environment:
+      ROLERANK_CORPUS_URL: postgres://corpus_rw:${ROLERANK_PW_CORPUS_RW:?prod.env}@postgres:5432/corpus
+      ROLERANK_VALKEY_URL: redis://:${ROLERANK_VALKEY_PASSWORD:?prod.env}@valkey:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks: [internal, egress]
+
+  # Embeds new postings: run by rolerank-embed.timer (deploy/systemd).
+  embed:
+    <<: *app
+    profiles: ["tools"]
+    restart: "no"
+    image: ${WORKER_IMAGE:?release.env}
+    command: ["/usr/local/bin/embed", "jobs"]
+    environment:
+      ROLERANK_CORPUS_URL: postgres://corpus_rw:${ROLERANK_PW_CORPUS_RW:?prod.env}@postgres:5432/corpus
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    <<: *app
+    image: pgvector/pgvector:0.8.7-pg18-trixie@sha256:9d9c930220cb9bf2f956d10a8f909cf9973d9672ca0278aef2c1e6facccad2e0
+    environment:
+      POSTGRES_PASSWORD: ${ROLERANK_PG_SUPERUSER_PASSWORD:?prod.env}
+      ROLERANK_PW_MIGRATOR_APP: ${ROLERANK_PW_MIGRATOR_APP:?prod.env}
+      ROLERANK_PW_MIGRATOR_CORPUS: ${ROLERANK_PW_MIGRATOR_CORPUS:?prod.env}
+      ROLERANK_PW_APP_RW: ${ROLERANK_PW_APP_RW:?prod.env}
+      ROLERANK_PW_CORPUS_RW: ${ROLERANK_PW_CORPUS_RW:?prod.env}
+      ROLERANK_PW_CORPUS_RO: ${ROLERANK_PW_CORPUS_RO:?prod.env}
+    # Sized for m7g.xlarge (16 GiB): Postgres takes about a quarter, the page cache most of the rest.
+    command: >-
+      postgres -c shared_buffers=4GB -c effective_cache_size=10GB -c maintenance_work_mem=1GB
+      -c work_mem=16MB -c max_parallel_maintenance_workers=4
+    shm_size: 2gb
+    volumes:
+      - pg:/var/lib/postgresql
+      - ../db/provision:/opt/rolerank/provision:ro
+      - ../db/provision/init.sh:/docker-entrypoint-initdb.d/10-rolerank.sh:ro
+      - /var/lib/rolerank/backup:/backup
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+
+  valkey:
+    <<: *app
+    image: valkey/valkey:9.1.2-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11
+    command: ["valkey-server", "--requirepass", "${ROLERANK_VALKEY_PASSWORD:?prod.env}", "--appendonly", "yes", "--maxmemory", "512mb", "--maxmemory-policy", "noeviction"]
+    environment:
+      ROLERANK_VALKEY_PASSWORD: ${ROLERANK_VALKEY_PASSWORD:?prod.env}
+    volumes:
+      - valkey:/data
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli --no-auth-warning -a \"$$ROLERANK_VALKEY_PASSWORD\" ping | grep -q PONG"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  migrate-app:
+    <<: *app
+    profiles: ["tools"]
+    restart: "no"
+    image: amacneil/dbmate:2.36.0@sha256:520c740c6e0ad73fde2cd1ea7e2b779aaf789d22aca8858f87a478e7094535fb
+    environment:
+      DATABASE_URL: postgres://migrator_app:${ROLERANK_PW_MIGRATOR_APP:?prod.env}@postgres:5432/app?sslmode=disable
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+      DBMATE_NO_DUMP_SCHEMA: "true"
+    volumes:
+      - ../db/app/migrations:/db/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  migrate-corpus:
+    <<: *app
+    profiles: ["tools"]
+    restart: "no"
+    image: amacneil/dbmate:2.36.0@sha256:520c740c6e0ad73fde2cd1ea7e2b779aaf789d22aca8858f87a478e7094535fb
+    environment:
+      DATABASE_URL: postgres://migrator_corpus:${ROLERANK_PW_MIGRATOR_CORPUS:?prod.env}@postgres:5432/corpus?sslmode=disable
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+      DBMATE_NO_DUMP_SCHEMA: "true"
+    volumes:
+      - ../db/corpus/migrations:/db/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  # No route out: the databases, the API and the model workers' internal traffic.
+  internal:
+    internal: true
+    labels: *labels
+  # Published ports and ACME for Caddy.
+  edge:
+    labels: *labels
+  # Outbound HTTPS for ingestion.
+  egress:
+    labels: *labels
+
+volumes:
+  pg:
+    labels: *labels
+  valkey:
+    labels: *labels
+  caddy_data:
+    labels: *labels
+  caddy_config:
+    labels: *labels

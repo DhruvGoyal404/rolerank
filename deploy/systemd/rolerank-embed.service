@@ -1,0 +1,9 @@
+# Embeds postings ingestion added since the last run, so they become searchable.
+[Unit]
+Description=RoleRank embeddings for new postings
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker compose -f /opt/rolerank/current/app/deploy/compose.prod.yaml --env-file /etc/rolerank/prod.env --env-file /opt/rolerank/current/release.env run --rm embed

@@ -1,0 +1,65 @@
+# Production edge for RoleRank: automatic HTTPS for $ROLERANK_DOMAIN (HTTP redirects), the
+# built site from /srv/web, and /api/* proxied to the API unchanged (the API's routes carry the
+# /api prefix, as under the Vite proxy). Follows CodeJudge's deploy/Caddyfile.
+{
+	email {$ACME_EMAIL}
+	admin off
+}
+
+# The page's Content-Security-Policy. It must equal web/vite.config.ts's CSP directive for
+# directive, which the e2e suite runs under: scripts/csp.test.mjs fails CI if they differ.
+# upgrade-insecure-requests is production only (vite preview serves plain HTTP).
+(csp) {
+	header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; manifest-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'; upgrade-insecure-requests"
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin"
+		Cross-Origin-Opener-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		-Server
+	}
+}
+
+{$ROLERANK_DOMAIN} {
+	encode zstd gzip
+
+	# Caddy sets X-Forwarded-For to the client address and ignores one sent by an untrusted
+	# client, so the API trusts exactly one hop.
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# Hashed build assets: immutable; a missing one is a real 404, never the SPA page.
+	handle /assets/* {
+		root * /srv/web
+		header Cache-Control "public, max-age=31536000, immutable"
+		import csp
+		file_server
+	}
+
+	# Any other path serves index.html (client-side routes), always revalidated.
+	handle {
+		root * /srv/web
+		header Cache-Control "no-cache"
+		import csp
+		try_files {path} /index.html
+		file_server
+	}
+
+	import security_headers
+
+	handle_errors {
+		import security_headers
+		header Cache-Control "no-store"
+		respond "{err.status_code} {err.status_text}" {err.status_code}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
