@@ -24,9 +24,8 @@ it("offers employers the opt-out, within 7 days", () => {
 });
 
 it("builds sign-in links", () => {
-  expect(startUrl("google", "", false)).toBe("/api/auth/google/start");
-  expect(startUrl("github", " abc ", true)).toBe("/api/auth/github/start?invite=abc&age18=1");
-  expect(startUrl("github", "a&b=c", false)).toBe("/api/auth/github/start?invite=a%26b%3Dc");
+  expect(startUrl("google", false)).toBe("/api/auth/google/start");
+  expect(startUrl("github", true)).toBe("/api/auth/github/start?age18=1");
 });
 
 it("states what privacy actually means here", () => {

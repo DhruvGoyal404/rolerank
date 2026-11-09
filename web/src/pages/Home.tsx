@@ -22,7 +22,7 @@ export function Home() {
               Where the jobs come from
             </Link>
           </div>
-          <p className="fine">Open by invite while it&apos;s in early development.</p>
+          <p className="fine">Sign in with Google or GitHub. Free, and you can delete everything at any time.</p>
         </div>
         <figure className="hero-example">
           <figcaption>An example of what you see for each role</figcaption>

@@ -37,12 +37,12 @@ interface PendingLogin {
   verifier: string;
   nonce: string;
   next: string;
-  inviteCode: string | null;
   ageConfirmed: boolean;
 }
 
 const STATE_TTL_SECONDS = 600;
 const SESSION_MAX_AGE_MS = 30 * 86_400_000;
+export const SIGNUPS_PER_HOUR = 10;
 
 /** Same-origin paths only. Anything else, including `//host`, goes home. */
 export function safeNext(value: unknown): string {
@@ -108,6 +108,14 @@ export function createApp(deps: AppDeps): Express {
     points: 20,
     duration: 60,
   });
+  // New accounts per client address (security review S1): open signup can't be used to farm
+  // accounts against the global LLM cap. Loose enough for a shared mobile-carrier address.
+  const signupLimiter = new RateLimiterRedis({
+    storeClient: valkey,
+    keyPrefix: "rl:signup",
+    points: SIGNUPS_PER_HOUR,
+    duration: 3600,
+  });
 
   app.get("/api/health", (_req, res) => {
     Promise.all([pool.query("SELECT 1"), valkey.ping()]).then(
@@ -131,13 +139,11 @@ export function createApp(deps: AppDeps): Express {
       return;
     }
     const state = randomToken();
-    const invite = req.query.invite;
     const pending: PendingLogin = {
       provider,
       verifier: randomToken(),
       nonce: randomToken(),
       next: safeNext(req.query.next),
-      inviteCode: typeof invite === "string" && invite !== "" ? invite : null,
       ageConfirmed: req.query.age18 === "1",
     };
     const key = `oauth:state:${sha256(state).toString("hex")}`;
@@ -203,8 +209,15 @@ export function createApp(deps: AppDeps): Express {
     }
 
     const result = await loginOrSignup(pool, provider, identity, {
-      inviteCode: pending.inviteCode,
       ageConfirmed: pending.ageConfirmed,
+      signupAllowed: () =>
+        signupLimiter.consume(req.ip ?? "unknown").then(
+          () => true,
+          (rejection: unknown) => {
+            if (rejection instanceof Error) throw rejection;
+            return false;
+          },
+        ),
     });
     if (!result.ok) {
       fail(res, result.reason);

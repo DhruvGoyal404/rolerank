@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Starts all of RoleRank locally against the real local corpus, in one command:
 #   Postgres and Valkey (compose), migrations, the extractor sandbox service, aiworker, the ranker
-#   service (compose), the API and the built site. Prints the URL, and your invite code the first
-#   time. Stop it all with: bash scripts/dev-down.sh
+#   service (compose), the API and the built site. Prints the URL.
+#   Stop it all with: bash scripts/dev-down.sh
 # Reads the gitignored .env and prints no secret. Logs go to .dev/logs (gitignored).
 set -euo pipefail
 export MSYS_NO_PATHCONV=1
@@ -96,19 +96,12 @@ wait_http http://127.0.0.1:8080/api/health 60 || { echo "API didn't start: see $
 wait_http http://localhost:5173 60 || { echo "site didn't start: see $DEV/logs/web.log"; exit 1; }
 wait_http http://127.0.0.1:8094/health 300 || { echo "ranker didn't start: docker compose logs ranker"; exit 1; }
 
-# One invite for you, made the first time; only its hash is in the database.
-if [ ! -s "$DEV/invite.txt" ]; then
-  APP_DATABASE_URL="$APP_URL" node api/dist/cli/invite.js 1 30 >"$DEV/invite.txt"
-fi
-invite=$(cat "$DEV/invite.txt")
-
 cat <<EOF
 
 +------------------------------------------------------------------+
 |  RoleRank is running locally                                     |
 |                                                                  |
 |  Open:    http://localhost:5173                                  |
-|  Invite:  $invite (one use; also in .dev/invite.txt)
 |  Corpus:  $rows searchable postings
 |  Logs:    .dev/logs/                                             |
 |                                                                  |

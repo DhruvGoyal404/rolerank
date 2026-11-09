@@ -21,7 +21,7 @@ export function Privacy() {
           From signing in with Google or GitHub: the account&apos;s ID, and the email address Google
           gives us. We don&apos;t keep the sign-in token.
         </li>
-        <li>That you confirmed you are 18 or older, and the invitation you used.</li>
+        <li>That you confirmed you are 18 or older (and, for accounts made while signup was invite-only, the invitation used).</li>
         <li>
           Your resume&apos;s text, your contact details from it, and the profile we read from it.
           These are encrypted with a key of your own before they are stored. The skills and level in
@@ -58,8 +58,9 @@ export function Privacy() {
           requires. Anthropic doesn&apos;t use API data to train models without permission.
         </li>
         <li>
-          We have no zero-data-retention agreement with Anthropic. We will look at one again before
-          RoleRank opens to the public.
+          We have no zero-data-retention agreement with Anthropic, and RoleRank opens to the public
+          without one. It is a small personal project, and such an agreement is a separate contract
+          with Anthropic, not a setting. So the 30-day and 2-year windows above apply to what is sent.
         </li>
         <li>
           You review the draft and confirm it. Nothing the AI read from hidden text, and nothing it

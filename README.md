@@ -15,7 +15,7 @@ Needs Docker, Node 24.22.0 and Go.
 the ranker service, the API and the built site):
 
 ```sh
-bash scripts/dev-up.sh      # prints http://localhost:5173 and, the first time, your invite code
+bash scripts/dev-up.sh      # prints http://localhost:5173
 bash scripts/dev-down.sh    # stops all of it; data stays in the compose volumes
 ```
 

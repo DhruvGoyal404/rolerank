@@ -1,15 +1,15 @@
 import type { Pool, PoolClient } from "pg";
-import { sha256 } from "../crypto.js";
 import type { ProviderIdentity, ProviderName } from "./providers.js";
 
 export interface SignupTerms {
-  inviteCode: string | null;
   ageConfirmed: boolean;
+  /** Asked only for a new account, after the age check: the per-address signup limit. */
+  signupAllowed?: () => Promise<boolean>;
 }
 
 export type LoginResult =
   | { ok: true; userId: string; created: boolean }
-  | { ok: false; reason: "invite_required" | "age_required" };
+  | { ok: false; reason: "age_required" | "signup_limited" };
 
 async function findUser(
   db: Pool | PoolClient,
@@ -26,7 +26,8 @@ async function findUser(
 const UNIQUE_VIOLATION = "23505";
 
 /**
- * Returning users sign in. A new user needs a valid invite and the 18+ confirmation.
+ * Returning users sign in. A new user needs the 18+ confirmation (signup is open since
+ * 2026-11-09; the invites table stays until a later release contracts it).
  * Identity is (provider, subject): the same email at another provider is another user.
  */
 export async function loginOrSignup(
@@ -39,26 +40,12 @@ export async function loginOrSignup(
   if (existing) return { ok: true, userId: existing, created: false };
 
   if (!terms.ageConfirmed) return { ok: false, reason: "age_required" };
-  if (!terms.inviteCode) return { ok: false, reason: "invite_required" };
+  if (terms.signupAllowed && !(await terms.signupAllowed())) return { ok: false, reason: "signup_limited" };
 
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const invite = await client.query<{ id: string }>(
-      `UPDATE invites SET uses_left = uses_left - 1
-       WHERE code_sha256 = $1 AND uses_left > 0 AND expires_at > now()
-       RETURNING id`,
-      [sha256(terms.inviteCode)],
-    );
-    const inviteId = invite.rows[0]?.id;
-    if (!inviteId) {
-      await client.query("ROLLBACK");
-      return { ok: false, reason: "invite_required" };
-    }
-    const user = await client.query<{ id: string }>(
-      `INSERT INTO users (age_confirmed_at, invite_id) VALUES (now(), $1) RETURNING id`,
-      [inviteId],
-    );
+    const user = await client.query<{ id: string }>(`INSERT INTO users (age_confirmed_at) VALUES (now()) RETURNING id`);
     const userId = user.rows[0]?.id;
     if (!userId) throw new Error("insert returned no user");
     await client.query(
@@ -71,7 +58,7 @@ export async function loginOrSignup(
     return { ok: true, userId, created: true };
   } catch (error) {
     await client.query("ROLLBACK");
-    // Two first logins raced: the winner's row stands and the invite use is rolled back.
+    // Two first logins raced: the winner's row stands.
     if ((error as { code?: string }).code === UNIQUE_VIOLATION) {
       const winner = await findUser(pool, provider, identity.subject);
       if (winner) return { ok: true, userId: winner, created: false };

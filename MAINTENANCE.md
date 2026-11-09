@@ -31,11 +31,6 @@ From Git Bash at the repository root:
   money.
 - Both are safe to run again after a half-failed run.
 
-**Invites** (signup is invite-only). While up: `bash scripts/prod-invite.sh [uses=1] [days=30]`.
-The code is made on this PC; only its SHA-256 reaches the host, through SSM. The code is
-appended to `.dev/prod-invites.txt` (gitignored) and never printed. Invites live in the `app`
-database, so they survive down and up through the backups.
-
 ## First time only
 
 1. **AWS login.** The account is CodeJudge's (QUESTIONS.md, Q15); the scripts use the

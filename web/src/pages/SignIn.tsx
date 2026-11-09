@@ -4,21 +4,16 @@ import { useSearchParams } from "react-router";
 const ERRORS: Record<string, string> = {
   state: "That sign-in link expired. Please try again.",
   provider: "We couldn't complete sign-in with that provider. Please try again.",
-  invite_required: "New accounts need a valid invite code.",
-  age_required: "New accounts must confirm they are 18 or over.",
+  age_required: "New accounts must confirm they are 18 or over. Tick the box, then choose your provider again.",
+  signup_limited: "Too many new accounts were made from this network in the last hour. Try again later, or sign in to an account you already have.",
 };
 
-export function startUrl(provider: "google" | "github", invite: string, age18: boolean): string {
-  const query = new URLSearchParams();
-  if (invite.trim() !== "") query.set("invite", invite.trim());
-  if (age18) query.set("age18", "1");
-  const suffix = query.toString();
-  return `/api/auth/${provider}/start${suffix === "" ? "" : `?${suffix}`}`;
+export function startUrl(provider: "google" | "github", age18: boolean): string {
+  return `/api/auth/${provider}/start${age18 ? "?age18=1" : ""}`;
 }
 
 export function SignIn() {
   const [params] = useSearchParams();
-  const [invite, setInvite] = useState("");
   const [age18, setAge18] = useState(false);
   const error = ERRORS[params.get("error") ?? ""];
 
@@ -26,17 +21,8 @@ export function SignIn() {
     <>
       <h1>Sign in</h1>
       {error ? <p role="alert">{error}</p> : null}
-      <p>Returning? Just choose your provider. New here? You&apos;ll need an invite code.</p>
-      <label htmlFor="invite">Invite code</label>
-      <input
-        id="invite"
-        value={invite}
-        autoComplete="off"
-        onChange={(event) => {
-          setInvite(event.target.value);
-        }}
-      />
-      <label>
+      <p>Use your Google or GitHub account. New here? Confirm your age first.</p>
+      <label className="check">
         <input
           type="checkbox"
           checked={age18}
@@ -47,10 +33,10 @@ export function SignIn() {
         I am 18 or over
       </label>
       <p>
-        <a href={startUrl("google", invite, age18)}>Continue with Google</a>
+        <a href={startUrl("google", age18)}>Continue with Google</a>
       </p>
       <p>
-        <a href={startUrl("github", invite, age18)}>Continue with GitHub</a>
+        <a href={startUrl("github", age18)}>Continue with GitHub</a>
       </p>
     </>
   );

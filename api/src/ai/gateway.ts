@@ -81,10 +81,15 @@ export interface ParseResult {
 }
 
 /** Only visible lines go to the model: hidden and tiny text can't ground anything anyway. */
+/** Removes any opening or closing form of a block's tag, in any case or spacing (security review S3). */
+export function stripTag(tag: string, text: string): string {
+  return text.replace(new RegExp(`<\\s*/?\\s*${tag}\\b[^>]*>`, "gi"), "");
+}
+
 export function resumeBlock(lines: Line[]): string {
   const body = lines
     .filter((l) => !l.hidden && !l.tiny)
-    .map((l) => `L${l.n}: ${l.text.replaceAll("</resume_lines>", "")}`)
+    .map((l) => `L${l.n}: ${stripTag("resume_lines", l.text)}`)
     .join("\n");
   return `<resume_lines>\n${body}\n</resume_lines>`;
 }
@@ -163,7 +168,7 @@ const tailorJsonSchema = {
 };
 
 /** Text inside a data block can't close it. */
-const data = (tag: string, body: string): string => `<${tag}>\n${body.replaceAll(`</${tag}>`, "")}\n</${tag}>`;
+export const data = (tag: string, body: string): string => `<${tag}>\n${stripTag(tag, body)}\n</${tag}>`;
 /** A job title is untrusted and only needs to be short. */
 const title = (t: string): string => t.replace(/\s+/g, " ").trim().slice(0, 120);
 

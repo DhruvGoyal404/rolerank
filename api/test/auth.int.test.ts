@@ -8,7 +8,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { githubProvider, googleProvider } from "../src/auth/providers.js";
 import { loadConfig, type Config } from "../src/config.js";
 import { sha256 } from "../src/crypto.js";
-import { createApp } from "../src/http/app.js";
+import { createApp, SIGNUPS_PER_HOUR } from "../src/http/app.js";
 import { createLog } from "../src/log.js";
 import {
   createTestDatabases,
@@ -78,20 +78,12 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await valkey.del("rl:auth:::ffff:127.0.0.1", "rl:auth:127.0.0.1", "rl:auth:::1");
+  await valkey.del("rl:signup:::ffff:127.0.0.1", "rl:signup:127.0.0.1", "rl:signup:::1");
   fake.googleClaims = {};
   fake.googleSub = `google-${randomBytes(4).toString("hex")}`;
   fake.githubId = randomBytes(4).readUInt32LE();
   fake.githubTokenBody = { access_token: "gh-token" };
 });
-
-async function invite(uses = 1): Promise<string> {
-  const code = randomBytes(8).toString("hex");
-  await admin.query(
-    `INSERT INTO invites (code_sha256, uses_left, expires_at) VALUES ($1, $2, now() + interval '1 day')`,
-    [sha256(code), uses],
-  );
-  return code;
-}
 
 interface Started {
   state: string;
@@ -126,7 +118,7 @@ function sessionCookie(res: request.Response): string {
 }
 
 async function signIn(provider = "github"): Promise<string> {
-  const s = await start(provider, { invite: await invite(), age18: "1" });
+  const s = await start(provider, { age18: "1" });
   const res = await finish(provider, s);
   expect(res.headers.location).toBe("/");
   return sessionCookie(res);
@@ -183,7 +175,7 @@ describe("sign-in", () => {
     expect(raw.rowCount).toBe(0);
   });
 
-  it("lets a returning user in without an invite", async () => {
+  it("lets a returning user in without the age box", async () => {
     await signIn();
     const res = await finish("github", await start("github"));
     expect(res.headers.location).toBe("/");
@@ -191,8 +183,7 @@ describe("sign-in", () => {
   });
 
   it("keeps a same-origin next and drops a foreign one", async () => {
-    const code = await invite(2);
-    const good = await start("github", { invite: code, age18: "1", next: "/matches" });
+    const good = await start("github", { age18: "1", next: "/matches" });
     expect((await finish("github", good)).headers.location).toBe("/matches");
     const bad = await start("github", { next: "https://evil.example/x" });
     expect((await finish("github", bad)).headers.location).toBe("/");
@@ -210,52 +201,53 @@ describe("sign-in", () => {
 });
 
 describe("signup rules", () => {
-  it("needs an invite", async () => {
+  it("is open: a new account needs only the 18+ confirmation", async () => {
     const res = await finish("github", await start("github", { age18: "1" }));
-    expect(res.headers.location).toBe("/signin?error=invite_required");
-    expect(sessionCookie(res)).toBe("");
+    expect(res.headers.location).toBe("/");
+    expect(sessionCookie(res)).toBeTruthy();
+    const { rows } = await admin.query<{ invite_id: string | null }>(
+      `SELECT u.invite_id FROM users u JOIN identities i ON i.user_id = u.id WHERE i.provider = 'github' AND i.subject = $1`,
+      [String(fake.githubId)],
+    );
+    expect(rows).toEqual([{ invite_id: null }]);
   });
 
-  it("needs the 18+ confirmation, without spending the invite", async () => {
-    const code = await invite();
-    const res = await finish("github", await start("github", { invite: code }));
+  it("needs the 18+ confirmation", async () => {
+    const res = await finish("github", await start("github"));
     expect(res.headers.location).toBe("/signin?error=age_required");
-    const again = await finish("github", await start("github", { invite: code, age18: "1" }));
+    expect(sessionCookie(res)).toBe("");
+    const again = await finish("github", await start("github", { age18: "1" }));
     expect(again.headers.location).toBe("/");
   });
 
-  it("refuses a used-up or expired invite", async () => {
-    const code = await invite(1);
-    await finish("github", await start("github", { invite: code, age18: "1" }));
-    fake.githubId += 1;
-    const used = await finish("github", await start("github", { invite: code, age18: "1" }));
-    expect(used.headers.location).toBe("/signin?error=invite_required");
-
-    const expired = randomBytes(8).toString("hex");
-    await admin.query(
-      `INSERT INTO invites (code_sha256, uses_left, expires_at) VALUES ($1, 1, now() - interval '1 hour')`,
-      [sha256(expired)],
-    );
-    const res = await finish("github", await start("github", { invite: expired, age18: "1" }));
-    expect(res.headers.location).toBe("/signin?error=invite_required");
+  it("ignores a leftover invite parameter", async () => {
+    const res = await finish("github", await start("github", { invite: "anything", age18: "1" }));
+    expect(res.headers.location).toBe("/");
   });
 
-  it("can't spend one invite twice under concurrency", async () => {
-    const code = await invite(1);
-    const attempts = await Promise.all(
-      [1, 2, 3, 4, 5].map(async (i) => {
-        fake.githubId += i;
-        const s = await start("github", { invite: code, age18: "1" });
-        return finish("github", s);
-      }),
-    );
-    const { rows } = await admin.query<{ uses_left: number }>(
-      `SELECT uses_left FROM invites WHERE code_sha256 = $1`,
-      [sha256(code)],
-    );
-    expect(rows[0]?.uses_left).toBe(0);
-    const accepted = attempts.filter((r) => r.headers.location === "/");
-    expect(accepted.length).toBeGreaterThanOrEqual(1);
+  it(`limits new accounts to ${String(SIGNUPS_PER_HOUR)} an hour per address, never a returning user`, async () => {
+    const first = fake.githubId;
+    for (let i = 0; i < SIGNUPS_PER_HOUR; i++) {
+      fake.githubId = first + i;
+      expect((await finish("github", await start("github", { age18: "1" }))).headers.location).toBe("/");
+    }
+    await valkey.del("rl:auth:::ffff:127.0.0.1", "rl:auth:127.0.0.1", "rl:auth:::1");
+    fake.githubId = first + SIGNUPS_PER_HOUR;
+    const limited = await finish("github", await start("github", { age18: "1" }));
+    expect(limited.headers.location).toBe("/signin?error=signup_limited");
+    expect(sessionCookie(limited)).toBe("");
+    fake.githubId = first;
+    const back = await finish("github", await start("github"));
+    expect(back.headers.location).toBe("/");
+  });
+
+  it("makes one account when two first logins race", async () => {
+    const attempts = await Promise.all([1, 2, 3, 4].map(async () => finish("github", await start("github", { age18: "1" }))));
+    expect(attempts.every((r) => r.headers.location === "/")).toBe(true);
+    const { rows } = await admin.query<{ n: string }>(`SELECT count(*) AS n FROM identities WHERE provider = 'github' AND subject = $1`, [
+      String(fake.githubId),
+    ]);
+    expect(Number(rows[0]?.n)).toBe(1);
   });
 });
 
@@ -273,8 +265,7 @@ describe("rejected logins", () => {
   });
 
   it("rejects a reused state", async () => {
-    const code = await invite(2);
-    const s = await start("github", { invite: code, age18: "1" });
+    const s = await start("github", { age18: "1" });
     expect((await finish("github", s)).headers.location).toBe("/");
     const replay = await finish("github", s);
     expect(replay.headers.location).toBe("/signin?error=state");
@@ -293,7 +284,7 @@ describe("rejected logins", () => {
     ["wrong issuer", { iss: "https://evil.example" }],
   ])("rejects a Google token with %s", async (_name, claims) => {
     fake.googleClaims = claims;
-    const s = await start("google", { invite: await invite(), age18: "1" });
+    const s = await start("google", { age18: "1" });
     const res = await finish("google", s);
     expect(res.headers.location).toBe("/signin?error=provider");
     expect(sessionCookie(res)).toBe("");
