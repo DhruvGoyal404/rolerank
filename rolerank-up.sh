@@ -240,12 +240,21 @@ github_ok() {
   grep -qi 'continue to' <<<"$page"
 }
 check github_ok
+CHECK="robots.txt and sitemap.xml are real files (text/plain, XML), not the app's page"
+crawler_ok() {
+  local t
+  t=$(curl -fsS --max-time 15 -o "$(winpath "$WORK/body")" -w '%{content_type}' --resolve "$DOMAIN:443:$IP" "https://$DOMAIN/robots.txt") || return 1
+  [[ "$t" == text/plain* ]] && grep -q '^Disallow: /api/' "$WORK/body" || return 1
+  t=$(curl -fsS --max-time 15 -o "$(winpath "$WORK/body")" -w '%{content_type}' --resolve "$DOMAIN:443:$IP" "https://$DOMAIN/sitemap.xml") || return 1
+  [[ "$t" == *xml* ]] && grep -q '<urlset' "$WORK/body"
+}
+check crawler_ok
 CHECK="one real LLM call through the spend ledger (ops scope, its own daily cap; no user data)"
 check ssm_run "$ID" ''"$HOST_COMPOSE"' exec -T aiworker node dist/cli/llm-check.js'
 CHECK="warm search under 200 ms on the host (${ms} ms)"
 check test "$ms" -lt 200
-CHECK="backup and embedding timers active, extractor running"
-check ssm_run "$ID" 'systemctl is-active rolerank-backup.timer rolerank-embed.timer rolerank-extractor.service'
+CHECK="backup and embedding timers active, extractor running with uploads sandboxed under gVisor (runsc)"
+check ssm_run "$ID" 'systemctl is-active rolerank-backup.timer rolerank-embed.timer rolerank-extractor.service && journalctl -u rolerank-extractor -b --no-pager | grep -c "extractor listening.*runtime=runsc" >/dev/null'
 [ "$fail" = 0 ] || die "some checks failed (above); the site is up: fix it, or run ./rolerank-down.sh"
 
 log "8/8 Up"

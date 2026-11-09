@@ -41,6 +41,14 @@
 		file_server
 	}
 
+	# Crawler files: served by name, a missing one is a 404, never the SPA's "Page not found".
+	@crawler path /robots.txt /sitemap.xml
+	handle @crawler {
+		root * /srv/web
+		header Cache-Control "public, max-age=3600"
+		file_server
+	}
+
 	# Any other path serves index.html (client-side routes), always revalidated.
 	handle {
 		root * /srv/web

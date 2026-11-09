@@ -1,0 +1,14 @@
+# RoleRank: public pages may be crawled; the API and signed-in pages may not.
+# Job pages are signed-in and noindex as well.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /signin
+Disallow: /resume
+Disallow: /matches
+Disallow: /jobs/
+Disallow: /jd
+Disallow: /tracker
+Disallow: /account
+
+Sitemap: https://rolerank.dhruvgoyal.tech/sitemap.xml

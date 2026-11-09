@@ -72,3 +72,19 @@ test("the web manifest loads under the CSP", async ({ page, context }) => {
   expect(manifest.data ?? "").toContain('"name": "RoleRank"');
   expect(blocked).toEqual([]);
 });
+
+// Real files, never the app's "Page not found" (Caddy serves them by name in production).
+test("robots.txt and sitemap.xml are real static files", async ({ request }) => {
+  const robots = await request.get("/robots.txt");
+  expect(robots.status()).toBe(200);
+  expect(robots.headers()["content-type"]).toMatch(/^text\/plain/);
+  const r = await robots.text();
+  expect(r).not.toContain("<html");
+  for (const rule of ["Disallow: /api/", "Disallow: /matches", "Disallow: /account", "Sitemap: https://rolerank.dhruvgoyal.tech/sitemap.xml"]) expect(r).toContain(rule);
+
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  expect(sitemap.headers()["content-type"]).toMatch(/xml/);
+  const locs = [...(await sitemap.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  expect(locs).toEqual(["/", "/sources", "/about/bot", "/privacy"].map((p) => `https://rolerank.dhruvgoyal.tech${p}`));
+});
