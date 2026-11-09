@@ -48,6 +48,9 @@ export function Resume() {
         <Review profileId={me.profile.id} confirmed={me.profile.confirmed} onConfirmed={refresh} onReplace={() => { setReplacing(true); }} />
       ) : (
         <Upload
+          // A new resume remounts it, so a fast failure shows its own message: the error state is
+          // read from `failed` only when it mounts (CI found the race, 2026-11-09).
+          key={me.resume?.id ?? "none"}
           failed={me.resume?.status === "failed" ? readError(me.resume.error) : null}
           onUploaded={async () => {
             setReplacing(false);
