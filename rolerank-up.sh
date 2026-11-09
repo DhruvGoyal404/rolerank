@@ -216,7 +216,8 @@ check retry curl -fsS --max-time 15 --resolve "$DOMAIN:443:$IP" "https://$DOMAIN
 CHECK="health on https://$DOMAIN (DNS -> $IP, valid certificate)"
 domain_ok() {
   for _ in $(seq 60); do
-    [ "$(curl -fsS --max-time 10 -o "$(winpath "$WORK/body")" -w '%{remote_ip}' "https://$DOMAIN/api/health" 2>/dev/null)" = "$IP" ] && return 0
+    # Public DNS over HTTPS: this PC's resolver can hold a negative answer from before the record existed.
+    [ "$(curl -fsS --max-time 10 --doh-url https://1.1.1.1/dns-query -o "$(winpath "$WORK/body")" -w '%{remote_ip}' "https://$DOMAIN/api/health" 2>/dev/null)" = "$IP" ] && return 0
     sleep 10
   done
   return 1
@@ -227,7 +228,7 @@ google_ok() {
   local loc
   loc=$(curl -fsS --max-time 15 -o "$(winpath "$WORK/body")" -w '%{redirect_url}' --resolve "$DOMAIN:443:$IP" "https://$DOMAIN/api/auth/google/start")
   [[ "$loc" == https://accounts.google.com/* && "$loc" == *client_id=* && "$loc" == *code_challenge_method=S256* && "$loc" == *nonce=* ]] || return 1
-  curl -fsS --max-time 15 -o /dev/null "$loc" # Google answers 200 for a registered client, 400 for an unknown one
+  curl -fsS --max-time 15 -o "$(winpath "$WORK/body")" "$loc" # Google answers 200 for a registered client, 400 for an unknown one
 }
 check google_ok
 CHECK="GitHub OAuth: the authorize page names our app"
