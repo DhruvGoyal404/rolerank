@@ -91,7 +91,7 @@ async function pdf(bytes) {
       text = text.replace(/\s+/g, " ").trim();
       if (!text) continue;
       const tiny = parts.every((q) => q.size < TINY_PT);
-      const isHidden = isIn(text, hidden);
+      const isHidden = isIn(text, hidden) || unreadable(text);
       lines.push({ text, hidden: isHidden, tiny });
     }
     page.cleanup();
@@ -104,13 +104,25 @@ async function pdf(bytes) {
 // so "I g n o r e   p r e v i o u s" never matched its own hidden string (D7-hard, 2026-11-07).
 // Either way round: pdf.js clips text that runs off the page, so a line can be a fragment of a
 // longer hidden string.
+// For glyphs pdf.js can't map to text, the drawing operators and the text layer disagree, so the
+// two are also compared on their ASCII letters and digits alone, after NFKC (a "ﬁ" ligature is
+// "fi"). D7-S, 2026-11-09: white Devanagari text drawn with a Latin font was never matched to
+// its own hidden string.
 const squash = (s) => s.replace(/\s+/g, "");
+const ascii = (s) => s.normalize("NFKC").replace(/[^A-Za-z0-9]/g, "");
+const within = (t, h, min) => h.length >= min && (t.includes(h) || (t.length >= 8 && h.includes(t)));
 function isIn(text, hidden) {
   const t = squash(text);
-  return [...hidden].some((raw) => {
-    const h = squash(raw);
-    return h.length >= 3 && (t.includes(h) || (t.length >= 8 && h.includes(t)));
-  });
+  const ta = ascii(text);
+  return [...hidden].some((raw) => within(t, squash(raw), 3) || within(ta, ascii(raw), 8));
+}
+
+// A line that is mostly characters with no meaning (the replacement character, lone surrogates,
+// private-use code points, controls) can't be read by the user either, so the model never gets it.
+function unreadable(text) {
+  const chars = [...text.replace(/\s+/g, "")];
+  const junk = chars.filter((c) => /[�\uD800-\uDFFF-\u0000-\u001F]/.test(c)).length;
+  return chars.length >= 6 && junk * 3 >= chars.length;
 }
 
 function hexRGB(hex) {
