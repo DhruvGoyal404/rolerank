@@ -291,8 +291,18 @@ export function mountJobs(
       const p = await posting(req, res);
       if (!p) return;
       const c = await latestConfirmed(pool, vault, byUser(req));
+      // The band for a job opened directly, scored as the matches list would score it. Null
+      // without a confirmed profile, or when the ranker can't answer: the page then shows none.
+      let band: string | null = null;
+      if (c && d.ranker) {
+        const prefs = await preferencesOf(pool, byUser(req));
+        const q = rankQuery(c.profile, { country: prefs.country, remote: prefs.remote, limit: 1 });
+        const hit = await d.ranker.score(prefs.targetTitles ? { ...q, titles: prefs.targetTitles } : q, Number(p.id));
+        band = hit ? bandName(hit.band) : null;
+      }
       res.json({
         job: card(p),
+        band,
         explanation: c ? explained(p, c.profile) : null,
       });
     })().catch(next);

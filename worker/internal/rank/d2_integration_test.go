@@ -203,6 +203,20 @@ func TestD2(t *testing.T) {
 		}
 	}
 
+	// One job scored on its own gets exactly the score and band it has in the list.
+	for _, r := range first[:min(10, len(first))] {
+		one, err := s.ScoreOne(ctx, prof, r.ID)
+		if err != nil || one == nil {
+			t.Fatalf("score one %d: %v %v", r.ID, one, err)
+		}
+		if one.Score != r.Score || one.Band != r.Band {
+			t.Fatalf("job %d: alone %.6f %s, in the list %.6f %s", r.ID, one.Score, one.Band, r.Score, r.Band)
+		}
+	}
+	if one, err := s.ScoreOne(ctx, prof, -1); err != nil || one != nil {
+		t.Fatalf("a missing posting scored: %v %v", one, err)
+	}
+
 	// Profiles are embedded with bge's query prefix: the P3 bake-off chose it on D3.
 	h := results["hybrid prefix=true"]
 	if h.NDCG10 < 0.85 || h.MRR < 0.90 || h.Recall < 0.98 || h.LevelViolation > 0.01 || h.GeoViolate != 0 {

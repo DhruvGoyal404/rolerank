@@ -16,15 +16,15 @@ export function tidyExcerpt(text: string): string {
 export function Job() {
   const { key = "" } = useParams();
   const { me, loading } = useSession();
-  const band = (useLocation().state as { band?: string } | null)?.band;
-  const [job, setJob] = useState<{ job: JobCard; explanation: Explanation | null } | null>(null);
+  const fromList = (useLocation().state as { band?: string } | null)?.band;
+  const [job, setJob] = useState<{ job: JobCard; band?: string | null; explanation: Explanation | null } | null>(null);
   const [missing, setMissing] = useState(false);
   const [prose, setProse] = useState<{ text: string | null; outcome: string } | null>(null);
   const [tailoring, setTailoring] = useState<Tailoring | null>(null);
   const [busy, setBusy] = useState<"" | "explain" | "tailor">("");
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    api<{ job: JobCard; explanation: Explanation | null }>(`/api/jobs/${key}`).then(setJob, () => { setMissing(true); });
+    api<{ job: JobCard; band: string | null; explanation: Explanation | null }>(`/api/jobs/${key}`).then(setJob, () => { setMissing(true); });
   }, [key]);
   if (loading) return <Loading what="your account" />;
   if (!me) return <Navigate to="/signin" replace />;
@@ -39,6 +39,8 @@ export function Job() {
       </div>
     );
   if (!job) return <Loading what="the job" />;
+  // The server's band, scored for this user; the list's, if the server couldn't answer.
+  const band = job.band ?? fromList;
 
   const run = async (what: "explain" | "tailor") => {
     setBusy(what);

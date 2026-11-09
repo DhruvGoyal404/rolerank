@@ -13,6 +13,8 @@ export interface Hit {
 
 export interface Ranker {
   search(q: RankQuery): Promise<Hit[] | null>;
+  /** One posting's fit, ranked as a search would rank it. Undefined when the ranker is down. */
+  score(q: RankQuery, id: number): Promise<Hit | null | undefined>;
 }
 
 export interface RankQuery {
@@ -34,21 +36,28 @@ export function rankQuery(p: Profile, opts: { country: string; remote: boolean; 
 }
 
 export function rankerClient(url: string, token: string, timeoutMs = 10_000): Ranker {
+  const post = async (path: string, body: unknown): Promise<unknown> => {
+    try {
+      const res = await fetch(`${url}${path}`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      return res.ok ? await res.json() : undefined;
+    } catch {
+      return undefined;
+    }
+  };
   return {
     async search(q) {
-      try {
-        const res = await fetch(`${url}/search`, {
-          method: "POST",
-          headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
-          body: JSON.stringify(q),
-          signal: AbortSignal.timeout(timeoutMs),
-        });
-        if (!res.ok) return null;
-        const body = (await res.json()) as { hits?: Array<{ id: number; band: string }> };
-        return (body.hits ?? []).map((h) => ({ id: h.id, band: h.band }));
-      } catch {
-        return null;
-      }
+      const body = (await post("/search", q)) as { hits?: Array<{ id: number; band: string }> } | undefined;
+      return body ? (body.hits ?? []).map((h) => ({ id: h.id, band: h.band })) : null;
+    },
+    async score(q, id) {
+      const body = (await post("/score", { ...q, id })) as { hit?: { id: number; band: string } | null } | undefined;
+      if (!body) return undefined;
+      return body.hit ? { id: body.hit.id, band: body.hit.band } : null;
     },
   };
 }

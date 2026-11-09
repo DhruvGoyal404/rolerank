@@ -46,6 +46,10 @@ const ranker: Ranker = {
     // Lower case, as the real ranker names them; the API capitalises.
     return Promise.resolve(rankDown ? null : [{ id: Number(jobKey), band: "strong" }, { id: 999999, band: "good" }]);
   },
+  score: (q, id) => {
+    rankAsked.push(q);
+    return Promise.resolve(rankDown ? undefined : { id, band: "good" });
+  },
 };
 let sent: string[];
 let jobKey: string;
@@ -349,6 +353,16 @@ describe("jobs", () => {
       explanation: { matched: ["Python", "PostgreSQL"], missing: ["Kubernetes"], niceMatched: ["Docker"] },
     });
     expect(JSON.stringify(res.body)).not.toContain(BODY_CANARY);
+    // Opened directly, the job still has its band, scored for this user's confirmed profile.
+    rankAsked.length = 0;
+    expect((await agent.get(`/api/jobs/${jobKey}`).expect(200)).body).toMatchObject({ band: "Good" });
+    expect(rankAsked[0]).toMatchObject({ level: "entry", country: "IN", remote: true });
+    expect(JSON.stringify(rankAsked[0])).not.toContain("asha@example.com");
+    rankDown = true;
+    expect((await agent.get(`/api/jobs/${jobKey}`).expect(200)).body).toMatchObject({ band: null });
+    rankDown = false;
+    const { agent: draft } = await user("j1d", false);
+    expect((await draft.get(`/api/jobs/${jobKey}`).expect(200)).body).toMatchObject({ band: null });
     await agent.get("/api/jobs/999999").expect(404);
     await agent.get("/api/jobs/1;drop").expect(404);
   });

@@ -31,6 +31,43 @@ func (f *fakeSearch) Search(_ context.Context, p rank.Profile, _ rank.Mode, limi
 	return []rank.Ranked{{Candidate: rank.Candidate{ID: 7}, Score: 0.6, Band: "Strong"}}, f.err
 }
 
+func (f *fakeSearch) ScoreOne(_ context.Context, p rank.Profile, id int64) (*rank.Ranked, error) {
+	f.p = p
+	if id == 404 {
+		return nil, f.err
+	}
+	return &rank.Ranked{Candidate: rank.Candidate{ID: id}, Score: 0.4, Band: "Good"}, f.err
+}
+
+func TestScoreRanksOnePosting(t *testing.T) {
+	e, s := &fakeEmbed{}, &fakeSearch{}
+	h := Handler(e, s, tok)
+	score := func(body string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest(http.MethodPost, "/score", strings.NewReader(body))
+		req.Header.Set("Authorization", "Bearer "+tok)
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, req)
+		return w
+	}
+	w := score(`{"skills":["Go"],"titles":"","level":"entry","country":"IN","remote":true,"text":"Go developer","limit":1,"id":42}`)
+	var out struct{ Hit *Hit }
+	if w.Code != http.StatusOK || json.Unmarshal(w.Body.Bytes(), &out) != nil || out.Hit == nil || out.Hit.ID != 42 || out.Hit.Band != "Good" {
+		t.Fatalf("status %d body %s", w.Code, w.Body)
+	}
+	if w := score(`{"skills":[],"titles":"","level":"entry","country":"IN","remote":true,"text":"x","limit":1,"id":404}`); w.Code != http.StatusOK || !strings.Contains(w.Body.String(), `"hit":null`) {
+		t.Fatalf("missing posting: %d %s", w.Code, w.Body)
+	}
+	if w := score(`{"skills":[],"titles":"","level":"entry","country":"IN","remote":true,"text":"x","limit":1}`); w.Code != http.StatusBadRequest {
+		t.Fatalf("no id: %d", w.Code)
+	}
+	req := httptest.NewRequest(http.MethodPost, "/score", strings.NewReader(`{}`))
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+	if rec.Code != http.StatusUnauthorized {
+		t.Fatalf("no token: %d", rec.Code)
+	}
+}
+
 const tok = "tttttttttttttttttttttttttttttttttttttttt"
 
 func post(h http.Handler, auth, body string) *httptest.ResponseRecorder {

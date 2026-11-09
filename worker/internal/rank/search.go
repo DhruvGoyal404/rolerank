@@ -78,24 +78,23 @@ func (s *Searcher) isLarge(ctx context.Context) (bool, error) {
 	return s.large, nil
 }
 
-// Search returns up to limit ranked jobs.
-func (s *Searcher) Search(ctx context.Context, p Profile, mode Mode, limit int) ([]Ranked, error) {
+// retrieve runs the mode's retrievers: each returns its candidates, best first.
+func (s *Searcher) retrieve(ctx context.Context, p Profile, mode Mode) (vec, lex []int64, err error) {
 	args := []any{Levels(p.Level)}
 	where, err := Eligible(p)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	large, err := s.isLarge(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var vec, lex []int64
 	if mode != Lexical {
 		if len(p.Embedding) != embed.Dims {
-			return nil, fmt.Errorf("profile embedding has %d dimensions", len(p.Embedding))
+			return nil, nil, fmt.Errorf("profile embedding has %d dimensions", len(p.Embedding))
 		}
 		if vec, err = s.vectorIDs(ctx, large, where, append(args, embed.Literal(p.Embedding), PerRetriever)); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	if mode == Lexical || (mode == Hybrid && !large) {
@@ -106,8 +105,39 @@ func (s *Searcher) Search(ctx context.Context, p Profile, mode Mode, limit int) 
 			  + (SELECT count(*) FROM unnest(title_terms) x WHERE x = ANY($3)) DESC, posting_id
 			LIMIT $4`, append(args, p.Skills, p.Titles, PerRetriever)...)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
+	}
+	return vec, lex, nil
+}
+
+// ScoreOne ranks one posting for a profile exactly as a hybrid Search would: the same retrievers
+// set its fusion rank (none when it isn't among their candidates), and a posting's score depends
+// on nothing else in the list, so a job in the matches list gets the same band on its own page.
+// Nil when the posting isn't searchable.
+func (s *Searcher) ScoreOne(ctx context.Context, p Profile, id int64) (*Ranked, error) {
+	vec, lex, err := s.retrieve(ctx, p, Hybrid)
+	if err != nil {
+		return nil, err
+	}
+	cands, err := s.candidates(ctx, p, vec, lex, id)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range cands {
+		if c.ID == id {
+			r := Rerank(p, []Candidate{c}, s.Weights, s.Bands, s.Now())[0]
+			return &r, nil
+		}
+	}
+	return nil, nil
+}
+
+// Search returns up to limit ranked jobs.
+func (s *Searcher) Search(ctx context.Context, p Profile, mode Mode, limit int) ([]Ranked, error) {
+	vec, lex, err := s.retrieve(ctx, p, mode)
+	if err != nil {
+		return nil, err
 	}
 	cands, err := s.candidates(ctx, p, vec, lex)
 	if err != nil {
@@ -173,8 +203,9 @@ func (s *Searcher) ids(ctx context.Context, sql string, args ...any) ([]int64, e
 	return pgx.CollectRows(rows, pgx.RowTo[int64])
 }
 
-func (s *Searcher) candidates(ctx context.Context, p Profile, vec, lex []int64) ([]Candidate, error) {
-	ids := append(slices.Clone(vec), lex...)
+// candidates loads the retrieved postings, and any extra ones, with their retriever ranks.
+func (s *Searcher) candidates(ctx context.Context, p Profile, vec, lex []int64, extra ...int64) ([]Candidate, error) {
+	ids := append(append(slices.Clone(vec), lex...), extra...)
 	slices.Sort(ids)
 	ids = slices.Compact(ids)
 	vector := "[" + "0" + "]"

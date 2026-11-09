@@ -129,7 +129,10 @@ async function main(): Promise<void> {
     }
   })();
 
-  const ranker: Ranker = { search: () => Promise.resolve(ids.map((id, i) => ({ id, band: BANDS[i] ?? "Good" }))) };
+  const ranker: Ranker = {
+    search: () => Promise.resolve(ids.map((id, i) => ({ id, band: BANDS[i] ?? "Good" }))),
+    score: (_q, id) => Promise.resolve({ id, band: BANDS[ids.indexOf(id)] ?? "Good" }),
+  };
   const config = loadConfig({
     NODE_ENV: "test",
     PUBLIC_ORIGIN: "http://localhost:5173",

@@ -24,6 +24,7 @@ type embedder interface {
 
 type searcher interface {
 	Search(ctx context.Context, p rank.Profile, mode rank.Mode, limit int) ([]rank.Ranked, error)
+	ScoreOne(ctx context.Context, p rank.Profile, id int64) (*rank.Ranked, error)
 }
 
 // Query is what the API sends. Skills are canonical taxonomy names; titles are the user's target
@@ -36,6 +37,7 @@ type Query struct {
 	Remote  bool     `json:"remote"`
 	Text    string   `json:"text"`
 	Limit   int      `json:"limit"`
+	ID      int64    `json:"id,omitempty"` // POST /score only: the posting to score
 }
 
 // Hit is one ranked posting: the explainable features, the score and its fit band.
@@ -51,31 +53,41 @@ var iso = regexp.MustCompile(`^[A-Z]{2}$`)
 
 const maxBody = 64 << 10
 
-// Handler serves POST /search and GET /health.
+// Handler serves POST /search, POST /score and GET /health.
 func Handler(e embedder, s searcher, token string) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) })
-	mux.HandleFunc("POST /search", func(w http.ResponseWriter, req *http.Request) {
+	// read authenticates, validates and embeds the query; it writes the error itself.
+	read := func(w http.ResponseWriter, req *http.Request) (Query, rank.Profile, bool) {
+		var q Query
 		if subtle.ConstantTimeCompare([]byte(req.Header.Get("Authorization")), []byte("Bearer "+token)) != 1 {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
-			return
+			return q, rank.Profile{}, false
 		}
-		var q Query
 		dec := json.NewDecoder(http.MaxBytesReader(w, req.Body, maxBody))
 		dec.DisallowUnknownFields()
 		if err := dec.Decode(&q); err != nil || !levels[q.Level] || !iso.MatchString(q.Country) || len(q.Skills) > 200 || len(q.Text) > 4000 {
 			http.Error(w, "invalid request", http.StatusBadRequest)
-			return
+			return q, rank.Profile{}, false
 		}
-		q.Limit = max(1, min(q.Limit, 50))
 		vec, err := e.Embed([]string{embed.QueryPrefix + q.Text})
 		if err != nil || len(vec) != 1 {
 			slog.Warn("embed failed")
 			http.Error(w, "search failed", http.StatusBadGateway)
+			return q, rank.Profile{}, false
+		}
+		return q, rank.Profile{Skills: q.Skills, Titles: skills.TitleTerms(q.Titles), Level: q.Level, Country: q.Country, Remote: q.Remote, Embedding: vec[0]}, true
+	}
+	reply := func(w http.ResponseWriter, v any) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(v)
+	}
+	mux.HandleFunc("POST /search", func(w http.ResponseWriter, req *http.Request) {
+		q, p, ok := read(w, req)
+		if !ok {
 			return
 		}
-		p := rank.Profile{Skills: q.Skills, Titles: skills.TitleTerms(q.Titles), Level: q.Level, Country: q.Country, Remote: q.Remote, Embedding: vec[0]}
-		got, err := s.Search(req.Context(), p, rank.Hybrid, q.Limit)
+		got, err := s.Search(req.Context(), p, rank.Hybrid, max(1, min(q.Limit, 50)))
 		if err != nil {
 			slog.Warn("search failed")
 			http.Error(w, "search failed", http.StatusBadGateway)
@@ -85,8 +97,29 @@ func Handler(e embedder, s searcher, token string) http.Handler {
 		for _, r := range got {
 			hits = append(hits, Hit{ID: r.ID, Score: r.Score, Band: r.Band, Features: r.Features})
 		}
-		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]any{"hits": hits})
+		reply(w, map[string]any{"hits": hits})
+	})
+	// One posting's fit for the profile, as a search would rank it (rank.Searcher.ScoreOne).
+	mux.HandleFunc("POST /score", func(w http.ResponseWriter, req *http.Request) {
+		q, p, ok := read(w, req)
+		if !ok {
+			return
+		}
+		if q.ID <= 0 {
+			http.Error(w, "invalid request", http.StatusBadRequest)
+			return
+		}
+		r, err := s.ScoreOne(req.Context(), p, q.ID)
+		if err != nil {
+			slog.Warn("score failed")
+			http.Error(w, "search failed", http.StatusBadGateway)
+			return
+		}
+		if r == nil {
+			reply(w, map[string]any{"hit": nil})
+			return
+		}
+		reply(w, map[string]any{"hit": Hit{ID: r.ID, Score: r.Score, Band: r.Band, Features: r.Features}})
 	})
 	return mux
 }
