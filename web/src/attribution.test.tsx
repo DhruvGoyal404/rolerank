@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 import type { JobCard } from "./api";
 import { SOURCES } from "./attribution";
-import { ApplyLink, Band, Via } from "./components";
+import { ApplyLink, Band, place, Via } from "./components";
 
 /**
  * Each source's attribution rule (docs/SOURCES.md), checked on the rendered card: the credit
@@ -64,4 +64,13 @@ it("shows a fit band, never a percentage", () => {
     expect(out).toContain(`${band} fit`);
     expect(out).not.toMatch(/\d+\s*%/);
   }
+});
+
+describe("place", () => {
+  it("keeps short locations and summarises region-wide country lists around India", () => {
+    expect(place("Bengaluru")).toBe("Bengaluru");
+    expect(place("India | Remote")).toBe("India, Remote");
+    expect(place("Afghanistan | Armenia | Bahrain | India | Japan")).toBe("India and 4 other countries");
+    expect(place("Australia | Fiji | Guam | Samoa")).toBe("Australia and 3 other countries");
+  });
 });

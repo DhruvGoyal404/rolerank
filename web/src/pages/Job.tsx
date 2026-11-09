@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router";
 import { api, ApiError, type Explanation, type JobCard, type Tailoring } from "../api";
-import { ApplyLink, JobHeading, Loading, SkillSummary, TailoringView, Via } from "../components";
+import { ApplyLink, Facts, Loading, SkillSummary, TailoringView, Via } from "../components";
 import { useSession } from "../session";
 import { SaveButton } from "./Tracker";
 
@@ -38,22 +38,23 @@ export function Job() {
   };
 
   return (
-    <div className="stack">
-      <p className="eyebrow">Job</p>
-      <h1>{job.job.title}</h1>
-      <JobHeading job={{ ...job.job, title: "" }} />
-      <div className="row">
-        <ApplyLink job={job.job} />
-        <SaveButton jobKey={job.job.key} />
-        <Via job={job.job} />
-      </div>
-      {job.job.excerpt ? <p className="hint">{job.job.excerpt}</p> : null}
+    <article className="job">
+      <header className="page-head">
+        <h1>{job.job.title}</h1>
+        <Facts job={job.job} />
+        <div className="actions">
+          <ApplyLink job={job.job} />
+          <SaveButton jobKey={job.job.key} />
+          <Via job={job.job} />
+        </div>
+        {job.job.excerpt ? <p className="lede">{job.job.excerpt}</p> : null}
+      </header>
       {job.explanation ? (
-        <section className="card" aria-labelledby="fit">
+        <section className="panel" aria-labelledby="fit">
           <h2 id="fit">How you fit</h2>
           <SkillSummary e={job.explanation} />
-          {prose?.text ? <p>{prose.text}</p> : null}
-          {prose && !prose.text ? <p className="hint">The skill lists above say it all for now.</p> : null}
+          {prose?.text ? <p className="prose">{prose.text}</p> : null}
+          {prose && !prose.text ? <p className="fine">The skill lists above say it all for now.</p> : null}
           {!prose ? (
             <button type="button" disabled={busy !== ""} onClick={() => void run("explain")}>
               {busy === "explain" ? "Writing…" : "Explain this match in words"}
@@ -63,9 +64,9 @@ export function Job() {
       ) : (
         <p className="notice">Confirm your profile to see how you fit.</p>
       )}
-      <section aria-labelledby="tailor">
+      <section className="section" aria-labelledby="tailor">
         <h2 id="tailor">Tailor your resume for this job</h2>
-        <p className="hint">Built only from your own resume lines: where each skill shows, the job&apos;s words for skills you have, and what to put first.</p>
+        <p className="lede">Built only from your own resume lines: where each skill shows, the job&apos;s words for skills you have, and what to put first.</p>
         {tailoring ? (
           <TailoringView t={tailoring} />
         ) : (
@@ -79,6 +80,6 @@ export function Job() {
           {error}
         </p>
       ) : null}
-    </div>
+    </article>
   );
 }

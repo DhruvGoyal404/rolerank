@@ -122,7 +122,7 @@ test("a job: credit and apply link, an explanation on demand, grounded tailoring
   await page.getByRole("button", { name: "Tailor my resume" }).click();
   const evidence = page.getByRole("region", { name: "Where your resume shows each skill" });
   await expect(evidence).toContainText("Built a payments service in Golang and Postgres");
-  await expect(evidence).toContainText("Kubernetes · not shown in your resume");
+  await expect(evidence.getByRole("row", { name: /Not shown in your resume/ })).toContainText("Kubernetes");
   const swaps = page.getByRole("region", { name: "Use the job's words" });
   await expect(swaps).toContainText("Golang");
   await expect(swaps).toContainText("Postgres");

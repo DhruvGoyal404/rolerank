@@ -46,7 +46,6 @@ export function BringJD() {
 
   return (
     <div className="stack">
-      <p className="eyebrow">Bring a job description</p>
       <h1>How do you fit a job you found?</h1>
       <p>Paste a job description from anywhere. It&apos;s read in memory and never stored or shared, and our AI model never sees its text.</p>
       <form onSubmit={(e) => void analyse(e)}>
@@ -65,7 +64,7 @@ export function BringJD() {
         </p>
       ) : null}
       {result ? (
-        <section className="card" aria-labelledby="jd-fit">
+        <section className="panel" aria-labelledby="jd-fit">
           <h2 id="jd-fit">{result.title || "This job"}</h2>
           {result.required.length === 0 ? <p className="notice">We couldn&apos;t find any skills we know in this text.</p> : <SkillSummary e={result} />}
         </section>

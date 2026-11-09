@@ -59,7 +59,6 @@ export function Tracker() {
 
   return (
     <>
-      <p className="eyebrow">Tracker</p>
       <h1>Jobs you&apos;re following</h1>
       {error ? (
         <p className="error" role="alert">
@@ -88,7 +87,7 @@ export function Tracker() {
               <tr key={item.id}>
                 <td>
                   <Link to={`/jobs/${item.key}`}>{item.title}</Link>
-                  <div className="meta">{item.company}</div>
+                  <div className="fine">{item.company}</div>
                 </td>
                 <td>
                   <select aria-label={`Status of ${item.title}`} value={item.status} onChange={(e) => { setStatus(item, e.target.value); }}>

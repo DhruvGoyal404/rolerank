@@ -41,7 +41,6 @@ export function Resume() {
   const busy = me.resume && ["queued", "extracting", "parsing"].includes(me.resume.status);
   return (
     <div className="narrow">
-      <p className="eyebrow">Your resume</p>
       {busy ? (
         <Waiting resumeId={me.resume?.id ?? ""} onDone={refresh} />
       ) : me.profile && !replacing ? (
@@ -264,16 +263,18 @@ function ProfileSummary({ profile, months }: { profile: Profile; months: number 
   return (
     <div className="stack">
       <h2>Experience</h2>
-      {profile.experience.length === 0 ? <p className="hint">None found.</p> : null}
+      {profile.experience.length === 0 ? <p className="fine">None found.</p> : null}
       {profile.experience.map((e) => (
-        <div className="card" key={`${e.employer}-${e.title}`}>
+        <div className="panel" key={`${e.employer}-${e.title}`}>
           <h3>{e.title}</h3>
-          <p className="meta">
-            {e.employer} · {e.kind} · {e.periods.map((p) => `${p.start || "?"} to ${p.end || "?"}`).join(", ")}
-          </p>
+          <ul className="facts">
+            <li>{e.employer}</li>
+            <li>{e.kind}</li>
+            <li>{e.periods.map((p) => `${p.start || "?"} to ${p.end || "?"}`).join(", ")}</li>
+          </ul>
         </div>
       ))}
-      <p className="hint">Work experience counted: {months} months (jobs and internships; programmes don&apos;t count).</p>
+      <p className="fine">Work experience counted: {months} months (jobs and internships; programmes don&apos;t count).</p>
       {profile.education.length > 0 ? (
         <>
           <h2>Education</h2>
@@ -281,7 +282,7 @@ function ProfileSummary({ profile, months }: { profile: Profile; months: number 
             <p key={`${e.institution}-${e.degree}`}>
               {e.degree}, {e.institution}
               {e.grad_year ? `, ${String(e.grad_year)}` : ""}
-              {e.score ? ` · ${e.score}` : ""}
+              {e.score ? `, ${e.score}` : ""}
             </p>
           ))}
         </>

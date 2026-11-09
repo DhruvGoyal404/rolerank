@@ -19,40 +19,43 @@ export function Band({ band }: { band: string }) {
 
 const LEVEL: Record<Explanation["level"]["fit"], string> = {
   fits: "Your level fits",
-  stretch: "One level up: a stretch",
+  stretch: "One level up",
   above: "Well above your level",
   unknown: "Level not stated",
 };
 
-export function SkillSummary({ e }: { e: Explanation }) {
+/** On a card, the first few missing skills; the job page lists them all. */
+const MISSING_ON_CARDS = 6;
+
+/** Skills had and missing as chips: missing ones are outlined and muted, calm but distinct. */
+export function SkillSummary({ e, compact }: { e: Explanation; compact?: boolean }) {
   return (
-    <div className="stack">
+    <div className={compact ? "skills skills-compact" : "skills"}>
       {e.matched.length > 0 ? (
-        <div>
-          <p className="eyebrow">You have</p>
-          <ul className="chips" aria-label="Required skills you have">
-            {e.matched.map((s) => (
-              <li className="chip have" key={s}>
-                {s}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="chips" aria-label="Required skills you have">
+          {e.matched.map((s) => (
+            <li className="chip have" key={s}>
+              {s}
+            </li>
+          ))}
+        </ul>
       ) : null}
       {e.missing.length > 0 ? (
-        <div>
-          <p className="eyebrow">Your resume doesn&apos;t show</p>
-          <ul className="chips" aria-label="Required skills your resume doesn't show">
-            {e.missing.map((s) => (
-              <li className="chip missing" key={s}>
-                {s}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="chips" aria-label="Required skills your resume doesn't show">
+          {(compact ? e.missing.slice(0, MISSING_ON_CARDS) : e.missing).map((s) => (
+            <li className="chip missing" key={s}>
+              {s}
+            </li>
+          ))}
+          {compact && e.missing.length > MISSING_ON_CARDS ? <li className="chip more">{`+${String(e.missing.length - MISSING_ON_CARDS)} more`}</li> : null}
+        </ul>
       ) : null}
-      {e.niceMatched.length > 0 ? <p className="hint">Nice to have, and you have: {e.niceMatched.join(", ")}</p> : null}
-      <p className="hint">{LEVEL[e.level.fit]}</p>
+      {compact ? null : (
+        <p className="fine">
+          {LEVEL[e.level.fit]}
+          {e.niceMatched.length > 0 ? `. Also nice to have, and you have: ${e.niceMatched.join(", ")}` : ""}
+        </p>
+      )}
     </div>
   );
 }
@@ -78,80 +81,143 @@ export function ApplyLink({ job }: { job: JobCard }) {
   );
 }
 
-export function JobHeading({ job, link }: { job: JobCard; link?: boolean }) {
+/** "today", "3 days ago": how fresh a posting is. */
+export function age(postedAt: string, now = Date.now()): string {
+  const days = Math.floor((now - Date.parse(postedAt)) / 86_400_000);
+  if (!Number.isFinite(days) || days < 1) return "posted today";
+  return days === 1 ? "posted yesterday" : `posted ${String(days)} days ago`;
+}
+
+/**
+ * A region-wide posting lists every country it accepts ("Afghanistan | Armenia | ... | Yemen",
+ * found in the walkthrough, 2026-11-09). Past three places, name India (or the first) and count
+ * the rest.
+ */
+export function place(location: string): string {
+  const parts = location.split(" | ").map((p) => p.trim()).filter(Boolean);
+  if (parts.length <= 3) return parts.join(", ");
+  const lead = parts.find((p) => /^india$/i.test(p)) ?? parts[0] ?? "";
+  return `${lead} and ${String(parts.length - 1)} other countries`;
+}
+
+/** Company, place and age as separate facts, not a dotted string. */
+export function Facts({ job }: { job: JobCard }) {
   return (
-    <div>
-      <h3>{link ? <Link to={`/jobs/${job.key}`}>{job.title}</Link> : job.title}</h3>
-      <p className="meta">
-        {job.company}
-        {job.location ? ` · ${job.location}` : ""}
-        {job.closed ? " · closed" : ""}
-      </p>
-    </div>
+    <ul className="facts">
+      <li>{job.company}</li>
+      {job.location ? <li>{place(job.location)}</li> : null}
+      <li>{age(job.postedAt)}</li>
+      {job.closed ? <li className="closed">Closed</li> : null}
+    </ul>
   );
 }
 
-/** The three grounded outputs of tailoring. Every line shown is the user's own, verbatim. */
+export function JobTitle({ job }: { job: JobCard }) {
+  return (
+    <h3 className="job-title">
+      <Link to={`/jobs/${job.key}`}>{job.title}</Link>
+    </h3>
+  );
+}
+
+/** Skills that cite exactly the same lines share one row: a skills list shouldn't repeat four times. */
+export function byLines(evidence: Tailoring["evidence"]): Array<{ skills: string[]; lines: Tailoring["evidence"][number]["lines"] }> {
+  const rows = new Map<string, { skills: string[]; lines: Tailoring["evidence"][number]["lines"] }>();
+  for (const e of evidence) {
+    const key = e.lines.map((l) => l.n).join(",");
+    const row = rows.get(key);
+    if (row) row.skills.push(e.skill);
+    else rows.set(key, { skills: [e.skill], lines: e.lines });
+  }
+  return [...rows.values()];
+}
+
+/**
+ * The three grounded outputs of tailoring, built to scan: a table from each job skill to the
+ * resume line that shows it, swaps as before and after, and the bullets to lead with, in order.
+ * Every line shown is the user's own, verbatim.
+ */
 export function TailoringView({ t }: { t: Tailoring }) {
   const nothing = t.evidence.length === 0 && t.alignments.length === 0 && t.emphasis.top.length === 0;
   return (
-    <div className="stack">
-      {nothing ? <p className="notice">Your resume doesn&apos;t show what this job asks for. Nothing honest to suggest.</p> : null}
-      {t.evidence.length > 0 || t.notShown.length > 0 ? (
-        <section className="card" aria-labelledby="ev">
+    <div className="tailoring">
+      {nothing ? <p className="notice">Your resume doesn&apos;t show what this job asks for, so there is nothing honest to suggest.</p> : null}
+      {t.evidence.length > 0 ? (
+        <section aria-labelledby="ev">
           <h3 id="ev">Where your resume shows each skill</h3>
-          <ul className="evidence">
-            {t.evidence.map((e) => (
-              <li key={e.skill}>
-                <strong>{e.skill}</strong>
-                {e.lines.map((l) => (
-                  <p className="quote" key={l.n}>
-                    {l.text}
-                  </p>
-                ))}
-              </li>
-            ))}
-            {t.notShown.map((s) => (
-              <li key={s}>
-                <strong>{s}</strong> <span className="hint">· not shown in your resume</span>
-              </li>
-            ))}
-          </ul>
+          <table className="evidence-table">
+            <thead>
+              <tr>
+                <th scope="col">Job asks for</th>
+                <th scope="col">Your resume line</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byLines(t.evidence).map((row) => (
+                <tr key={row.skills.join()}>
+                  <th scope="row">{row.skills.join(", ")}</th>
+                  <td>
+                    {row.lines.map((l) => (
+                      <q key={l.n}>{l.text.replace(/^\s*[-–—•*]\s*/, "")}</q>
+                    ))}
+                  </td>
+                </tr>
+              ))}
+              {t.notShown.length > 0 ? (
+                <tr className="not-shown">
+                  <th scope="row">Not shown in your resume</th>
+                  <td>
+                    <ul className="chips" aria-label="Skills the job asks for that your resume doesn't show">
+                      {t.notShown.map((s) => (
+                        <li className="chip missing" key={s}>
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
         </section>
       ) : null}
       {t.alignments.length > 0 ? (
-        <section className="card" aria-labelledby="al">
+        <section aria-labelledby="al">
           <h3 id="al">Use the job&apos;s words</h3>
-          <p className="hint">The same skill, named the way this job names it. Nothing else in the line changes.</p>
-          <ul className="evidence">
+          <p className="fine">The same skill, named the way this job names it. Nothing else in the line changes.</p>
+          <ul className="swaps">
             {t.alignments.map((a) => (
-              <li key={`${String(a.line)}-${a.from}`} className="swap">
-                <del>{a.from}</del> → <ins>{a.to}</ins>
-                <p className="quote">{a.rewrite}</p>
+              <li key={`${String(a.line)}-${a.from}`}>
+                <span className="swap-terms">
+                  <del>{a.from}</del>
+                  <span aria-hidden="true"> to </span>
+                  <ins>{a.to}</ins>
+                </span>
+                <q>{a.rewrite.replace(/^\s*[-–—•*]\s*/, "")}</q>
               </li>
             ))}
           </ul>
         </section>
       ) : null}
       {t.emphasis.top.length > 0 ? (
-        <section className="card" aria-labelledby="em">
+        <section aria-labelledby="em">
           <h3 id="em">Put these first</h3>
-          <ol className="evidence">
+          <ol className="lead-with">
             {t.emphasis.top.map((l) => (
-              <li key={l.n}>
-                <p className="quote">{l.text}</p>
-              </li>
+              <li key={l.n}>{l.text.replace(/^\s*[-–—•*]\s*/, "")}</li>
             ))}
           </ol>
           {t.emphasis.addMetric.length > 0 ? (
             <>
-              <h3>Add a number, if you have one</h3>
-              <p className="hint">Users, time saved, scale, accuracy: only if it&apos;s true. RoleRank never suggests a number.</p>
-              {t.emphasis.addMetric.map((l) => (
-                <p className="quote" key={l.n}>
-                  {l.text}
-                </p>
-              ))}
+              <h4>Add a number, if you have one</h4>
+              <p className="fine">Users, time saved, scale or accuracy: only if it&apos;s true. RoleRank never suggests a number.</p>
+              <ul className="plain">
+                {t.emphasis.addMetric.map((l) => (
+                  <li key={l.n}>
+                    <q>{l.text.replace(/^\s*[-–—•*]\s*/, "")}</q>
+                  </li>
+                ))}
+              </ul>
             </>
           ) : null}
         </section>
@@ -162,8 +228,23 @@ export function TailoringView({ t }: { t: Tailoring }) {
 
 export function Loading({ what }: { what: string }) {
   return (
-    <p className="hint" role="status">
+    <p className="fine" role="status">
       Loading {what}…
     </p>
+  );
+}
+
+/** Placeholder cards while matches load, so the page doesn't jump when they arrive. */
+export function MatchSkeleton() {
+  return (
+    <ul className="match-list" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <li className="match skeleton" key={i}>
+          <span className="sk sk-title" />
+          <span className="sk sk-line" />
+          <span className="sk sk-chips" />
+        </li>
+      ))}
+    </ul>
   );
 }

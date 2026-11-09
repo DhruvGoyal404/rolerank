@@ -49,14 +49,13 @@ export function Account() {
 
   return (
     <div className="narrow stack">
-      <p className="eyebrow">Account</p>
       <h1>Your account</h1>
       {error ? (
         <p className="error" role="alert">
           {error}
         </p>
       ) : null}
-      <section className="card" aria-labelledby="prefs">
+      <section className="panel" aria-labelledby="prefs">
         <h2 id="prefs">What you&apos;re looking for</h2>
         {!prefs ? (
           <Loading what="preferences" />
@@ -78,13 +77,13 @@ export function Account() {
               value={prefs.targetTitles}
               onChange={(e) => { setPrefs({ ...prefs, targetTitles: e.target.value }); }}
             />
-            <p className="hint">Matches lean towards these titles. Leave blank to use the roles on your resume.</p>
+            <p className="fine">Matches lean towards these titles. Leave blank to use the roles on your resume.</p>
             <div className="row">
               <button className="primary" type="submit">
                 Save preferences
               </button>
               {saved ? (
-                <span role="status" className="hint">
+                <span role="status" className="fine">
                   Saved.
                 </span>
               ) : null}
@@ -92,14 +91,14 @@ export function Account() {
           </form>
         )}
       </section>
-      <section className="card" aria-labelledby="export">
+      <section className="panel" aria-labelledby="export">
         <h2 id="export">Your data</h2>
         <p>Download everything RoleRank keeps about you as one JSON file: your account, resume text, profiles, tracker and AI usage.</p>
         <a className="button" href="/api/me/export" download="rolerank-export.json">
           Export my data
         </a>
       </section>
-      <section className="card" aria-labelledby="delete">
+      <section className="panel" aria-labelledby="delete">
         <h2 id="delete">Delete your account</h2>
         <p>This removes, at once and for good:</p>
         <ul>
@@ -107,7 +106,7 @@ export function Account() {
           <li>your resume text, contact details and every profile;</li>
           <li>your tracker, preferences and the encryption key for your data.</li>
         </ul>
-        <p className="hint">
+        <p className="fine">
           Backups aren&apos;t running yet. When they start, the <a href="/privacy">privacy page</a> will say how long a deleted account can
           stay in one.
         </p>
