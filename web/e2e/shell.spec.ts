@@ -56,3 +56,19 @@ test("works on a 360 px phone", async ({ page }) => {
   );
   expect(overflow).toBe(false);
 });
+
+// Walkthrough bug (2026-11-08): the CSP had no manifest-src, so default-src 'none' blocked the
+// manifest. Chrome loads it here as it would to install the app, and any CSP block fails the test.
+test("the web manifest loads under the CSP", async ({ page, context }) => {
+  const blocked: string[] = [];
+  page.on("console", (m) => {
+    if (/manifest/i.test(m.text())) blocked.push(m.text());
+  });
+  await page.goto("/");
+  const cdp = await context.newCDPSession(page);
+  const manifest = (await cdp.send("Page.getAppManifest")) as { url: string; errors: unknown[]; data?: string };
+  expect(manifest.url).toMatch(/\/manifest\.webmanifest$/);
+  expect(manifest.errors).toEqual([]);
+  expect(manifest.data ?? "").toContain('"name": "RoleRank"');
+  expect(blocked).toEqual([]);
+});
