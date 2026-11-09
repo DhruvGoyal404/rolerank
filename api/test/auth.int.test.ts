@@ -298,6 +298,16 @@ describe("rejected logins", () => {
 });
 
 describe("sessions", () => {
+  it("answers /api/session with 200 whether or not anyone is signed in", async () => {
+    const anon = await request(app).get("/api/session");
+    expect(anon.status).toBe(200);
+    expect(anon.body).toEqual({ me: null });
+    const cookie = await signIn();
+    const me = await request(app).get("/api/session").set("Cookie", cookie);
+    expect(me.status).toBe(200);
+    expect((me.body as { me: { id: string } }).me.id).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
   it("logs out, and the token stops working", async () => {
     const cookie = await signIn();
     const out = await request(app).post("/api/auth/logout").set("Cookie", cookie).set("Origin", ORIGIN);

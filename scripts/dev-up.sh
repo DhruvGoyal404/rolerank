@@ -66,7 +66,7 @@ echo "Corpus: $rows searchable postings"
 
 say "Builds (API, site, extractor)"
 (cd api && npm run --silent build)
-(cd web && npx vite build --logLevel error)
+(cd web && npm run --silent build >/dev/null)
 bash scripts/build-extractor.sh >/dev/null
 (cd worker && go build -o .bin/rolerank-extractor.exe ./cmd/extractor)
 

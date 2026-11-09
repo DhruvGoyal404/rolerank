@@ -49,12 +49,13 @@
 		file_server
 	}
 
-	# Any other path serves index.html (client-side routes), always revalidated.
+	# A prerendered public page (web/scripts/prerender.mjs) is served as its own HTML; any other
+	# path gets the app shell, app.html (noindex), for client-side routes. Always revalidated.
 	handle {
 		root * /srv/web
 		header Cache-Control "no-cache"
 		import csp
-		try_files {path} /index.html
+		try_files {path} {path}/index.html /app.html
 		file_server
 	}
 

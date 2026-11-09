@@ -1,7 +1,7 @@
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist/**", "*.mjs", "playwright-report/**", "test-results/**"] },
+  { ignores: ["dist/**", "dist-ssr/**", "*.mjs", "scripts/*.mjs", "playwright-report/**", "test-results/**"] },
   ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {

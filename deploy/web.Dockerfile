@@ -6,7 +6,8 @@ WORKDIR /app
 COPY web/package.json web/package-lock.json ./
 RUN npm ci --ignore-scripts --no-fund --no-audit
 COPY web/ ./
-RUN npx vite build
+# Client build, then the public pages prerendered to HTML (web/scripts/prerender.mjs).
+RUN npm run build
 
 FROM caddy:2.11.6-alpine@sha256:d44355d3c2149dc580ce2cac735955d1c08d3d00882c30489c241aa51a5c10d9
 COPY deploy/Caddyfile /etc/caddy/Caddyfile

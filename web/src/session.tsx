@@ -17,7 +17,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const refresh = useCallback(async () => {
     try {
-      setMe(await api<Me>("/api/me"));
+      setMe((await api<{ me: Me | null }>("/api/session")).me);
     } catch (error) {
       if (!(error instanceof ApiError)) throw error;
       setMe(null);

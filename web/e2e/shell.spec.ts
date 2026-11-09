@@ -88,3 +88,46 @@ test("robots.txt and sitemap.xml are real static files", async ({ request }) => 
   const locs = [...(await sitemap.text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   expect(locs).toEqual(["/", "/sources", "/about/bot", "/privacy"].map((p) => `https://rolerank.dhruvgoyal.tech${p}`));
 });
+
+// Crawlers read real HTML for the public pages (web/scripts/prerender.mjs), never an empty shell.
+test("public pages are prerendered with their own title, description, canonical and card", async ({ request }) => {
+  const pages: Array<[string, string, string]> = [
+    ["/", "/index.html", "Real jobs, ranked against your resume"],
+    ["/sources", "/sources/index.html", "Where our jobs come from"],
+    ["/about/bot", "/about/bot/index.html", "About RoleRankBot"],
+    ["/privacy", "/privacy/index.html", "Privacy"],
+  ];
+  const titles = new Set<string>();
+  for (const [path, file, h1] of pages) {
+    const html = await (await request.get(file)).text();
+    expect(html).toContain(`data-prerendered="${path}"`);
+    expect(html).toContain(`<h1`);
+    expect(html).toContain(h1);
+    expect(html).toContain(`<link rel="canonical" href="https://rolerank.dhruvgoyal.tech${path}" />`);
+    expect(html).toContain('<meta property="og:image" content="https://rolerank.dhruvgoyal.tech/og.png" />');
+    expect(html).toContain('<meta name="robots" content="index, follow" />');
+    expect(html).not.toContain("JobPosting");
+    titles.add(/<title>([^<]+)<\/title>/.exec(html)?.[1] ?? "");
+  }
+  expect(titles.size).toBe(pages.length);
+  const landing = await (await request.get("/index.html")).text();
+  expect(landing).toContain('"@type":"Organization"');
+  // Every other route gets the noindex shell.
+  const shell = await (await request.get("/app.html")).text();
+  expect(shell).toContain('<meta name="robots" content="noindex" />');
+  expect(shell).not.toContain("data-prerendered");
+  expect((await request.get("/og.png")).headers()["content-type"]).toBe("image/png");
+});
+
+test("a prerendered page hydrates with no console errors", async ({ page }) => {
+  const problems: string[] = [];
+  page.on("console", (m) => {
+    if (m.type() === "error" || m.type() === "warning") problems.push(m.text());
+  });
+  page.on("pageerror", (e) => problems.push(e.message));
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Get started" })).toBeVisible();
+  await page.getByRole("link", { name: "Get started" }).click();
+  await expect(page).toHaveURL(/\/signin$/);
+  expect(problems).toEqual([]);
+});
