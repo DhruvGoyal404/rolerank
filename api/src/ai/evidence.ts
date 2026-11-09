@@ -68,31 +68,78 @@ export function formsIn(text: string): Record<string, string> {
   return out;
 }
 
+/** A section heading: no lower-case letters ("ACHIEVEMENTS & CERTIFICATIONS"), or a short label ending in ":". */
+const HEADING = /^[^a-z]*[A-Z]{2}[^a-z]*$|^\s*\S+(?:\s+\S+){0,4}:\s*$/;
+/** A line that starts with a date: "Jan 2024 - Mar 2024", "03/2024", "2023 -". */
+const DATE_LED = /^\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s*['’]?\d{2,4}|\d{1,2}[/.-]\d{2,4}|(?:19|20)\d{2}\b)/i;
+/** An entry line: "Title | Organisation | Year". */
+const ENTRY = /\s\|\s/;
+/** Words that end a line cut off mid-phrase by the wrap ("...and later added"). */
+const CUT = /[a-z,]$/;
+const MAX_UNIT_LINES = 4;
+
 /**
- * Units: each whole bullet, with the lines a wrapped bullet continues on (no marker of their own,
- * right after a line that had one), and every other line on its own. A unit is named by its first
- * line. Matching runs on the joined text, so "integration" + "tests" across a wrap is one skill
- * (D4-R, 2026-11-08), and a reason is checked against the whole bullet it describes.
+ * Units: each whole bullet, with the lines a wrapped bullet continues on, and every other line on
+ * its own. A unit is named by its first line. Matching runs on the joined text, so "integration" +
+ * "tests" across a wrap is one skill (D4-R, 2026-11-08). Only a true wrap joins (owner's
+ * walkthrough, 2026-11-09): a line with no marker of its own that starts in lower case, or that
+ * follows a long line cut off mid-phrase. A heading, a new bullet, a date-led line, an entry line
+ * with "|" or a skills list always starts its own unit, and a unit is at most four lines.
  */
 export function units(lines: Line[]): Array<{ n: number; text: string }> {
   const visible = lines.filter((l) => !l.hidden && !l.tiny);
-  const out: Array<{ n: number; text: string; open: boolean }> = [];
+  const wide = Math.max(0, ...visible.map((l) => l.text.trim().length));
+  const out: Array<{ n: number; text: string; open: boolean; last: string; count: number }> = [];
   let prev = -1;
   for (const l of visible) {
     const last = out.at(-1);
-    if (last?.open && l.n === prev + 1 && !BULLET.test(l.text) && !isList(l.text)) last.text += ` ${l.text.trim()}`;
-    else out.push({ n: l.n, text: l.text, open: BULLET.test(l.text) });
+    const t = l.text.trim();
+    const own = BULLET.test(l.text) || HEADING.test(t) || DATE_LED.test(t) || ENTRY.test(t) || isList(t);
+    const wraps =
+      !own &&
+      last?.open === true &&
+      l.n === prev + 1 &&
+      last.count < MAX_UNIT_LINES &&
+      (/^[a-z(&]/.test(t) || (CUT.test(last.last) && last.last.length >= 0.75 * wide));
+    if (last && wraps) {
+      last.text += ` ${t}`;
+      last.last = t;
+      last.count++;
+    } else out.push({ n: l.n, text: l.text, open: BULLET.test(l.text), last: t, count: 1 });
     prev = l.n;
   }
   return out.map(({ n, text }) => ({ n, text }));
 }
 
+/** Link and contact labels: a line made mostly of these is a header, never evidence. */
+const LINK_LABEL =
+  /\[(?:EMAIL|PHONE|URL|PIN)\]|\b(?:linkedin|github|gitlab|bitbucket|leetcode|codeforces|codechef|hackerrank|hackerearth|kaggle|orcid|portfolio|website|blog|medium|twitter|behance|dribbble|scholar|researchgate|stack\s?overflow)\b/i;
+
+/**
+ * The contact header, or any line that is mostly links and labels ("[PHONE] | [EMAIL] | LinkedIn |
+ * GitHub | DSA Portfolio"): it names no work, so it proves no skill (owner's walkthrough, 2026-11-09).
+ */
+export function isLinkLine(text: string): boolean {
+  const parts = text
+    .split(/\s[|•·]\s|\s{3,}|\s[-–]\s/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+  if (parts.length < 2) return false;
+  const labels = parts.filter((x) => LINK_LABEL.test(x) && x.split(/\s+/).length <= 4).length;
+  return labels * 2 >= parts.length;
+}
+
+/** Platform names the taxonomy lists as aliases of a skill: "GitHub" is not proof of Git. */
+const PLATFORMS = new Set(["github", "gitlab", "bitbucket"]);
+
 export function tailoring(lines: Line[], job: JobSkills): Tailoring {
   const t = taxonomy();
   const required = canonical(job.required);
   const nice = canonical(job.nice).filter((s) => !required.includes(s));
-  const all = units(lines).map((u) => {
-    const spans = t.spans(u.text);
+  const all = units(lines)
+    .filter((u) => !isLinkLine(u.text))
+    .map((u) => {
+    const spans = t.spans(u.text).filter((m) => !PLATFORMS.has(m.surface.toLowerCase()));
     return { ...u, spans, names: new Set(spans.map((s) => s.name)), list: isList(u.text) };
   });
 
