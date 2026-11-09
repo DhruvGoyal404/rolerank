@@ -205,7 +205,7 @@ const [s1, cold] = await go(); const [s2, ms, n] = await go();
 console.log(\"RESULT warm=\" + [s1, s2, cold, ms, n].join(\" \"));
 "') || die "the ranker warm-up failed"
 read -r s1 s2 cold ms hits <<<"$(result warm "$warm")"
-[ "$s1" = 200 ] && [ "$s2" = 200 ] || die "the ranker answered $s1/$s2 to the warm-up"
+if [ "$s1" != 200 ] || [ "$s2" != 200 ]; then die "the ranker answered $s1/$s2 to the warm-up"; fi
 echo "ranker: cold search ${cold} ms, warm ${ms} ms, $hits postings" >&2
 
 log "7/8 Checks"

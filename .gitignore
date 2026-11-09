@@ -28,6 +28,8 @@ test-results/
 
 # CDK
 cdk.out/
+# Cached AWS lookups, keyed by the account ID; the repository is public and CI masks that ID.
+infra/cdk.context.json
 
 # Editors and OS
 .vscode/

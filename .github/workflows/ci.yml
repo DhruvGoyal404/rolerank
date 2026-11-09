@@ -22,8 +22,16 @@ jobs:
       - name: Audit the extractor's packages
         working-directory: extractor
         run: npm audit --omit=dev
+      # The runner's own shellcheck is older and judges differently; this is the version the gate uses.
+      - name: Install shellcheck 0.11.0
+        run: |
+          set -euo pipefail
+          curl -fsSL -o sc.tar.xz https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz
+          echo "8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198  sc.tar.xz" | sha256sum -c --quiet
+          tar -xJf sc.tar.xz && sudo install -m 0755 shellcheck-v0.11.0/shellcheck /usr/local/bin/shellcheck && rm -rf sc.tar.xz shellcheck-v0.11.0
+          shellcheck --version
       - name: Shellcheck the deploy and up/down scripts
-        run: shellcheck -x deploy/host/*.sh deploy/backup/*.sh scripts/models.sh rolerank-up.sh rolerank-down.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh scripts/seed-corpus.sh
+        run: shellcheck -xdeploy/host/*.sh deploy/backup/*.sh scripts/models.sh rolerank-up.sh rolerank-down.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh scripts/seed-corpus.sh
 
   secrets:
     name: Gitleaks

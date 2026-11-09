@@ -58,7 +58,7 @@ echo "RESULT release=$(base64 -w0 /opt/rolerank/state/current.json)"
   stamp=$(result stamp "$out")
   counts=$(result counts "$out")
   caddy=$(result caddy "$out")
-  [ -n "$stamp" ] && [ -n "$counts" ] || die "the host did not report the backup: nothing was removed"
+  if [ -z "$stamp" ] || [ -z "$counts" ]; then die "the host did not report the backup: nothing was removed"; fi
 
   log "2/5 Verify in S3 and keep under $FINAL_PREFIX"
   for name in "rolerank-$stamp-app.dump.age" "rolerank-$stamp-corpus.dump.age" ${caddy:+"$caddy"}; do
