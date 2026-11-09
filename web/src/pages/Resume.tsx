@@ -5,19 +5,32 @@ import { Loading } from "../components";
 import { useSession } from "../session";
 
 const MAX_BYTES = 5 * 1024 * 1024;
+// Each says which check failed, in plain words, and what to do (walkthrough, 2026-11-08).
 const ERRORS: Record<string, string> = {
-  pdf_or_docx_only: "Please upload a PDF or a Word (.docx) file.",
-  rate_limited: "That's a lot of uploads. Please try again later.",
+  too_large: "File too large: the limit is 5 MB. Export a smaller PDF and try again.",
+  pdf_or_docx_only: "Not a PDF or a Word file: the file's contents aren't a PDF or a .docx, whatever its name says.",
+  rate_limited: "Too many uploads for now. Please try again in an hour.",
 };
-/** Why a file couldn't be read, and what to do instead (the codes aiworker records). */
+/** Why a file couldn't be read: the codes aiworker records, with what to do instead. */
 export const READ_ERRORS: Record<string, string> = {
-  no_text: "We couldn't find any text: it looks like a scanned image. Please upload the PDF your word processor exports, or a .docx.",
-  password_protected: "The file is password-protected. Please remove the password and upload it again.",
-  too_many_pages: "The file has too many pages. A resume of a few pages works best.",
-  rejected: "That file didn't look like a normal PDF or Word document, so we didn't open it. Please export it again and retry.",
-  unreadable: "We couldn't read that file. Please export it again as PDF or .docx and retry.",
+  no_text: "The PDF has no selectable text: it looks like a scanned image. Upload the PDF your word processor exports, or a .docx.",
+  password_protected: "The PDF is password-protected. Remove the password and upload it again.",
+  too_many_pages: "The file has too many pages to be a resume. A resume of a few pages works best.",
+  rejected: "The file failed our safety checks: its structure looks unusual, so we didn't open it. Export it again and retry.",
+  unreadable: "The file opened, but its text couldn't be read. Export it again as PDF or .docx and retry.",
+  extract_startup: "Our file reader was slow to start, not your file. Please upload it again.",
+  extract_timeout: "Reading this file took longer than our limit. Export a simpler PDF (fewer images or pages) and retry.",
+  extract_too_much_text: "The file holds far more text than a resume. Upload just your resume.",
+  extract_failed: "Our file reader failed on our side, not because of your file. Please upload it again.",
+  file_missing: "The upload didn't arrive in full. Please upload it again.",
   internal: "Something went wrong on our side while reading it. Please try again.",
+  parse_invalid: "We read the text but couldn't build your profile from it. Please try again.",
+  parse_error: "We read the text but couldn't build your profile from it. Please try again.",
+  parse_refused: "We read the text but couldn't build your profile from it. Please try again.",
 };
+/** A code without its own message still names itself, so it can be reported. */
+export const readError = (code: string | null | undefined): string =>
+  READ_ERRORS[code ?? ""] ?? `We couldn't read that file (code: ${code ?? "unknown"}). Please try again.`;
 
 /** Upload, wait for the parse, then review and confirm. */
 export function Resume() {
@@ -35,7 +48,7 @@ export function Resume() {
         <Review profileId={me.profile.id} confirmed={me.profile.confirmed} onConfirmed={refresh} onReplace={() => { setReplacing(true); }} />
       ) : (
         <Upload
-          failed={me.resume?.status === "failed" ? (READ_ERRORS[me.resume.error ?? ""] ?? READ_ERRORS.unreadable ?? "") : null}
+          failed={me.resume?.status === "failed" ? readError(me.resume.error) : null}
           onUploaded={async () => {
             setReplacing(false);
             await refresh();
@@ -53,14 +66,14 @@ function Upload({ failed, onUploaded }: { failed: string | null; onUploaded: () 
     event.preventDefault();
     const file = new FormData(event.currentTarget).get("resume");
     if (!(file instanceof File) || file.size === 0) { setError("Choose a file first."); return; }
-    if (file.size > MAX_BYTES) { setError("That file is over 5 MB."); return; }
+    if (file.size > MAX_BYTES) { setError(ERRORS.too_large ?? ""); return; }
     setSending(true);
     setError(null);
     try {
       await api("/api/resumes", { method: "POST", raw: file });
       await onUploaded();
     } catch (e) {
-      setError(e instanceof ApiError ? (ERRORS[e.code] ?? "Upload failed. Please try again.") : "Upload failed. Please try again.");
+      setError(e instanceof ApiError ? (ERRORS[e.code] ?? `Upload failed (code: ${e.code}). Please try again.`) : "Upload failed: we couldn't reach RoleRank. Check your connection and retry.");
     } finally {
       setSending(false);
     }

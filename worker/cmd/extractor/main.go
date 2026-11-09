@@ -41,6 +41,19 @@ func main() {
 	}
 }
 
+// failure names why a run failed, in a fixed word aiworker maps to a message for the user.
+func failure(err error) string {
+	switch {
+	case errors.Is(err, extract.ErrStartup):
+		return "startup"
+	case errors.Is(err, extract.ErrTimeout):
+		return "timeout"
+	case errors.Is(err, extract.ErrOutput):
+		return "output"
+	}
+	return "sandbox"
+}
+
 type runner interface {
 	Run(context.Context, []byte) (extract.Result, error)
 }
@@ -74,9 +87,10 @@ func Handler(r runner, token string, concurrent int) http.Handler {
 			return
 		}
 		if err != nil {
-			slog.Warn("extract failed", "bytes", len(body)) // no content, no error text from the file
+			reason := failure(err)
+			slog.Warn("extract failed", "reason", reason, "bytes", len(body)) // a fixed word: no content, no error text from the file
 			w.WriteHeader(http.StatusBadGateway)
-			_ = json.NewEncoder(w).Encode(map[string]string{"error": "failed"})
+			_ = json.NewEncoder(w).Encode(map[string]string{"error": "failed", "reason": reason})
 			return
 		}
 		_ = json.NewEncoder(w).Encode(res)

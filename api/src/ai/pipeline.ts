@@ -25,7 +25,12 @@ export function httpExtractor(url: string, token: string): Extractor {
         body: new Uint8Array(file),
       });
       if (res.status === 422) return { status: "failed", code: "rejected" };
-      if (!res.ok) return { status: "failed", code: "extract_failed" };
+      if (!res.ok) {
+        // The extractor names why in a fixed word (worker/cmd/extractor): keep it for the user.
+        const why = ((await res.json().catch(() => ({}))) as { reason?: string }).reason;
+        const codes: Record<string, string> = { startup: "extract_startup", timeout: "extract_timeout", output: "extract_too_much_text" };
+        return { status: "failed", code: codes[why ?? ""] ?? "extract_failed" };
+      }
       const out = (await res.json()) as { lines?: Line[]; error?: string };
       if (out.error) return { status: "failed", code: errorCode(out.error) };
       return { status: "ok", lines: out.lines ?? [] };

@@ -50,6 +50,7 @@ const extractor: Extractor = {
   extract: (file) => {
     if (file.includes(Buffer.from("SCANNED"))) return Promise.resolve({ status: "ok", lines: [] });
     if (file.includes(Buffer.from("PASSWORD"))) return Promise.resolve({ status: "failed", code: "password_protected" });
+    if (file.includes(Buffer.from("SLOWSTART"))) return Promise.resolve({ status: "failed", code: "extract_startup" });
     return Promise.resolve({ status: "ok", lines: LINES });
   },
 };

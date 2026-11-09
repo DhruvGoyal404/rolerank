@@ -37,6 +37,14 @@ const (
 // ErrRejected wraps every reason Check refuses a file.
 var ErrRejected = errors.New("file rejected")
 
+// Why a sandbox run failed, for a plain message to the user. None carries file content.
+var (
+	ErrStartup = errors.New("sandbox didn't start in time") // Docker was slow, not the file
+	ErrTimeout = errors.New("extraction timed out")         // the file ran past its limit
+	ErrOutput  = errors.New("extraction output too large")
+	ErrSandbox = errors.New("sandbox failed")
+)
+
 func reject(format string, a ...any) error {
 	return fmt.Errorf("%w: %s", ErrRejected, fmt.Sprintf(format, a...))
 }
@@ -127,9 +135,11 @@ type Result struct {
 
 // Runner starts sandbox containers.
 type Runner struct {
-	Image   string        // the extractor image, pinned by digest outside development
-	Runtime string        // "runsc" (gVisor) in production; "" is Docker's default, for development
-	Timeout time.Duration // whole run, create to result; 20 s if zero
+	Image          string        // the extractor image, pinned by digest outside development
+	Runtime        string        // "runsc" (gVisor) in production; "" is Docker's default, for development
+	Timeout        time.Duration // the extraction itself, once the container exists; 20 s if zero
+	StartupTimeout time.Duration // Docker creating the container; 90 s if zero
+	Docker         string        // the docker CLI; "docker" if empty (tests use a stand-in)
 }
 
 // Args are the docker run flags for one container: no network, read-only root, every
@@ -148,21 +158,54 @@ func (r Runner) Args(name string) []string {
 }
 
 // Run checks the file, then extracts it in a fresh container, which is always removed.
+//
+// Creating the container and running it have separate budgets. Docker Desktop can take 20 s or
+// more just to create a container on a busy machine, and when one budget covered both, good files
+// failed before the sandbox even started (walkthrough bug, 2026-11-08). The strict limit
+// (Timeout) now applies only to the extraction, which is what it guards against.
 func (r Runner) Run(ctx context.Context, b []byte) (Result, error) {
 	kind, err := Check(b)
 	if err != nil {
 		return Result{}, err
 	}
-	timeout := r.Timeout
+	docker := r.Docker
+	if docker == "" {
+		docker = "docker"
+	}
+	timeout, startup := r.Timeout, r.StartupTimeout
 	if timeout == 0 {
 		timeout = 20 * time.Second
 	}
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
+	if startup == 0 {
+		startup = 90 * time.Second
+	}
 	id := make([]byte, 8)
 	_, _ = rand.Read(id)
 	name := "rolerank-extract-" + hex.EncodeToString(id)
-	cmd := exec.CommandContext(ctx, "docker", r.Args(name)...)
+	cleanup := func() {
+		// Killing the docker client doesn't stop the container; kill it by name.
+		_ = exec.Command(docker, "kill", name).Run()
+		_ = exec.Command(docker, "rm", "-f", name).Run()
+	}
+
+	cctx, ccancel := context.WithTimeout(ctx, startup)
+	defer ccancel()
+	create := append([]string{"create"}, r.Args(name)[1:]...) // the run flags, without "run"
+	var createErr bytes.Buffer
+	cmd := exec.CommandContext(cctx, docker, create...)
+	cmd.Stdout = io.Discard
+	cmd.Stderr = &capped{max: 4096, w: &createErr}
+	if err := cmd.Run(); err != nil {
+		cleanup()
+		if cctx.Err() != nil {
+			return Result{}, fmt.Errorf("%w: no container after %s", ErrStartup, startup)
+		}
+		return Result{}, fmt.Errorf("%w: create: %v: %s", ErrSandbox, err, strings.TrimSpace(createErr.String()))
+	}
+
+	rctx, rcancel := context.WithTimeout(ctx, timeout)
+	defer rcancel()
+	cmd = exec.CommandContext(rctx, docker, "start", "--attach", "--interactive", name)
 	cmd.Stdin = bytes.NewReader(b)
 	out := &capped{max: MaxOutput}
 	cmd.Stdout = out
@@ -170,24 +213,26 @@ func (r Runner) Run(ctx context.Context, b []byte) (Result, error) {
 	errOut := &capped{max: 4096, w: &stderr}
 	cmd.Stderr = errOut
 	runErr := cmd.Run()
-	if ctx.Err() != nil || out.over || errOut.over {
-		// Killing the docker client doesn't stop the container; kill it by name.
-		_ = exec.Command("docker", "kill", name).Run()
-		_ = exec.Command("docker", "rm", "-f", name).Run()
+	if rctx.Err() != nil || out.over || errOut.over {
+		cleanup()
 		if out.over {
-			return Result{}, fmt.Errorf("extract: output over %d bytes", MaxOutput)
+			return Result{}, fmt.Errorf("%w: output over %d bytes", ErrOutput, MaxOutput)
 		}
-		return Result{}, fmt.Errorf("extract: timed out after %s", timeout)
+		if errOut.over {
+			return Result{}, fmt.Errorf("%w: stderr over 4096 bytes", ErrSandbox)
+		}
+		return Result{}, fmt.Errorf("%w: after %s", ErrTimeout, timeout)
 	}
 	if runErr != nil {
-		return Result{}, fmt.Errorf("extract: %v: %s", runErr, strings.TrimSpace(stderr.String()))
+		cleanup()
+		return Result{}, fmt.Errorf("%w: %v: %s", ErrSandbox, runErr, strings.TrimSpace(stderr.String()))
 	}
 	var res Result
 	if err := json.Unmarshal(out.buf.Bytes(), &res); err != nil {
-		return Result{}, fmt.Errorf("extract: bad output: %w", err)
+		return Result{}, fmt.Errorf("%w: bad output: %v", ErrSandbox, err)
 	}
 	if res.Error == "" && res.Kind != kind {
-		return Result{}, fmt.Errorf("extract: sandbox read %q, check said %q", res.Kind, kind)
+		return Result{}, fmt.Errorf("%w: sandbox read %q, check said %q", ErrSandbox, res.Kind, kind)
 	}
 	return res, nil
 }

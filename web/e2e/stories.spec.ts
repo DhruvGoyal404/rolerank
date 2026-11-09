@@ -170,13 +170,20 @@ test("an unreadable file says why and what to do", async ({ page }) => {
   await page.goto("/resume");
   await page.getByLabel("PDF or Word (.docx), up to 5 MB").setInputFiles({ name: "scan.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 SCANNED") });
   await page.getByRole("button", { name: "Upload" }).click();
-  await expect(page.getByRole("alert")).toContainText("scanned image", { timeout: 30_000 });
+  await expect(page.getByRole("alert")).toContainText("no selectable text", { timeout: 30_000 });
   await page.getByLabel("PDF or Word (.docx), up to 5 MB").setInputFiles({ name: "locked.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 PASSWORD") });
   await page.getByRole("button", { name: "Upload" }).click();
   await expect(page.getByRole("alert")).toContainText("password-protected", { timeout: 30_000 });
-  await page.getByLabel("PDF or Word (.docx), up to 5 MB").setInputFiles({ name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("hello") });
+  await page.getByLabel("PDF or Word (.docx), up to 5 MB").setInputFiles({ name: "slow.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4 SLOWSTART") });
   await page.getByRole("button", { name: "Upload" }).click();
-  await expect(page.getByRole("alert")).toContainText("PDF or a Word");
+  await expect(page.getByRole("alert")).toContainText("slow to start, not your file", { timeout: 30_000 });
+  // Each check names itself: not a PDF, and too large.
+  await page.getByLabel("PDF or Word (.docx), up to 5 MB").setInputFiles({ name: "notes.pdf", mimeType: "application/pdf", buffer: Buffer.from("hello, not a PDF") });
+  await page.getByRole("button", { name: "Upload" }).click();
+  await expect(page.getByRole("alert")).toContainText("Not a PDF or a Word file");
+  await page.getByLabel("PDF or Word (.docx), up to 5 MB").setInputFiles({ name: "big.pdf", mimeType: "application/pdf", buffer: Buffer.concat([Buffer.from("%PDF-1.4"), Buffer.alloc(5 * 1024 * 1024)]) });
+  await page.getByRole("button", { name: "Upload" }).click();
+  await expect(page.getByRole("alert")).toContainText("File too large");
 });
 
 test("account: preferences, export and deletion of everything", async ({ page }) => {
