@@ -13,7 +13,7 @@ arch=${1:-x64}
 fetch() { # url path sha256
   if [ -f "$2" ] && echo "$3  $2" | sha256sum -c --status; then return; fi
   mkdir -p "$(dirname "$2")"
-  curl -fsSL --retry 3 -A "$UA" -o "$2.part" "$1"
+  curl -fsSL --retry 5 --retry-all-errors --retry-delay 5 -A "$UA" -o "$2.part" "$1"
   echo "$3  $2.part" | sha256sum -c --status || { echo "checksum mismatch: $2" >&2; rm -f "$2.part"; exit 1; }
   mv "$2.part" "$2"
 }

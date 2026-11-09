@@ -32,10 +32,11 @@ put() {
   rm -f "$f"
   echo "stored   $name ($type)" >&2
 }
-ask() { # ask NAME PROMPT [secret]
+ask() { # ask NAME PROMPT [secret] [default]
   local v
   if exists "/rolerank/$1" && [ "$rotate" != "${1##*/}" ]; then echo "kept     /rolerank/$1" >&2; return; fi
   if [ -n "${3:-}" ]; then read -rsp "$2: " v; echo >&2; else read -rp "$2: " v; fi
+  v=${v:-${4:-}}
   [ -n "$v" ] || die "$2 is required"
   local type=String
   [ -z "${3:-}" ] || type=SecureString
@@ -56,8 +57,8 @@ if ! exists "$P/age_identity" || [ "$rotate" = age_identity ]; then
 else
   echo "kept     $P/age_identity (and age_recipient)" >&2
 fi
-ask prod/ROLERANK_DOMAIN "Domain (rolerank.dhruvgoyal.tech)"
-ask prod/ACME_EMAIL "Let's Encrypt account email (bot@dhruvgoyal.tech)"
+ask prod/ROLERANK_DOMAIN "Domain [rolerank.dhruvgoyal.tech]" "" rolerank.dhruvgoyal.tech
+ask prod/ACME_EMAIL "Let's Encrypt account email [bot@dhruvgoyal.tech]" "" bot@dhruvgoyal.tech
 ask ops/alarm_email "Alarm and budget email"
 ask prod/ANTHROPIC_API_KEY "Model API key (zero-retention org)" secret
 ask prod/GOOGLE_CLIENT_ID "Google OAuth client ID (production client)"

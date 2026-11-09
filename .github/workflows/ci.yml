@@ -31,7 +31,7 @@ jobs:
           tar -xJf sc.tar.xz && sudo install -m 0755 shellcheck-v0.11.0/shellcheck /usr/local/bin/shellcheck && rm -rf sc.tar.xz shellcheck-v0.11.0
           shellcheck --version
       - name: Shellcheck the deploy and up/down scripts
-        run: shellcheck -xdeploy/host/*.sh deploy/backup/*.sh scripts/models.sh rolerank-up.sh rolerank-down.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh scripts/seed-corpus.sh
+        run: shellcheck -x deploy/host/*.sh deploy/backup/*.sh scripts/models.sh rolerank-up.sh rolerank-down.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh scripts/seed-corpus.sh
 
   secrets:
     name: Gitleaks
