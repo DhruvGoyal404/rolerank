@@ -83,6 +83,7 @@ func TestBandsHoldToRequiredSkills(t *testing.T) {
 		{0.48, 0.75, 4, "good"},   // coverage never lifts a band above its score
 		{0.10, 1.0, 3, "stretch"},
 		{0.80, 0.0, 0, "good"}, // no required skills read: can't be shown to be strong
+		{0.80, 1.0, 1, "good"}, // 1 of 1: thin evidence, not strong
 		{0.10, 0.0, 0, "stretch"},
 	} {
 		if got := DefaultBands.Band(c.score, c.coverage, c.required); got != c.want {

@@ -149,8 +149,8 @@ var DefaultBands = Bands{Strong: 0.505, Good: 0.46}
 // Band names a score, held to the job's required skills (owner's walkthrough, 2026-11-08: a
 // job showed Strong with 1 of 5 required skills). Strong also needs more than half of the
 // required skills; three quarters or more missing is Stretch, whatever the score (on D3 these
-// are the jobs least often graded a fit). A job with no required skills read from it can't be
-// shown to fit strongly, so it stops at Good.
+// are the jobs least often graded a fit). A job with fewer than two required skills read can't be
+// shown to fit strongly (one skill is thin evidence: walkthrough, 2026-11-09), so it stops at Good.
 func (b Bands) Band(score, coverage float64, required int) string {
 	band := "stretch"
 	switch {
@@ -162,7 +162,7 @@ func (b Bands) Band(score, coverage float64, required int) string {
 	switch {
 	case required > 0 && coverage < 0.25:
 		return "stretch"
-	case band == "strong" && (required == 0 || coverage <= 0.5):
+	case band == "strong" && (required < 2 || coverage <= 0.5):
 		return "good"
 	}
 	return band
