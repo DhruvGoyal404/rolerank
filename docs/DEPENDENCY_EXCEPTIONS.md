@@ -21,3 +21,21 @@ itself, drop the override.
 
 `Ecosystem` is `npm`, `go` (modules) or `go-toolchain`. Adding an ecosystem means adding
 a reader to `scripts/check-deps.mjs`.
+
+## Accepted advisories
+
+Advisories with no fixed release to adopt, accepted for a stated reason and a short time.
+`node scripts/check-deps.mjs --audit <dir>` runs `npm audit` there and fails on any finding
+not listed here for that directory, on any entry past its expiry, and on any entry whose
+advisory no longer appears, so the entry goes as soon as the fix is in.
+
+| Where | Package | Advisory | Recorded | Expires |
+|---|---|---|---|---|
+| infra | minimatch | GHSA-g3hv-75wg-m249 | 2026-11-09 | 2026-12-15 |
+
+minimatch 10.2.6 is bundled inside aws-cdk-lib (every release up to 2.275.0, checked
+2026-11-09), so an npm override can't replace it. It runs only when `cdk synth` builds the
+templates, on our own configuration and file paths, never on input from users, and never on
+the host. Remove the entry as soon as an aws-cdk-lib release that bundles minimatch 11.0.1 or
+later passes the 14-day rule, and by 2026-12-15 in any case. The owner accepted it on
+2026-11-09.

@@ -6,10 +6,12 @@ import { join } from "node:path";
 import { test } from "node:test";
 import {
   ageErrors,
+  auditErrors,
   expiredExceptions,
   goItems,
   npmItems,
   npmPinErrors,
+  parseAccepted,
   parseExceptions,
 } from "./check-deps.mjs";
 
@@ -171,4 +173,47 @@ test("the real command exits 1 on a lapsed Go exception", () => {
 
 test("the real command exits 0 once the lapsed row is gone and the version has aged", () => {
   assert.equal(runCli("").status, 0);
+});
+
+const acceptedDoc = `${header}
+
+## Accepted advisories
+
+| Where | Package | Advisory | Recorded | Expires |
+|---|---|---|---|---|
+| infra | minimatch | GHSA-g3hv-75wg-m249 | 2026-11-09 | 2026-12-15 |
+`;
+const finding = (name, ghsa) => ({
+  vulnerabilities: {
+    "aws-cdk-lib": { via: [name] },
+    [name]: { via: [{ name, url: `https://github.com/advisories/${ghsa}`, severity: "moderate" }] },
+  },
+});
+
+test("accepted advisories are read from their own table, not as young-release exceptions", () => {
+  const { rows, errors } = parseAccepted(acceptedDoc);
+  assert.deepEqual(errors, []);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].where, "infra");
+  assert.deepEqual(parseExceptions(acceptedDoc).rows, []);
+});
+
+test("an accepted advisory passes only in the directory it was accepted for", () => {
+  const { rows } = parseAccepted(acceptedDoc);
+  assert.deepEqual(auditErrors({ dir: "infra", audit: finding("minimatch", "GHSA-g3hv-75wg-m249"), accepted: rows }), []);
+  assert.match(auditErrors({ dir: "api", audit: finding("minimatch", "GHSA-g3hv-75wg-m249"), accepted: rows })[0], /not an accepted advisory/);
+});
+
+test("a new advisory fails, and an accepted one that no longer appears must be removed", () => {
+  const { rows } = parseAccepted(acceptedDoc);
+  const errors = auditErrors({ dir: "infra", audit: finding("tar", "GHSA-xxxx-yyyy-zzzz"), accepted: rows });
+  assert.ok(errors.some((e) => /tar GHSA-xxxx-yyyy-zzzz .* not an accepted advisory/.test(e)));
+  assert.ok(errors.some((e) => /minimatch GHSA-g3hv-75wg-m249 no longer appears/.test(e)));
+});
+
+test("an accepted advisory expires like any exception, and a bad row fails", () => {
+  const { rows } = parseAccepted(acceptedDoc);
+  assert.match(expiredExceptions(rows, "2026-12-16T00:00:00Z")[0], /expired on 2026-12-15/);
+  assert.deepEqual(expiredExceptions(rows, "2026-12-15T12:00:00Z"), []);
+  assert.match(parseAccepted(acceptedDoc.replace("GHSA-g3hv-75wg-m249", "CVE-1")).errors[0], /can't read/);
 });

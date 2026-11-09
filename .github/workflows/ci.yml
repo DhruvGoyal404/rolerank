@@ -18,12 +18,12 @@ jobs:
           node-version-file: .nvmrc
       - run: node --test "scripts/*.test.mjs"
       - run: node scripts/check-workflows.mjs
-      - run: node scripts/check-deps.mjs api web worker extractor
+      - run: node scripts/check-deps.mjs api web worker extractor infra
       - name: Audit the extractor's packages
         working-directory: extractor
         run: npm audit --omit=dev
       - name: Shellcheck the deploy and up/down scripts
-        run: shellcheck -x deploy/host/*.sh deploy/backup/*.sh scripts/models.sh $(ls rolerank-*.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh 2>/dev/null)
+        run: shellcheck -x deploy/host/*.sh deploy/backup/*.sh scripts/models.sh rolerank-up.sh rolerank-down.sh scripts/rolerank-lib.sh scripts/prod-secrets.sh scripts/seed-corpus.sh
 
   secrets:
     name: Gitleaks
@@ -241,6 +241,28 @@ jobs:
         run: |
           go test ./...
           go build ./...
+
+  infra:
+    name: Infrastructure (CDK synth, no deploy)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
+      - run: npm ci
+      # npm audit, with the accepted advisories of docs/DEPENDENCY_EXCEPTIONS.md and their expiry.
+      - run: node scripts/check-deps.mjs --audit infra
+        working-directory: .
+      - run: npm run typecheck
+      - run: npm test
+      # No AWS credentials here: the host stack synthesises against placeholders, for review only.
+      - run: npx cdk synth --quiet
 
   images:
     name: Production images (arm64 build, no push)

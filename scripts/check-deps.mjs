@@ -2,11 +2,15 @@
 // Enforces the dependency rules in CLAUDE.md across every ecosystem we use: exact pins,
 // and every package at least 14 days old unless docs/DEPENDENCY_EXCEPTIONS.md covers it.
 // Any exception past its expiry date fails, whether or not it's still needed.
+// With --audit, each npm directory's `npm audit` findings must all be listed under "Accepted
+// advisories" in the same file; a listed advisory that no longer appears fails too, so the
+// entry goes as soon as the fix is in.
 //
-//   node scripts/check-deps.mjs [--now 2026-10-31] [--times fixture.json] [--exceptions file] dir...
+//   node scripts/check-deps.mjs [--now 2026-10-31] [--times fixture.json] [--exceptions file] [--audit] dir...
 //
 // A directory with go.mod is checked as Go, one with package-lock.json as npm. Adding an
 // ecosystem means adding it to ECOSYSTEMS and a reader below.
+import { execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -17,11 +21,13 @@ const ECOSYSTEMS = new Set(["npm", "go", "go-toolchain"]);
 const EXPIRY = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2}))?$/;
 const expiryTime = (expires) => new Date(expires.includes("T") ? expires : `${expires}T23:59:59Z`);
 
+const ACCEPTED = "## Accepted advisories";
+
 /** Reads the table. Anything that looks like a row but can't be read is an error. */
 export function parseExceptions(markdown) {
   const rows = [];
   const errors = [];
-  for (const line of markdown.split("\n")) {
+  for (const line of markdown.split(ACCEPTED)[0].split("\n")) {
     if (!line.startsWith("|") || /^\|[\s:|-]+\|?$/.test(line) || /^\|\s*Ecosystem\b/.test(line)) continue;
     const cells = line.split("|").slice(1, -1).map((cell) => cell.trim());
     const [ecosystem, name, version, , advisory, , expires] = cells;
@@ -32,6 +38,48 @@ export function parseExceptions(markdown) {
     rows.push({ ecosystem, name, version, advisory, expires });
   }
   return { rows, errors };
+}
+
+/** The accepted-advisories table: | Where | Package | Advisory | Recorded | Expires |. */
+export function parseAccepted(markdown) {
+  const rows = [];
+  const errors = [];
+  const section = markdown.split(ACCEPTED)[1] ?? "";
+  for (const line of section.split("\n")) {
+    if (!line.startsWith("|") || /^\|[\s:|-]+\|?$/.test(line) || /^\|\s*Where\b/.test(line)) continue;
+    const cells = line.split("|").slice(1, -1).map((cell) => cell.trim());
+    const [where, name, advisory, , expires] = cells;
+    if (cells.length !== 5 || !where || !name || !/^GHSA-[\w-]+$/.test(advisory ?? "") || !EXPIRY.test(expires ?? "")) {
+      errors.push(`accepted advisories table: can't read "${line}"`);
+      continue;
+    }
+    rows.push({ ecosystem: "npm", where, name, version: advisory, advisory, expires });
+  }
+  return { rows, errors };
+}
+
+/**
+ * Pure: one directory's `npm audit --json` against the accepted rows. Every finding must be
+ * accepted for that directory, and every accepted row must still be a finding.
+ */
+export function auditErrors({ dir, audit, accepted }) {
+  const errors = [];
+  const found = new Set();
+  for (const vulnerability of Object.values(audit.vulnerabilities ?? {})) {
+    // String entries name the dependency that carries the advisory; it's reported there.
+    for (const via of vulnerability.via ?? []) {
+      if (typeof via !== "object") continue;
+      const advisory = /GHSA-[\w-]+/.exec(via.url ?? "")?.[0] ?? `npm-${String(via.source)}`;
+      found.add(`${via.name} ${advisory}`);
+      if (!accepted.some((row) => row.where === dir && row.name === via.name && row.advisory === advisory)) {
+        errors.push(`${dir}: ${via.name} ${advisory} (${via.severity}) is not an accepted advisory`);
+      }
+    }
+  }
+  for (const row of accepted.filter((r) => r.where === dir && !found.has(`${r.name} ${r.advisory}`))) {
+    errors.push(`${dir}: ${row.name} ${row.advisory} no longer appears in npm audit; remove the accepted entry`);
+  }
+  return errors;
 }
 
 export function expiredExceptions(rows, now) {
@@ -160,8 +208,12 @@ async function main() {
   const timesFile = option("--times");
   const exceptionsFile = option("--exceptions") ?? "docs/DEPENDENCY_EXCEPTIONS.md";
 
-  const { rows, errors: tableErrors } = parseExceptions(readFileSync(exceptionsFile, "utf8"));
-  const problems = [...tableErrors, ...expiredExceptions(rows, now)];
+  const audit = args.includes("--audit");
+  if (audit) args.splice(args.indexOf("--audit"), 1);
+  const markdown = readFileSync(exceptionsFile, "utf8");
+  const { rows, errors: tableErrors } = parseExceptions(markdown);
+  const { rows: accepted, errors: acceptedErrors } = parseAccepted(markdown);
+  const problems = [...tableErrors, ...acceptedErrors, ...expiredExceptions([...rows, ...accepted], now)];
 
   for (const dir of args) {
     let items;
@@ -176,6 +228,16 @@ async function main() {
     const { errors, used } = ageErrors({ items, times, exceptions: rows, now });
     console.log(`${dir}: ${items.length} packages, exceptions in use: ${used.join(", ") || "none"}`);
     problems.push(...errors);
+    if (audit && !existsSync(join(dir, "go.mod"))) {
+      // npm audit exits non-zero when it finds anything; the JSON on stdout is what counts.
+      let out;
+      try {
+        out = execSync("npm audit --json", { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+      } catch (error) {
+        out = error.stdout;
+      }
+      problems.push(...auditErrors({ dir, audit: JSON.parse(out), accepted }));
+    }
   }
   for (const problem of problems) console.error(`  ${problem}`);
   if (problems.length > 0) process.exit(1);

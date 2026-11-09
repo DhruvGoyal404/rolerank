@@ -179,7 +179,7 @@ features.
    short list of numbers in config, versioned with the eval report that produced them.
 4. **Fit band:** Strong, Good or Stretch, from score thresholds fitted on D3 grades and held to
    required-skill coverage: Strong also needs more than half of the job's required skills,
-   under a quarter is Stretch whatever the score, and a job with no required skills read stops
+   under a quarter is Stretch whatever the score, and a job with fewer than two required skills stops
    at Good (PHASE6.md, 2026-11-09). The UI shows the band and its reasons, never a percentage
    that implies false precision.
 5. **Explanation without an LLM:** matched skills = required ∩ profile; missing =
@@ -539,8 +539,9 @@ Compose, and `ingest` and `extractor` under systemd (gVisor needs the host runti
 4. Restore `db-app`, apply tombstones, check counts. Restore `db-corpus`, build indexes.
 5. Point DNS at the host; start the catch-up ingestion cycle.
 6. Checks: `/api/health` by IP and by domain; Google and GitHub authorize pages name the
-   app; one real LLM call; one embedding; one SES send to the owner; a real
-   `/api/matches` request under 200 ms.
+   app; one real LLM call through the spend ledger (ops scope, its own daily cap); one
+   embedding; a real search under 200 ms. No email check in v1: email arrives with alerts in
+   v1.1 (owner, 2026-11-09).
 7. Box: URL, fallback hosts-file line, cost per hour, "run rolerank-down.sh when done".
 
 **Backups:** nightly while up, plus the final one at down. The host role can only
@@ -564,6 +565,12 @@ and verified active by the deploy.
 - Backups are `pg_dump` custom-format files of both databases, `age`-encrypted to a public key
   in SSM, with each file's SHA-256 in its S3 metadata. The drill restores into scratch
   databases and must reproduce every app table's row count recorded at backup time.
+- `rolerank-up.sh` warms the ranker with two searches for a synthetic profile before the
+  checks, so the first user's matches don't pay the cold start (PHASE6.md: 1.25 s cold, 70 to
+  90 ms warm locally). Its model check goes through the spend ledger under the `ops` scope
+  (user_id NULL, $0.01 a day of its own, inside the global cap).
+- The first up restores the corpus from a seed of the local corpus (`scripts/seed-corpus.sh`,
+  encrypted like a backup, under `rolerank/seed/`); the app database starts empty.
 
 ## Cost (ap-south-1, on-demand, USD; Rs at 94.95)
 

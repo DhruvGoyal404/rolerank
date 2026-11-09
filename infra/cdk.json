@@ -1,0 +1,9 @@
+{
+  "app": "node bin/app.ts",
+  "context": {
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/core:defaultCrossStackReferences": "strong",
+    "rolerank:hostAmi": "ami-072d8688e7b3aba7a"
+  }
+}

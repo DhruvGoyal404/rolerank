@@ -266,7 +266,8 @@ CDK: persistent stack and host stack. GitHub OIDC, deploy by digest, SSM, auto-r
 - down leaves the audit clean, exit 0.
 - A real cycle passes: up, real request, down (audit clean), up. Then left down.
 - up ends with the box: URL, fallback, cost per hour, "run rolerank-down.sh when done".
-- up makes a real call to each critical external API: LLM, embedding, email.
+- up makes a real call to each critical external API: LLM (through the spend ledger) and
+  embedding. Email has no check in v1; it comes with the alerts in v1.1 (owner, 2026-11-09).
 - Backup restore drill passes on every down: row counts equal, or nothing is removed.
 - Backup freshness alarm fires in a drill, and the email actually arrives. Evidence
   recorded. All timers checked active, not just enabled.
