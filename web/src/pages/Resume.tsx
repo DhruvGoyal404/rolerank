@@ -1,7 +1,7 @@
-import { useEffect, useState, type SyntheticEvent } from "react";
+import { useEffect, useRef, useState, type DragEvent, type SyntheticEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 import { api, ApiError, type Profile } from "../api";
-import { Loading } from "../components";
+import { Journey, Loading } from "../components";
 import { useSession } from "../session";
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -61,9 +61,28 @@ export function Resume() {
   );
 }
 
+const kb = (n: number) => (n < 1024 * 1024 ? `${String(Math.max(1, Math.round(n / 1024)))} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
+
 function Upload({ failed, onUploaded }: { failed: string | null; onUploaded: () => Promise<void> }) {
   const [error, setError] = useState<string | null>(failed);
   const [sending, setSending] = useState(false);
+  const [chosen, setChosen] = useState<File | null>(null);
+  const [over, setOver] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const pick = (file: File | null) => {
+    setChosen(file);
+    setError(file && file.size > MAX_BYTES ? (ERRORS.too_large ?? "") : null);
+  };
+  const drop = (event: DragEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setOver(false);
+    const file = event.dataTransfer.files[0];
+    if (!file || !input.current) return;
+    const list = new DataTransfer();
+    list.items.add(file);
+    input.current.files = list.files;
+    pick(file);
+  };
   const submit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     const file = new FormData(event.currentTarget).get("resume");
@@ -82,28 +101,63 @@ function Upload({ failed, onUploaded }: { failed: string | null; onUploaded: () 
   };
   return (
     <>
-      <h1>Upload your resume</h1>
-      <p>
-        We read it in a sandbox with no network, strip your contact details before anything reaches our AI model, and store the text
-        encrypted with a key of your own. The original file is deleted once it&apos;s read.
-      </p>
-      <form className="drop" onSubmit={(e) => void submit(e)}>
+      <header className="page-head">
+        <Journey at={1} />
+        <h1>Upload your resume</h1>
+        <p className="lede">RoleRank reads it once, shows you what it found, and matches only on what you confirm.</p>
+      </header>
+      <form
+        className={over ? "drop over" : "drop"}
+        onSubmit={(e) => void submit(e)}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setOver(true);
+        }}
+        onDragLeave={() => {
+          setOver(false);
+        }}
+        onDrop={drop}
+      >
         <label htmlFor="resume">PDF or Word (.docx), up to 5 MB</label>
-        <input id="resume" name="resume" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-        <p>
-          <button className="primary" type="submit" disabled={sending}>
-            {sending ? "Uploading…" : "Upload"}
-          </button>
-        </p>
+        <p className="fine">Drop the file here, or choose it.</p>
+        <input
+          ref={input}
+          id="resume"
+          name="resume"
+          type="file"
+          aria-describedby={error ? "upload-error" : undefined}
+          aria-invalid={error ? true : undefined}
+          accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          onChange={(e) => {
+            pick(e.target.files?.[0] ?? null);
+          }}
+        />
+        {chosen ? (
+          <p className="chosen">
+            {chosen.name}, {kb(chosen.size)}
+          </p>
+        ) : null}
+        <button className="primary" type="submit" disabled={sending} aria-busy={sending}>
+          {sending ? "Uploading…" : "Upload"}
+        </button>
         {error ? (
-          <p className="error" role="alert">
+          <p className="error" role="alert" id="upload-error">
             {error}
           </p>
         ) : null}
       </form>
+      <ul className="promise">
+        <li>Read in a sandbox with no network, then the file is deleted.</li>
+        <li>Contact details are removed before any text reaches our AI model.</li>
+        <li>Stored encrypted with a key of your own. Delete it any time.</li>
+      </ul>
     </>
   );
 }
+
+/** Parsing in four named stages (DESIGN.md, Progress), polled every 2 s. */
+const STAGES = ["Uploading", "Reading the file in the sandbox", "Understanding your profile", "Done"] as const;
+const STAGE_OF: Record<string, number> = { queued: 1, extracting: 1, parsing: 2, ready: 3, failed: 3 };
 
 function Waiting({ resumeId, onDone }: { resumeId: string; onDone: () => Promise<void> }) {
   const [status, setStatus] = useState("queued");
@@ -128,12 +182,27 @@ function Waiting({ resumeId, onDone }: { resumeId: string; onDone: () => Promise
       stop = true;
     };
   }, [resumeId, onDone]);
-  const words: Record<string, string> = { queued: "Waiting in line", extracting: "Reading the file in the sandbox", parsing: "Reading your profile" };
+  const at = STAGE_OF[status] ?? 1;
   return (
     <>
-      <h1>Reading your resume</h1>
-      <p role="status" aria-live="polite">
-        {words[status] ?? "Working"}… this usually takes under a minute.
+      <header className="page-head">
+        <Journey at={1} />
+        <h1>Reading your resume</h1>
+        <p className="lede">This usually takes under a minute. You can leave this page; it carries on.</p>
+      </header>
+      <ol className="stages" aria-label="Progress">
+        {STAGES.map((label, i) => (
+          <li key={label} className={i < at ? "done" : undefined} aria-current={i === at ? "step" : undefined}>
+            <span className="mark" aria-hidden="true" />
+            <span>
+              {label}
+              {i < at ? <span className="sr-only"> (done)</span> : null}
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p className="sr-only" role="status" aria-live="polite">
+        {STAGES[at]}
       </p>
     </>
   );
@@ -187,24 +256,46 @@ function Review(props: { profileId: string; confirmed: boolean; onConfirmed: () 
 
   if (props.confirmed)
     return (
-      <>
-        <h1>Your confirmed profile</h1>
+      <div className="review">
+        <header className="page-head">
+          <h1>Your confirmed profile</h1>
+          <p className="lede">Matching uses exactly this. Upload a new resume to change it.</p>
+          <div className="actions">
+            <button className="primary" type="button" onClick={() => void navigate("/matches")}>
+              See matches
+            </button>
+            <button type="button" onClick={props.onReplace}>
+              Upload a new resume
+            </button>
+          </div>
+        </header>
+        <section aria-labelledby="stage">
+          <h2 id="stage">Career stage</h2>
+          <p>{LEVELS.find(([v]) => v === profile.level)?.[1] ?? profile.level}</p>
+        </section>
+        <section aria-labelledby="skills">
+          <h2 id="skills">Skills</h2>
+          <ul className="chips" aria-label="Your skills">
+            {profile.skills.map((s) => (
+              <li className="chip have" key={s.name}>
+                {s.name}
+              </li>
+            ))}
+          </ul>
+        </section>
         <ProfileSummary profile={profile} months={months} />
-        <div className="row">
-          <button className="primary" type="button" onClick={() => void navigate("/matches")}>
-            See matches
-          </button>
-          <button type="button" onClick={props.onReplace}>
-            Upload a new resume
-          </button>
-        </div>
-      </>
+      </div>
     );
 
   return (
-    <>
-      <h1>Check what we read</h1>
-      <p>Correct anything that&apos;s wrong, then confirm. Matching uses only what you confirm here.</p>
+    <div className="review">
+      <header className="page-head">
+        <Journey at={2} />
+        <h1>Check what we read</h1>
+        <p className="lede">Correct anything that&apos;s wrong, then confirm. Matching uses only what you confirm here.</p>
+      </header>
+      <section aria-labelledby="stage">
+      <h2 id="stage">Level</h2>
       <label htmlFor="level">Career stage</label>
       <select id="level" value={profile.level} onChange={(e) => { update({ ...profile, level: e.target.value as Profile["level"] }); }}>
         {LEVELS.map(([v, label]) => (
@@ -213,19 +304,28 @@ function Review(props: { profileId: string; confirmed: boolean; onConfirmed: () 
           </option>
         ))}
       </select>
-      <h2>Skills</h2>
+      </section>
+      <section aria-labelledby="skills">
+      <h2 id="skills">Skills</h2>
+      <p className="fine">Each one cites the resume line it was read from. Remove any that aren&apos;t yours.</p>
       <ul className="chips" aria-label="Your skills">
         {profile.skills.map((s) => (
-          <li className="chip" key={s.name}>
+          <li className="chip have" key={s.name}>
             {s.name}
-            <button type="button" aria-label={`Remove ${s.name}`} onClick={() => { update({ ...profile, skills: profile.skills.filter((x) => x !== s) }); }}>
-              ×
+            {s.line > 0 ? <span className="cite" title={`Read from line ${String(s.line)} of your resume`}>{`L${String(s.line)}`}</span> : null}
+            <button
+              type="button"
+              className="chip-remove"
+              aria-label={`Remove ${s.name}`}
+              onClick={() => { update({ ...profile, skills: profile.skills.filter((x) => x !== s) }); }}
+            >
+              <span aria-hidden="true">&times;</span>
             </button>
           </li>
         ))}
       </ul>
       <label htmlFor="add-skill">Add a skill your resume shows</label>
-      <div className="row">
+      <div className="add-row">
         <input
           id="add-skill"
           value={skill}
@@ -241,52 +341,61 @@ function Review(props: { profileId: string; confirmed: boolean; onConfirmed: () 
           Add
         </button>
       </div>
+      </section>
       <ProfileSummary profile={profile} months={months} />
-      {error ? (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      ) : null}
-      <div className="row">
-        <button className="primary" type="button" disabled={saving} onClick={() => void confirm()}>
+      <div className="confirm-bar">
+        <button className="primary" type="button" disabled={saving} aria-busy={saving} onClick={() => void confirm()}>
           {saving ? "Saving…" : "Confirm and see matches"}
         </button>
-        <button type="button" onClick={props.onReplace}>
+        <button type="button" className="quiet" onClick={props.onReplace}>
           Upload a different file
         </button>
+        {error ? (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
-    </>
+    </div>
   );
 }
 
 function ProfileSummary({ profile, months }: { profile: Profile; months: number }) {
   return (
-    <div className="stack">
-      <h2>Experience</h2>
-      {profile.experience.length === 0 ? <p className="fine">None found.</p> : null}
-      {profile.experience.map((e) => (
-        <div className="panel" key={`${e.employer}-${e.title}`}>
-          <h3>{e.title}</h3>
-          <ul className="facts">
-            <li>{e.employer}</li>
-            <li>{e.kind}</li>
-            <li>{e.periods.map((p) => `${p.start || "?"} to ${p.end || "?"}`).join(", ")}</li>
+    <>
+      <section aria-labelledby="experience">
+        <h2 id="experience">Experience</h2>
+        {profile.experience.length === 0 ? <p className="fine">No jobs or internships found. That&apos;s normal for a fresher; projects still count in matching.</p> : null}
+        {profile.experience.length > 0 ? (
+          <ul className="entries">
+            {profile.experience.map((e) => (
+              <li key={`${e.employer}-${e.title}`}>
+                <h3>{e.title}</h3>
+                <ul className="facts">
+                  <li>{e.employer}</li>
+                  <li>{e.kind}</li>
+                  <li>{e.periods.map((p) => `${p.start || "?"} to ${p.end || "?"}`).join(", ")}</li>
+                </ul>
+              </li>
+            ))}
           </ul>
-        </div>
-      ))}
-      <p className="fine">Work experience counted: {months} months (jobs and internships; programmes don&apos;t count).</p>
+        ) : null}
+        <p className="fine hint">Work experience counted: {months} months (jobs and internships; programmes don&apos;t count).</p>
+      </section>
       {profile.education.length > 0 ? (
-        <>
-          <h2>Education</h2>
-          {profile.education.map((e) => (
-            <p key={`${e.institution}-${e.degree}`}>
-              {e.degree}, {e.institution}
-              {e.grad_year ? `, ${String(e.grad_year)}` : ""}
-              {e.score ? `, ${e.score}` : ""}
-            </p>
-          ))}
-        </>
+        <section aria-labelledby="education">
+          <h2 id="education">Education</h2>
+          <ul className="entries">
+            {profile.education.map((e) => (
+              <li key={`${e.institution}-${e.degree}`}>
+                {e.degree}, {e.institution}
+                {e.grad_year ? `, ${String(e.grad_year)}` : ""}
+                {e.score ? `, ${e.score}` : ""}
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
-    </div>
+    </>
   );
 }

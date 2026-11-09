@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router";
 import { api, ApiError, type Match } from "../api";
-import { ago, Band, Facts, JobTitle, Loading, MatchSkeleton, SkillSummary, Via } from "../components";
+import { ago, ApplyLink, Band, Facts, JobTitle, Loading, MatchSkeleton, SkillSummary, Via } from "../components";
 import { useSession } from "../session";
 import { SaveButton } from "./Tracker";
 
@@ -27,6 +27,23 @@ export function applyFilters(ms: Match[], f: Filters, now = Date.now()): Match[]
       (f.days === 0 || now - Date.parse(m.job.postedAt) <= f.days * 86_400_000),
   );
 }
+
+/** Runs of the same band, in rank order: the list stays ranked, with a heading where the band changes. */
+export function byBand(ms: Match[]): Array<{ band: string; items: Match[] }> {
+  const out: Array<{ band: string; items: Match[] }> = [];
+  for (const m of ms) {
+    const last = out.at(-1);
+    if (last?.band === m.band) last.items.push(m);
+    else out.push({ band: m.band, items: [m] });
+  }
+  return out;
+}
+
+const BAND_NOTE: Record<string, string> = {
+  Strong: "Your resume shows most of what these ask for.",
+  Good: "A solid overlap, with a few skills to show or learn.",
+  Stretch: "Worth a look if you're ready to learn on the job.",
+};
 
 const active = (f: Filters) => [f.level !== "", f.internship, f.location.trim() !== "", f.company.trim() !== "", f.days !== 0].filter(Boolean).length;
 
@@ -75,7 +92,11 @@ export function Matches() {
         <p className="lede">
           Ranked by how well your confirmed profile fits. <Link to="/jd">Found a job elsewhere? Bring its description.</Link>
         </p>
-        {refreshedAt ? <p className="fine">Jobs last refreshed {ago(refreshedAt)}.</p> : null}
+        {refreshedAt ? (
+          <p className="fine">
+            Jobs last refreshed {ago(refreshedAt)}. New postings are checked every 6 hours while RoleRank is running.
+          </p>
+        ) : null}
       </header>
       <button
         type="button"
@@ -86,7 +107,8 @@ export function Matches() {
           setOpen(!open);
         }}
       >
-        Filters{n > 0 ? ` (${String(n)} on)` : ""}
+        {open ? "Hide filters" : "Filters"}
+        {n > 0 ? ` (${String(n)} on)` : ""}
       </button>
       <form id="filters" className={open ? "filter-bar open" : "filter-bar"} aria-label="Filter matches" onSubmit={(e) => { e.preventDefault(); }}>
         <div className="field">
@@ -115,6 +137,7 @@ export function Matches() {
             <option value={30}>Last month</option>
           </select>
         </div>
+        <div className="checks">
         <label className="check">
           <input type="checkbox" checked={filters.internship} onChange={(e) => { set({ internship: e.target.checked }); }} />
           Internships only
@@ -129,6 +152,18 @@ export function Matches() {
           />
           Remote roles open to India
         </label>
+        {n > 0 ? (
+          <button
+            type="button"
+            className="quiet clear"
+            onClick={() => {
+              setFilters(NO_FILTERS);
+            }}
+          >
+            Clear filters
+          </button>
+        ) : null}
+        </div>
       </form>
 
       {error ? (
@@ -152,13 +187,17 @@ export function Matches() {
       ) : null}
       {all?.length === 0 ? (
         <div className="state">
-          <p>No open role fits your profile right now. New postings arrive every day.</p>
-          <Link to="/account">Widen what you&apos;re looking for</Link>
+          <h2>No open role fits your profile yet</h2>
+          <p>New postings arrive every day. Adding target roles, or turning on remote roles, widens the search.</p>
+          <Link className="button" to="/account">
+            Widen what you&apos;re looking for
+          </Link>
         </div>
       ) : null}
       {all && all.length > 0 && shown?.length === 0 ? (
         <div className="state">
-          <p>Nothing matches these filters.</p>
+          <h2>Nothing matches these filters</h2>
+          <p>{`${String(all.length)} roles fit your profile; the filters hide all of them.`}</p>
           <button
             type="button"
             onClick={() => {
@@ -169,24 +208,38 @@ export function Matches() {
           </button>
         </div>
       ) : null}
-      {shown && shown.length > 0 ? (
-        <ul className="match-list">
-          {shown.map((m) => (
-            <li className="match" key={m.job.key}>
-              <div className="match-head">
-                <JobTitle job={m.job} />
-                <Band band={m.band} />
+      {shown && shown.length > 0
+        ? byBand(shown).map((group, g) => (
+            <section key={`${group.band}-${String(g)}`} aria-labelledby={`band-${String(g)}`}>
+              <div className="group-head">
+                <h2 id={`band-${String(g)}`}>
+                  <Band band={group.band} />
+                  <span className="sr-only">{`, ${String(group.items.length)} roles`}</span>
+                </h2>
+                <p className="fine">{BAND_NOTE[group.band] ?? ""}</p>
               </div>
-              <Facts job={m.job} />
-              <SkillSummary e={m.explanation} compact />
-              <div className="match-foot">
-                <SaveButton jobKey={m.job.key} />
-                <Via job={m.job} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+              <ol className={g === 0 ? "match-list reveal" : "match-list"}>
+                {group.items.map((m) => (
+                  <li className="match" key={m.job.key}>
+                    <div className="match-head">
+                      <JobTitle job={m.job} band={m.band} />
+                      <Band band={m.band} />
+                    </div>
+                    <div className="match-body">
+                      <Facts job={m.job} />
+                      <SkillSummary e={m.explanation} compact />
+                    </div>
+                    <div className="match-foot">
+                      <SaveButton jobKey={m.job.key} />
+                      <ApplyLink job={m.job} compact />
+                      <Via job={m.job} />
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        : null}
     </>
   );
 }

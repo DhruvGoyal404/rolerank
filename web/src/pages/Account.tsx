@@ -48,8 +48,11 @@ export function Account() {
   };
 
   return (
-    <div className="narrow stack">
-      <h1>Your account</h1>
+    <div className="account-grid">
+      <header className="page-head">
+        <h1>Your account</h1>
+        <p className="lede">What RoleRank searches for, your data, and how to delete it.</p>
+      </header>
       {error ? (
         <p className="error" role="alert">
           {error}
@@ -94,11 +97,13 @@ export function Account() {
       <section className="panel" aria-labelledby="export">
         <h2 id="export">Your data</h2>
         <p>Download everything RoleRank keeps about you as one JSON file: your account, resume text, profiles, tracker and AI usage.</p>
-        <a className="button" href="/api/me/export" download="rolerank-export.json">
+        <p className="hint">
+          <a className="button" href="/api/me/export" download="rolerank-export.json">
           Export my data
-        </a>
+          </a>
+        </p>
       </section>
-      <section className="panel" aria-labelledby="delete">
+      <section className="panel danger-zone" aria-labelledby="delete">
         <h2 id="delete">Delete your account</h2>
         <p>This removes, at once and for good:</p>
         <ul>
@@ -107,13 +112,20 @@ export function Account() {
           <li>your tracker, preferences and the encryption key for your data.</li>
         </ul>
         <p className="fine">
-          Backups aren&apos;t running yet. When they start, the <a href="/privacy">privacy page</a> will say how long a deleted account can
-          stay in one.
+          Encrypted backups can hold a deleted account for a while, and every restore deletes it again first. The{" "}
+          <a href="/privacy#delete">privacy page</a> says for how long.
         </p>
         <label htmlFor="confirm-delete">Type DELETE to confirm</label>
-        <input id="confirm-delete" value={confirmText} onChange={(e) => { setConfirmText(e.target.value); }} autoComplete="off" />
-        <p>
-          <button type="button" disabled={confirmText !== "DELETE"} onClick={() => void remove()}>
+        <input
+          id="confirm-delete"
+          value={confirmText}
+          onChange={(e) => { setConfirmText(e.target.value); }}
+          autoComplete="off"
+          spellCheck={false}
+          autoCapitalize="characters"
+        />
+        <p className="hint">
+          <button type="button" className="danger" disabled={confirmText !== "DELETE"} onClick={() => void remove()}>
             Delete my account
           </button>
         </p>

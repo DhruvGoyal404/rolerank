@@ -1,12 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import type { Explanation, JobCard, Tailoring } from "./api";
 import { applyHref, ruleFor } from "./attribution";
 
 /** The fit band as the logo's three bars. A band, never a percentage (CLAUDE.md). */
-export function Band({ band }: { band: string }) {
+export function Band({ band, large }: { band: string; large?: boolean }) {
   const name = band === "Strong" || band === "Good" || band === "Stretch" ? band : "Stretch";
   return (
-    <span className={`band band-${name.toLowerCase()}`}>
+    <span className={`band band-${name.toLowerCase()}${large ? " band-large" : ""}`}>
       <span className="bars" aria-hidden="true">
         <i />
         <i />
@@ -27,28 +28,38 @@ const LEVEL: Record<Explanation["level"]["fit"], string> = {
 /** On a card, the first few missing skills; the job page lists them all. */
 const MISSING_ON_CARDS = 6;
 
-/** Skills had and missing as chips: missing ones are outlined and muted, calm but distinct. */
+/** Skills had and missing as chips in labelled rows: had ones filled, missing ones outlined. */
 export function SkillSummary({ e, compact }: { e: Explanation; compact?: boolean }) {
   return (
     <div className={compact ? "skills skills-compact" : "skills"}>
       {e.matched.length > 0 ? (
-        <ul className="chips" aria-label="Required skills you have">
-          {e.matched.map((s) => (
-            <li className="chip have" key={s}>
-              {s}
-            </li>
-          ))}
-        </ul>
+        <div className="skill-row">
+          <span className="label" aria-hidden="true">
+            You have
+          </span>
+          <ul className="chips" aria-label="Required skills you have">
+            {e.matched.map((s) => (
+              <li className="chip have" key={s}>
+                {s}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
       {e.missing.length > 0 ? (
-        <ul className="chips" aria-label="Required skills your resume doesn't show">
-          {(compact ? e.missing.slice(0, MISSING_ON_CARDS) : e.missing).map((s) => (
-            <li className="chip missing" key={s}>
-              {s}
-            </li>
-          ))}
-          {compact && e.missing.length > MISSING_ON_CARDS ? <li className="chip more">{`+${String(e.missing.length - MISSING_ON_CARDS)} more`}</li> : null}
-        </ul>
+        <div className="skill-row">
+          <span className="label" aria-hidden="true">
+            Not shown
+          </span>
+          <ul className="chips" aria-label="Required skills your resume doesn't show">
+            {(compact ? e.missing.slice(0, MISSING_ON_CARDS) : e.missing).map((s) => (
+              <li className="chip missing" key={s}>
+                {s}
+              </li>
+            ))}
+            {compact && e.missing.length > MISSING_ON_CARDS ? <li className="chip more">{`+${String(e.missing.length - MISSING_ON_CARDS)} more`}</li> : null}
+          </ul>
+        </div>
       ) : null}
       {compact ? null : (
         <p className="fine">
@@ -73,10 +84,11 @@ export function Via({ job }: { job: JobCard }) {
   );
 }
 
-export function ApplyLink({ job }: { job: JobCard }) {
+export function ApplyLink({ job, compact }: { job: JobCard; compact?: boolean }) {
   return (
-    <a className="button primary" href={applyHref(job)} rel={ruleFor(job.source).rel} target="_blank">
-      Apply on the employer&apos;s site
+    <a className={compact ? "button compact" : "button primary"} href={applyHref(job)} rel={ruleFor(job.source).rel} target="_blank">
+      {compact ? "Apply" : "Apply on the employer's site"}
+      <span className="sr-only"> (new tab)</span>
     </a>
   );
 }
@@ -132,10 +144,13 @@ export function Facts({ job }: { job: JobCard }) {
   );
 }
 
-export function JobTitle({ job }: { job: JobCard }) {
+/** The job's title as a link; the band rides along so the job page can show it. */
+export function JobTitle({ job, band }: { job: JobCard; band?: string }) {
   return (
     <h3 className="job-title">
-      <Link to={`/jobs/${job.key}`}>{job.title}</Link>
+      <Link to={`/jobs/${job.key}`} state={band ? { band } : undefined}>
+        {job.title}
+      </Link>
     </h3>
   );
 }
@@ -157,10 +172,50 @@ export function byLines(evidence: Tailoring["evidence"]): Array<{ skills: string
  * resume line that shows it, swaps as before and after, and the bullets to lead with, in order.
  * Every line shown is the user's own, verbatim.
  */
+/** A resume line, verbatim; long ones clamp to two lines with a toggle. */
+export function ResumeLine({ text }: { text: string }) {
+  const clean = text.replace(/^\s*[-\u2013\u2014\u2022*]\s*/, "");
+  const [open, setOpen] = useState(false);
+  const long = clean.length > 160;
+  return (
+    <div className="line">
+      <q className={long && !open ? "clamp" : undefined}>{clean}</q>
+      {long ? (
+        <button
+          type="button"
+          className="quiet more-toggle"
+          aria-expanded={open}
+          onClick={() => {
+            setOpen(!open);
+          }}
+        >
+          {open ? "Show less" : "Show all"}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 export function TailoringView({ t }: { t: Tailoring }) {
   const nothing = t.evidence.length === 0 && t.alignments.length === 0 && t.emphasis.top.length === 0;
+  const parts = [
+    t.evidence.length > 0 && ["ev", "Evidence"],
+    t.alignments.length > 0 && ["al", "The job's words"],
+    t.emphasis.top.length > 0 && ["em", "What to put first"],
+  ].filter((x): x is [string, string] => Array.isArray(x));
   return (
     <div className="tailoring">
+      {parts.length > 1 ? (
+        <nav aria-label="Tailoring sections">
+          <ul className="jump">
+            {parts.map(([id, label]) => (
+              <li key={id}>
+                <a href={`#${id}`}>{label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
       {nothing ? <p className="notice">Your resume doesn&apos;t show what this job asks for, so there is nothing honest to suggest.</p> : null}
       {t.evidence.length > 0 ? (
         <section aria-labelledby="ev">
@@ -178,7 +233,7 @@ export function TailoringView({ t }: { t: Tailoring }) {
                   <th scope="row">{row.skills.join(", ")}</th>
                   <td>
                     {row.lines.map((l) => (
-                      <q key={l.n}>{l.text.replace(/^\s*[-–—•*]\s*/, "")}</q>
+                      <ResumeLine key={l.n} text={l.text} />
                     ))}
                   </td>
                 </tr>
@@ -208,12 +263,17 @@ export function TailoringView({ t }: { t: Tailoring }) {
           <ul className="swaps">
             {t.alignments.map((a) => (
               <li key={`${String(a.line)}-${a.from}`}>
-                <span className="swap-terms">
+                <div className="before">
+                  <span className="tag">Your resume says</span>
                   <del>{a.from}</del>
-                  <span aria-hidden="true"> to </span>
-                  <ins>{a.to}</ins>
-                </span>
-                <q>{a.rewrite.replace(/^\s*[-–—•*]\s*/, "")}</q>
+                </div>
+                <div className="after">
+                  <span className="tag">This job says</span>
+                  <span>
+                    <ins>{a.to}</ins>
+                  </span>
+                  <ResumeLine text={a.rewrite} />
+                </div>
               </li>
             ))}
           </ul>
@@ -224,7 +284,9 @@ export function TailoringView({ t }: { t: Tailoring }) {
           <h3 id="em">Put these first</h3>
           <ol className="lead-with">
             {t.emphasis.top.map((l) => (
-              <li key={l.n}>{l.text.replace(/^\s*[-–—•*]\s*/, "")}</li>
+              <li key={l.n}>
+                <ResumeLine text={l.text} />
+              </li>
             ))}
           </ol>
           {t.emphasis.addMetric.length > 0 ? (
@@ -234,7 +296,7 @@ export function TailoringView({ t }: { t: Tailoring }) {
               <ul className="plain">
                 {t.emphasis.addMetric.map((l) => (
                   <li key={l.n}>
-                    <q>{l.text.replace(/^\s*[-–—•*]\s*/, "")}</q>
+                    <ResumeLine text={l.text} />
                   </li>
                 ))}
               </ul>
@@ -246,11 +308,15 @@ export function TailoringView({ t }: { t: Tailoring }) {
   );
 }
 
+/** A loading state shaped like content, with the words for screen readers. */
 export function Loading({ what }: { what: string }) {
   return (
-    <p className="fine" role="status">
-      Loading {what}…
-    </p>
+    <div className="loading" role="status">
+      <span className="sr-only">Loading {what}…</span>
+      <span className="sk sk-title" aria-hidden="true" />
+      <span className="sk sk-line" aria-hidden="true" />
+      <span className="sk sk-block" aria-hidden="true" />
+    </div>
   );
 }
 
@@ -258,7 +324,7 @@ export function Loading({ what }: { what: string }) {
 export function MatchSkeleton() {
   return (
     <ul className="match-list" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
+      {[0, 1, 2, 3].map((i) => (
         <li className="match skeleton" key={i}>
           <span className="sk sk-title" />
           <span className="sk sk-line" />
@@ -266,5 +332,21 @@ export function MatchSkeleton() {
         </li>
       ))}
     </ul>
+  );
+}
+
+const JOURNEY = ["Sign in", "Upload your resume", "Confirm your profile", "See your matches"] as const;
+
+/** The first-run journey, shown until the profile is confirmed. `at` is the current step, 0 to 3. */
+export function Journey({ at }: { at: number }) {
+  return (
+    <ol className="journey" aria-label="Getting started">
+      {JOURNEY.map((label, i) => (
+        <li key={label} className={i < at ? "done" : undefined} aria-current={i === at ? "step" : undefined}>
+          {label}
+          {i < at ? <span className="sr-only"> (done)</span> : null}
+        </li>
+      ))}
+    </ol>
   );
 }

@@ -20,7 +20,7 @@ export function currentTheme(): Theme {
 
 export function setTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
-  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) meta.setAttribute("content", theme === "dark" ? "#0d1226" : "#f5f4ee");
+  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) meta.setAttribute("content", theme === "dark" ? "#0b1022" : "#f6f7fb");
   try {
     localStorage.setItem(KEY, theme);
   } catch {
