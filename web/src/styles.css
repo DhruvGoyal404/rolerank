@@ -1076,3 +1076,10 @@ q {
     padding: 0;
   }
 }
+
+.facts .stale {
+  color: var(--warn-ink);
+  background: var(--warn-bg);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--s2);
+}

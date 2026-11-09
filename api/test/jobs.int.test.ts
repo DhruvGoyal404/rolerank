@@ -231,6 +231,7 @@ describe("matches", () => {
     expect(body.matches).toHaveLength(1); // a hit with no posting is skipped
     expect(body.matches[0]).toMatchObject({ job: { key: jobKey, title: "Backend Engineer" }, band: "Strong", explanation: { missing: ["Kubernetes"] } });
     expect(JSON.stringify(body)).not.toContain(BODY_CANARY);
+    expect(res.body).toHaveProperty("refreshedAt"); // the newest board check, or null before any
     expect(rankAsked[0]).toMatchObject({ level: "entry", country: "IN", remote: true, limit: 5 });
     expect(JSON.stringify(rankAsked[0])).not.toContain("asha@example.com");
     expect(JSON.stringify(rankAsked[0])).not.toContain("Software Engineer Intern, Acme Corp:"); // no resume lines

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router";
 import { api, ApiError, type Match } from "../api";
-import { Band, Facts, JobTitle, Loading, MatchSkeleton, SkillSummary, Via } from "../components";
+import { ago, Band, Facts, JobTitle, Loading, MatchSkeleton, SkillSummary, Via } from "../components";
 import { useSession } from "../session";
 import { SaveButton } from "./Tracker";
 
@@ -34,6 +34,7 @@ export function Matches() {
   const { me, loading } = useSession();
   const [remote, setRemote] = useState<boolean | null>(null); // null: use saved preferences
   const [all, setAll] = useState<Match[] | null>(null);
+  const [refreshedAt, setRefreshedAt] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [open, setOpen] = useState(false); // the filter sheet, on phones
   const [error, setError] = useState<string | null>(null);
@@ -43,9 +44,10 @@ export function Matches() {
     setAll(null);
     setError(null);
     const q = remote === null ? "" : `&remote=${remote ? "1" : "0"}`;
-    api<{ matches: Match[]; remote: boolean }>(`/api/matches?limit=50${q}`).then(
+    api<{ matches: Match[]; remote: boolean; refreshedAt: string | null }>(`/api/matches?limit=50${q}`).then(
       (r) => {
         setAll(r.matches);
+        setRefreshedAt(r.refreshedAt);
         if (remote === null) setRemote(r.remote);
       },
       (e: unknown) => {
@@ -73,6 +75,7 @@ export function Matches() {
         <p className="lede">
           Ranked by how well your confirmed profile fits. <Link to="/jd">Found a job elsewhere? Bring its description.</Link>
         </p>
+        {refreshedAt ? <p className="fine">Jobs last refreshed {ago(refreshedAt)}.</p> : null}
       </header>
       <button
         type="button"

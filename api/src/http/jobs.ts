@@ -279,7 +279,9 @@ export function mountJobs(
           const p = byId.get(String(h.id));
           return p ? [{ job: card(p), band: bandName(h.band), explanation: explained(p, c.profile) }] : [];
         });
-        res.json({ matches, country, remote });
+        // When the corpus was last refreshed: the newest board check (ingest re-checks every 6 h while up).
+        const fresh = await corpus.query<{ at: Date | null }>(`SELECT max(last_checked_at) AS at FROM boards WHERE status = 'active'`);
+        res.json({ matches, country, remote, refreshedAt: fresh.rows[0]?.at ?? null });
       })().catch(next);
     });
   }

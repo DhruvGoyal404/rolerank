@@ -81,6 +81,22 @@ export function ApplyLink({ job }: { job: JobCard }) {
   );
 }
 
+/** Postings older than this are marked: the role may already be filled. */
+export const STALE_DAYS = 30;
+
+export const daysSince = (at: string, now = Date.now()): number => Math.floor((now - Date.parse(at)) / 86_400_000);
+
+/** "2 hours ago", "3 days ago": for the corpus refresh time. */
+export function ago(at: string, now = Date.now()): string {
+  const mins = Math.floor((now - Date.parse(at)) / 60_000);
+  if (!Number.isFinite(mins)) return "at an unknown time";
+  if (mins < 60) return mins <= 1 ? "just now" : `${String(mins)} minutes ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${String(hours)} hours ago`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? "yesterday" : `${String(days)} days ago`;
+}
+
 /** "today", "3 days ago": how fresh a posting is. */
 export function age(postedAt: string, now = Date.now()): string {
   const days = Math.floor((now - Date.parse(postedAt)) / 86_400_000);
@@ -106,7 +122,11 @@ export function Facts({ job }: { job: JobCard }) {
     <ul className="facts">
       <li>{job.company}</li>
       {job.location ? <li>{place(job.location)}</li> : null}
-      <li>{age(job.postedAt)}</li>
+      {daysSince(job.postedAt) > STALE_DAYS ? (
+        <li className="stale">{age(job.postedAt)}: may already be filled</li>
+      ) : (
+        <li>{age(job.postedAt)}</li>
+      )}
       {job.closed ? <li className="closed">Closed</li> : null}
     </ul>
   );
