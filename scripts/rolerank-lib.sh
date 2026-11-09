@@ -94,7 +94,10 @@ cdk_() {
   (
     cd "$ROOT/infra" || exit 1
     [ -d node_modules ] || npm ci --no-audit --no-fund >&2
-    CDK_DEFAULT_ACCOUNT=$ACCOUNT npx cdk "$@" -c alarmEmail="$ALARM_EMAIL" --require-approval never --progress events
+    # --require-approval and --progress exist only on deploy; destroy warns about them.
+    local only_deploy=()
+    [ "$1" = deploy ] && only_deploy=(--require-approval never --progress events)
+    CDK_DEFAULT_ACCOUNT=$ACCOUNT npx cdk "$@" -c alarmEmail="$ALARM_EMAIL" "${only_deploy[@]}"
   )
 }
 stack_exists() {
