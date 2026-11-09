@@ -32,7 +32,7 @@ S3_MAX_BYTES=$((6 * 1073741824))  # 2 final sets of ~1.3 GB, plus locked old ver
 # On-demand, ap-south-1 (ARCHITECTURE.md, "Cost": AWS price files, 2026-10-31).
 PRICE_HOUR_USD=0.127 # m7g.xlarge 0.1166 + gp3 40 GB 0.0050 + public IPv4 0.005
 USD_INR=94.95
-HOST_COMPOSE="docker compose -f /opt/rolerank/current/app/deploy/compose.prod.yaml --env-file /etc/rolerank/prod.env --env-file /opt/rolerank/current/release.env"
+HOST_COMPOSE="docker compose --progress quiet -f /opt/rolerank/current/app/deploy/compose.prod.yaml --env-file /etc/rolerank/prod.env --env-file /opt/rolerank/current/release.env"
 
 # Windows form too (C:/...): native jq, curl and aws.exe must open these files.
 WORK=$(cd "$(mktemp -d)" && { pwd -W 2>/dev/null || pwd; })

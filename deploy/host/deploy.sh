@@ -57,7 +57,7 @@ umask 022
 
 previous=$(readlink -f "$ROOT/current" 2>/dev/null || true)
 switch() { ln -sfn "$1" "$ROOT/current.new" && mv -Tf "$ROOT/current.new" "$ROOT/current"; }
-compose() { docker compose -f "$ROOT/current/app/deploy/compose.prod.yaml" --env-file /etc/rolerank/prod.env --env-file "$ROOT/current/release.env" "$@"; }
+compose() { docker compose --progress quiet -f "$ROOT/current/app/deploy/compose.prod.yaml" --env-file /etc/rolerank/prod.env --env-file "$ROOT/current/release.env" "$@"; }
 
 start() {
   install -m 0644 "$ROOT"/current/app/deploy/systemd/*.service "$ROOT"/current/app/deploy/systemd/*.timer /etc/systemd/system/
