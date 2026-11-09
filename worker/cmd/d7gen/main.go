@@ -5,6 +5,7 @@
 //
 //	d7gen <out-dir>        writes <out-dir>/<id>.pdf|.docx and <out-dir>/cases.jsonl
 //	d7gen <out-dir> hard   writes D7-hard (hard.go): held out, harder attacks, run once
+//	d7gen <out-dir> signup writes D7-S (signup.go): held out for open signup, run once
 package main
 
 import (
@@ -53,13 +54,17 @@ var plants = []string{"Kubernetes", "Rust", "Terraform", "Scala"}
 var vectors = []string{"visible", "white", "tiny", "docx_hidden"}
 
 func main() {
-	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard") {
-		fmt.Fprintln(os.Stderr, "usage: d7gen <out-dir> [hard]")
+	if len(os.Args) < 2 || len(os.Args) > 3 || (len(os.Args) == 3 && os.Args[2] != "hard" && os.Args[2] != "signup") {
+		fmt.Fprintln(os.Stderr, "usage: d7gen <out-dir> [hard|signup]")
 		os.Exit(2)
 	}
 	dir := os.Args[1]
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		panic(err)
+	}
+	if len(os.Args) == 3 && os.Args[2] == "signup" {
+		generateSignup(dir)
+		return
 	}
 	if len(os.Args) == 3 {
 		generateHard(dir)
