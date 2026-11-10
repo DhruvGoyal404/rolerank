@@ -44,6 +44,13 @@ export const PROJECT_TAG = { key: "rolerank:project", value: "rolerank" } as con
  */
 export const BUDGET_USD = 5.27;
 export const HOST_INSTANCE = "m7g.xlarge";
+/**
+ * Arm64 types the host may run on, in fallback order (rolerank-up.sh tries every AZ for one type
+ * before the next): 4 vCPU each, 16 GiB or more. Graviton, so the arm64 images and the gVisor
+ * build are the same on all of them.
+ */
+export const HOST_TYPES = [HOST_INSTANCE, "m6g.xlarge", "r7g.xlarge"] as const;
+const HOST_AZ = /^ap-south-1[abc]$/;
 export const HOST_DISK_GB = 40;
 export const AMI_ID = /^ami-[0-9a-f]{8,17}$/;
 /** Longest base64 release manifest the deploy document accepts (one is ~1 KB). */
@@ -233,6 +240,10 @@ export interface HostStackProps extends StackProps {
    * release. OS updates happen on the host (unattended-upgrades).
    */
   hostAmi: string;
+  /** The AZ to place the host in (rolerank-up.sh chooses it per attempt); the default VPC's first otherwise. */
+  hostAz?: string | undefined;
+  /** One of HOST_TYPES; HOST_INSTANCE otherwise. */
+  hostType?: string | undefined;
 }
 
 export class RoleRankHostStack extends Stack {
@@ -240,13 +251,16 @@ export class RoleRankHostStack extends Stack {
     super(scope, id, props);
     const ami = props.hostAmi || (props.offline ? "ami-00000000000000000" : "");
     if (!AMI_ID.test(ami)) throw new Error(`pin the host AMI in infra/cdk.json "rolerank:hostAmi" (Ubuntu 24.04 arm64), got ${JSON.stringify(props.hostAmi)}`);
+    const type = props.hostType ?? HOST_INSTANCE;
+    if (!(HOST_TYPES as readonly string[]).includes(type)) throw new Error(`host type ${type} is not one of ${HOST_TYPES.join(", ")}`);
+    if (props.hostAz !== undefined && !HOST_AZ.test(props.hostAz)) throw new Error(`host AZ ${props.hostAz} is not in ${REGION}`);
 
     const vpc = props.offline
       ? ec2.Vpc.fromVpcAttributes(this, "DefaultVpc", {
           vpcId: "vpc-00000000000000000",
-          availabilityZones: [`${REGION}a`],
-          publicSubnetIds: ["subnet-00000000000000000"],
-          publicSubnetRouteTableIds: ["rtb-00000000000000000"],
+          availabilityZones: [`${REGION}a`, `${REGION}b`, `${REGION}c`],
+          publicSubnetIds: ["subnet-0000000000000000a", "subnet-0000000000000000b", "subnet-0000000000000000c"],
+          publicSubnetRouteTableIds: ["rtb-00000000000000000", "rtb-00000000000000000", "rtb-00000000000000000"],
         })
       : ec2.Vpc.fromLookup(this, "DefaultVpc", { isDefault: true });
     const backups = props.persistent.backups;
@@ -317,8 +331,10 @@ export class RoleRankHostStack extends Stack {
     );
     const host = new ec2.Instance(this, "Host", {
       vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
-      instanceType: new ec2.InstanceType(HOST_INSTANCE),
+      // Any AZ works: the Elastic IP, the backups and the Caddy data are regional, and the disk is
+      // new on every up.
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC, ...(props.hostAz ? { availabilityZones: [props.hostAz] } : {}) },
+      instanceType: new ec2.InstanceType(type),
       machineImage: ec2.MachineImage.genericLinux({ [REGION]: ami }),
       role,
       securityGroup: sg,

@@ -40,7 +40,28 @@ main_sha=$(git -C "$ROOT" ls-remote origin refs/heads/main | cut -f1)
   echo "note: local HEAD differs from origin/main; a build deploys origin/main" >&2
 
 log "1/8 Stacks (persistent, then the host)"
-cdk_ deploy "$PERSISTENT" "$HOST_STACK"
+cdk_ deploy "$PERSISTENT" --exclusively
+# deploy_host AZ TYPE LOG: one host deploy. ROLERANK_TEST_NO_CAPACITY_AZ=<az> fakes a capacity
+# refusal there, to prove the fallback on a real up (MAINTENANCE.md, "If EC2 has no capacity").
+deploy_host() {
+  if [ "${ROLERANK_TEST_NO_CAPACITY_AZ:-}" = "$1" ]; then
+    echo "Instance: InsufficientInstanceCapacity (faked for $1 by ROLERANK_TEST_NO_CAPACITY_AZ)" | tee "$3" >&2
+    return 1
+  fi
+  cdk_ deploy "$HOST_STACK" --exclusively -c rolerank:hostAz="$1" -c rolerank:hostType="$2" 2>&1 | tee "$3" >&2
+}
+clear_failed_host
+running=$(host_id)
+if [ -n "$running" ]; then
+  # A host that is already up stays where it is: another AZ or type would replace it.
+  read -r HOST_AZ HOST_TYPE <<<"$(aws_ ec2 describe-instances --instance-ids "$running" \
+    --query 'Reservations[0].Instances[0].[Placement.AvailabilityZone,InstanceType]' --output text | tr -d '\r')"
+  deploy_host "$HOST_AZ" "$HOST_TYPE" "$WORK/host-deploy.log" || die "the host deploy failed (above)"
+else
+  place_host deploy_host
+fi
+PRICE_HOUR_USD=$(host_price "$HOST_TYPE")
+echo "host: $HOST_TYPE in $HOST_AZ, ~\$$PRICE_HOUR_USD/hour" >&2
 BUCKET=$(bucket)
 ID=$(stack_output "$HOST_STACK" InstanceId)
 IP=$(stack_output "$HOST_STACK" PublicIp)
@@ -263,7 +284,8 @@ printf '\n\033[1m+--------------------------------------------------------------
 printf '| RoleRank is UP                                                   |\n' >&2
 printf '|   URL:       https://%-44s|\n' "$DOMAIN" >&2
 printf '|   fallback:  add to your hosts file: %-28s|\n' "$IP $DOMAIN" >&2
-printf '|   cost:      ~$%s/hour (~Rs %s/hour) while up                 |\n' "$PRICE_HOUR_USD" "$(awk "BEGIN{printf \"%.1f\", $PRICE_HOUR_USD*$USD_INR}")" >&2
+printf '|   host:      %-52s|\n' "$HOST_TYPE in $HOST_AZ" >&2
+printf '|   cost:      %-52s|\n' "~\$$PRICE_HOUR_USD/hour (~Rs $(awk "BEGIN{printf \"%.1f\", $PRICE_HOUR_USD*$USD_INR}")/hour) while up" >&2
 printf '|   took:      %-52s|\n' "$((secs / 60)) min $((secs % 60)) s" >&2
 printf '|   when done: run ./rolerank-down.sh                              |\n' >&2
 printf '+------------------------------------------------------------------+\033[0m\n' >&2

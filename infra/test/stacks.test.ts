@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { App } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
 
-import { BUDGET_USD, GITHUB_SUB, HOST_INSTANCE, RoleRankHostStack, RoleRankProdStack, tagProject } from "../lib/stacks.ts";
+import { BUDGET_USD, GITHUB_SUB, HOST_INSTANCE, HOST_TYPES, RoleRankHostStack, RoleRankProdStack, tagProject } from "../lib/stacks.ts";
 
 const app = new App();
 const env = { account: "111111111111", region: "ap-south-1" };
@@ -96,4 +96,20 @@ test("registries keep two images each and every resource carries the project tag
   prod.resourceCountIs("AWS::ECR::Repository", 4);
   prod.allResourcesProperties("AWS::ECR::Repository", { ImageTagMutability: "IMMUTABLE" });
   host.hasResourceProperties("AWS::EC2::Instance", { Tags: Match.arrayWith([{ Key: "rolerank:host", Value: "prod" }, { Key: "rolerank:project", Value: "rolerank" }]) });
+});
+
+test("the host goes in the AZ and on the fallback type rolerank-up.sh chooses, and nowhere else", () => {
+  const place = (hostAz?: string, hostType?: string) => {
+    const a = new App();
+    const pr = new RoleRankProdStack(a, "Prod", { env, alarmEmail: "alarms@example.invalid" });
+    return new RoleRankHostStack(a, "Host", { env, offline: true, persistent: pr, hostAmi: "ami-0123456789abcdef0", hostAz, hostType });
+  };
+  const inst = (s: RoleRankHostStack) =>
+    (Object.values(Template.fromStack(s).findResources("AWS::EC2::Instance"))[0] as { Properties: { SubnetId: string; InstanceType: string } }).Properties;
+  assert.deepEqual(inst(place("ap-south-1b", "m6g.xlarge")), { ...inst(place("ap-south-1b", "m6g.xlarge")), SubnetId: "subnet-0000000000000000b", InstanceType: "m6g.xlarge" });
+  assert.equal(inst(place("ap-south-1c", "r7g.xlarge")).SubnetId, "subnet-0000000000000000c");
+  assert.equal(inst(place()).InstanceType, HOST_INSTANCE);
+  assert.deepEqual([...HOST_TYPES], ["m7g.xlarge", "m6g.xlarge", "r7g.xlarge"]);
+  assert.throws(() => place("ap-south-1b", "t3.micro"), /not one of/);
+  assert.throws(() => place("us-east-1a"), /not in ap-south-1/);
 });

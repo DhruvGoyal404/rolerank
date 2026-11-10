@@ -31,6 +31,18 @@ From Git Bash at the repository root:
   money.
 - Both are safe to run again after a half-failed run.
 
+### If EC2 has no capacity
+
+`rolerank-up.sh` places the host itself: it tries m7g.xlarge in ap-south-1a, 1b and 1c, then
+m6g.xlarge in each, then r7g.xlarge in each (`place_host`, `HOST_TYPES` in `infra/lib/stacks.ts`),
+and stops with an error only if all nine are refused. A failed attempt leaves the host stack in
+ROLLBACK_COMPLETE; up deletes a host stack in any failed state before it deploys. The final box
+names the type and AZ it chose, with that type's price. A host that is already running keeps its
+AZ and type. Any AZ works: the Elastic IP, the backups and Caddy's certificates are regional, and
+the disk is new on every up. To prove the fallback on a real up:
+`ROLERANK_TEST_NO_CAPACITY_AZ=ap-south-1a ./rolerank-up.sh` fakes a refusal in 1a.
+`bash scripts/place-host.test.sh` checks the order offline (CI runs it).
+
 ## First time only
 
 1. **AWS login.** The account is CodeJudge's (QUESTIONS.md, Q15); the scripts use the
@@ -91,4 +103,9 @@ The `rolerank:project` cost-allocation tag was activated in Billing on 2026-11-1
 
 ## Incidents
 
-None yet.
+**2026-11-10: an up blocked by EC2 capacity.** `rolerank-up.sh --build` failed with
+InsufficientInstanceCapacity for m7g.xlarge in ap-south-1a; CloudFormation rolled the host stack
+back to ROLLBACK_COMPLETE, which bills nothing but blocks the next deploy. Nothing was down that
+should have been up, and no data was at risk. Cause: the host had one fixed type and the AZ the
+default VPC listed first. Fix: up deletes a failed host stack, then falls back across the three
+AZs and two more arm64 types ("If EC2 has no capacity" above).

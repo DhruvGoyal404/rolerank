@@ -31,6 +31,13 @@ ECR_MAX_BYTES=$((3 * 1073741824)) # 2 releases of 4 images are ~1.5 GB; more mea
 S3_MAX_BYTES=$((6 * 1073741824))  # 2 final sets of ~1.3 GB, plus locked old versions for 15 days
 # On-demand, ap-south-1 (ARCHITECTURE.md, "Cost": AWS price files, 2026-10-31).
 PRICE_HOUR_USD=0.127 # m7g.xlarge 0.1166 + gp3 40 GB 0.0050 + public IPv4 0.005
+# Host placement (rolerank-up.sh, place_host): every AZ is tried for one type before the next type.
+# Must match HOST_TYPES in infra/lib/stacks.ts. On-demand Linux prices in ap-south-1 from the AWS
+# Pricing API (2026-11-10); the disk and the public IPv4 add HOST_EXTRA_USD whatever the type.
+HOST_AZS=(ap-south-1a ap-south-1b ap-south-1c)
+HOST_TYPES=(m7g.xlarge m6g.xlarge r7g.xlarge)
+declare -A HOST_PRICE=([m7g.xlarge]=0.1166 [m6g.xlarge]=0.1012 [r7g.xlarge]=0.1502)
+HOST_EXTRA_USD=0.0100
 USD_INR=94.95
 HOST_COMPOSE="docker compose --progress quiet -f /opt/rolerank/current/app/deploy/compose.prod.yaml --env-file /etc/rolerank/prod.env --env-file /opt/rolerank/current/release.env"
 
@@ -105,6 +112,47 @@ stack_exists() {
   s=$(aws cloudformation describe-stacks --stack-name "$1" --query 'Stacks[0].StackStatus' --output text 2>/dev/null) || return 1
   [ "$s" != DELETE_COMPLETE ]
 }
+stack_status() { aws cloudformation describe-stacks --stack-name "$1" --query 'Stacks[0].StackStatus' --output text 2>/dev/null || echo NONE; }
+
+# A stack in one of these states can't be updated: CloudFormation needs it deleted first.
+FAILED_STACK='^(CREATE_FAILED|ROLLBACK_COMPLETE|ROLLBACK_FAILED|DELETE_FAILED|UPDATE_ROLLBACK_FAILED)$'
+
+# clear_failed_host: deletes the host stack if a failed deploy left it in a state CloudFormation
+# can't update (a failed create rolls back to ROLLBACK_COMPLETE, which bills nothing).
+clear_failed_host() {
+  local s
+  s=$(stack_status "$HOST_STACK")
+  [[ "$s" =~ $FAILED_STACK ]] || return 0
+  echo "host stack is $s: deleting it before the deploy" >&2
+  aws_ cloudformation delete-stack --stack-name "$HOST_STACK"
+  aws_ cloudformation wait stack-delete-complete --stack-name "$HOST_STACK" || die "the failed host stack would not delete: see the CloudFormation console"
+}
+
+host_price() { awk "BEGIN{printf \"%.3f\", ${HOST_PRICE[$1]} + $HOST_EXTRA_USD}"; }
+
+# A capacity refusal, in CloudFormation's words or EC2's: worth another AZ or type, nothing else is.
+CAPACITY_ERROR='InsufficientInstanceCapacity|InsufficientCapacity|Unsupported|not supported in your requested Availability Zone'
+
+# place_host ATTEMPT: runs ATTEMPT AZ TYPE LOG (one host deploy, its output in LOG) for each type
+# in HOST_TYPES and each AZ in HOST_AZS, in that order, until one succeeds; a capacity refusal moves
+# on, any other failure stops. Sets HOST_AZ and HOST_TYPE.
+place_host() {
+  local attempt=$1 type az log="$WORK/host-deploy.log"
+  for type in "${HOST_TYPES[@]}"; do
+    for az in "${HOST_AZS[@]}"; do
+      echo "host: trying $type in $az" >&2
+      if "$attempt" "$az" "$type" "$log"; then
+        HOST_AZ=$az HOST_TYPE=$type
+        return 0
+      fi
+      grep -Eq "$CAPACITY_ERROR" "$log" || { tail -n 25 "$log" >&2; die "the host deploy failed for a reason other than capacity (above)"; }
+      echo "host: no $type capacity in $az" >&2
+      clear_failed_host
+    done
+  done
+  die "no capacity for any of ${HOST_TYPES[*]} in ${HOST_AZS[*]}: try again later"
+}
+
 stack_output() { aws_ cloudformation describe-stacks --stack-name "$1" --query "Stacks[0].Outputs[?OutputKey=='$2'].OutputValue" --output text; }
 bucket() { stack_output "$PERSISTENT" BackupBucket; }
 
@@ -213,7 +261,8 @@ audit() {
     v=$((v + n))
   done
   report "$([ "$v" -le "$ECR_MAX_BYTES" ] && echo no || echo yes)" "ECR (rolerank/*): $((v / 1048576)) MiB, expected for current + previous release: ~\$$(awk "BEGIN{printf \"%.2f\", $v/1073741824*0.10}")/month (flagged above 3 GB)"
-  v=$(aws_ s3api list-object-versions --bucket "$BUCKET" --query 'sum(Versions[].Size)' --output text 2>/dev/null || echo 0)
+  local in=${BUCKET:-$(bucket)}
+  v=$(aws_ s3api list-object-versions --bucket "$in" --query 'sum(Versions[].Size)' --output text 2>/dev/null || echo 0)
   [ "$v" = None ] && v=0
   report "$([ "$v" -le "$S3_MAX_BYTES" ] && echo no || echo yes)" "S3 backups (all versions): $((v / 1048576)) MiB: ~\$$(awk "BEGIN{printf \"%.3f\", $v/1073741824*0.025}")/month (flagged above 6 GB)"
   n=$(aws_ cloudwatch describe-alarms --query 'length(MetricAlarms)' --output text)

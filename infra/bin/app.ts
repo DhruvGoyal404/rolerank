@@ -24,9 +24,11 @@ const persistent = new RoleRankProdStack(app, "RoleRankProd", {
 new RoleRankHostStack(app, "RoleRankHost", {
   env,
   offline: !account,
-  description: "RoleRank host (EC2 m7g.xlarge, EBS, Elastic IP): destroyed by rolerank-down.sh",
+  description: "RoleRank host (EC2 arm64, EBS, Elastic IP): destroyed by rolerank-down.sh",
   persistent,
   hostAmi: context("rolerank:hostAmi") ?? "",
+  hostAz: context("rolerank:hostAz"),
+  hostType: context("rolerank:hostType"),
 });
 tagProject(app);
 
