@@ -3,18 +3,23 @@
 The production runbook, and the record of anything that broke production or a backup
 (CLAUDE.md). RoleRank is normally **down**; it runs only when needed.
 
-**Status (2026-11-09):** the code exists (P8 prep) and nothing has been deployed. `cdk synth`,
-the infra tests and shellcheck pass; no step below has run against AWS yet. P8 proper runs the
-first real cycle and fills in the measured numbers.
+**Status (2026-11-10): v1 is done.** Every step below has run against AWS: several full cycles
+(up, real requests, down with a clean audit, up), a live check of every page, and the capacity
+fallback proven on a real up. Between uses RoleRank is down and bills about $0.30 a month.
 
 ## Up and down
 
 From Git Bash at the repository root:
 
 ```
-./rolerank-up.sh      # fully down -> live; prints the box with the URL and the cost per hour
-./rolerank-down.sh    # live -> nothing billing; ends with the audit
+aws sso login --profile codejudge   # once per session; both scripts check it
+./rolerank-up.sh                    # fully down -> live in about 10 to 15 minutes; prints the box
+./rolerank-up.sh --build            # only after code changes: builds main in GitHub Actions first
+./rolerank-down.sh                  # live -> nothing billing; ends with the audit
 ```
+
+Measured: up from a saved release 10 min 1 s; up with `--build` 14 min 51 s to 20 min 48 s
+(the image build dominates); down 6 to 10 minutes including the restore drill.
 
 - **up** deploys both stacks, waits for the host's bootstrap, restores Caddy's certificates,
   redeploys the release saved at the last down by digest (or builds main with `--build`),

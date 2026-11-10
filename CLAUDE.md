@@ -7,8 +7,11 @@ India, with freshers and interns as first-class users.
 This file is the project's constitution. It binds every change, human or AI.
 To weaken a rule, change this file in its own commit and say why.
 
-**Status: Phase 1 (foundation and CI).** Phase 0 is complete. Read these before
-changing anything:
+**Status: v1 done (2026-11-10), normally DOWN.** Deployed at https://rolerank.dhruvgoyal.tech
+only when needed: `aws sso login --profile codejudge`, then `./rolerank-up.sh` (about 10 to 15
+minutes; add `--build` only after code changes) and `./rolerank-down.sh` when done (it ends with
+the billing audit). MAINTENANCE.md is the runbook; the v1.1 list is in ROADMAP.md. Read these
+before changing anything:
 
 | Doc | What it holds |
 |---|---|
@@ -20,6 +23,9 @@ changing anything:
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phases and exit criteria |
 | [docs/QUESTIONS.md](docs/QUESTIONS.md) | The owner's decisions and their reasoning |
 | [docs/OUTREACH.md](docs/OUTREACH.md) | Emails to providers, for the owner to send |
+| [MAINTENANCE.md](MAINTENANCE.md) | Runbook: up and down, the AZ and instance fallback, budgets, backups, incidents |
+| [DESIGN.md](DESIGN.md) | The UI's design system |
+| [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | The review before open signup, and the held-out injection results |
 
 ## How we work
 

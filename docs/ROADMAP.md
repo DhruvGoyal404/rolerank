@@ -7,6 +7,10 @@ takes a written reason.
 
 ## Schedule
 
+**v1 done (2026-11-10).** Deployed, verified page by page on production by the owner, and left
+normally down (MAINTENANCE.md). What remains is the v1.1 list at the end, including the P8 exit
+criteria that didn't run.
+
 **Lean v1 (owner's decision, 2026-11-04).** v1 is P3, P4, P5 (with Bring a JD), a minimal
 P6 and P8, **deployed by 2026-11-22**. P7's email alerts and everything listed under "v1.1"
 below wait until after v1. Every dataset is model-labelled with a small human audit; the
@@ -257,6 +261,15 @@ grant `user:email` incrementally, only when they turn alerts on; sign-in stays `
 
 ## P8: deploy, up and down
 
+**Closed 2026-11-10.** Met: up under 15 minutes from a saved release (10 min 1 s); down with a
+clean audit and a passing restore drill every time; real cycles of up, requests, down, up; the box
+with the type, AZ and price chosen; real LLM and embedding checks; the account-wide and project
+budgets with 50/80/100% and forecast emails; the cost table; the security review and a held-out
+injection set before open signup (SECURITY_REVIEW.md). Up also survives an EC2 capacity refusal
+(MAINTENANCE.md, "If EC2 has no capacity"). Not run, moved to v1.1: the freshness-alarm drill
+with a delivered email, deletion across an older restore on production, a load test on the host,
+and the first real bill.
+
 CDK: persistent stack and host stack. GitHub OIDC, deploy by digest, SSM, auto-rollback.
 `rolerank-up.sh`, `rolerank-down.sh`. Backups. Budget alert. Runbook in MAINTENANCE.md.
 
@@ -285,8 +298,15 @@ CDK: persistent stack and host stack. GitHub OIDC, deploy by digest, SSM, auto-r
 ## v1.1 (after v1 is deployed)
 
 - Email alerts: P7 as written above.
-- Skill-gap page, multiple profiles, tracker notes, extra dashboards.
-- Entry-level recall: v1 misses F1 0.90 (PHASE2.md, "Known v1 gaps").
+- Skill-gap page: what to learn next across your matches.
+- Demo mode: try RoleRank with a sample resume, without signing in.
+- Entry-level classifier: v1 misses F1 0.90 on entry-level recall (PHASE2.md, "Known v1 gaps").
+- Model-written reasons in tailoring: off in v1; back only after a fresh held-out run passes
+  (PHASE5.md).
+- Experience recall in resume parsing: D1-hard-4's 0.900 is the recorded gap (PHASE4.md).
+- P8's unrun checks: the freshness-alarm drill with a delivered email, deletion across an older
+  restore on production, a load test on the host, the first real bill.
+- Multiple profiles, tracker notes, extra dashboards.
 - D3 made gold: owner-graded pairs, or a rubric agreed at kappa 0.6 or above (PHASE3.md).
 - Skill extraction precision to 0.90: skip company-description sections (PHASE3.md).
 - Cloud embedding bake-off (Titan, OpenAI): optional; local bge-small passes and keeps resume
