@@ -103,6 +103,15 @@ The `rolerank:project` cost-allocation tag was activated in Billing on 2026-11-1
   private key is an SSM SecureString only the host role and the owner can read.
 - Object Lock (governance, 14 days): nothing deletes a backup within retention, the host
   included. The host role can only put and get under `rolerank/pg/`.
+- What stays: the newest 2 final sets under `rolerank/final/` (up restores the newest), the newest
+  corpus seed under `rolerank/seed/` (only `--first` reads it), and nightly sets under
+  `rolerank/pg/` for 14 days. After down verifies a new final set, it deletes that set's nightly
+  copy and prunes final sets beyond the newest 2, never the one it just wrote (`prune_finals`;
+  `scripts/prune.test.sh`). The audit prints how many final sets are kept and the newest stamp.
+- A delete only hides a version: Object Lock keeps it 14 days from its creation, then the
+  `old-versions` lifecycle rule removes it a day after it stopped being current (the backstop if
+  a prune is missed). Current final sets never expire, because while RoleRank is down they are its
+  only copy. So the bucket shrinks to its floor about two weeks after the last up.
 - The `BackupMissing` alarm emails after 26 hours without a success while up; down disables
   its actions and up re-enables them after a fresh backup.
 

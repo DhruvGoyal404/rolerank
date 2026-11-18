@@ -67,6 +67,8 @@ echo "RESULT release=$(base64 -w0 /opt/rolerank/state/current.json)"
     aws_ s3 cp "s3://$BUCKET/$NIGHTLY_PREFIX$name" "s3://$BUCKET/$FINAL_PREFIX$name" --only-show-errors
     got=$(aws_ s3api head-object --bucket "$BUCKET" --key "$FINAL_PREFIX$name" --query Metadata.sha256 --output text)
     [ "$got" = "$want" ] || die "the copy of $name lost its checksum: nothing was removed"
+    # The nightly prefix's copy is now a duplicate of the verified one in final/.
+    aws_ s3 rm "s3://$BUCKET/$NIGHTLY_PREFIX$name" --only-show-errors
     echo "kept $FINAL_PREFIX$name (sha256 ${want:0:12}...)" >&2
   done
   printf '%s\n' "$counts" >"$WORK/counts"
@@ -76,15 +78,7 @@ echo "RESULT release=$(base64 -w0 /opt/rolerank/state/current.json)"
     die "the host's release manifest is incomplete: nothing was removed"
   aws_ s3 cp "$(winpath "$WORK/release.json")" "s3://$BUCKET/$RELEASE_KEY" --only-show-errors
   echo "saved release $(jq -r .release "$WORK/release.json" | cut -c1-12); counts at backup: $counts" >&2
-  # The newest few sets stay; older ones get delete markers (Object Lock keeps their versions
-  # for the retention period, then the lifecycle rule removes them).
-  aws_ s3api list-objects-v2 --bucket "$BUCKET" --prefix "$FINAL_PREFIX" --query 'Contents[].Key' --output text | tr '\t' '\n' | tr -d '\r' |
-    sed -n 's/^.*rolerank-\([0-9TZ]*\)-app\.dump\.age$/\1/p' | sort | head -n "-$KEEP_FINAL" | while read -r old; do
-    for k in "rolerank-$old-app.dump.age" "rolerank-$old-corpus.dump.age" "rolerank-$old.counts" "caddy-$old.tar.gz"; do
-      aws s3 rm "s3://$BUCKET/$FINAL_PREFIX$k" --only-show-errors 2>/dev/null || true
-    done
-    echo "pruned backup set $old" >&2
-  done
+  prune_finals "$stamp"
 else
   log "1-2/5 No host running: nothing to back up (newest kept set: $(newest_stamp "$FINAL_PREFIX"))"
 fi

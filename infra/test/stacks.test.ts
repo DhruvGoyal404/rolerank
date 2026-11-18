@@ -113,3 +113,15 @@ test("the host goes in the AZ and on the fallback type rolerank-up.sh chooses, a
   assert.throws(() => place("ap-south-1b", "t3.micro"), /not one of/);
   assert.throws(() => place("us-east-1a"), /not in ap-south-1/);
 });
+
+test("backups: nightly sets expire at 14 days, old versions go a day after, final sets never expire", () => {
+  const bucket = Object.values(prod.findResources("AWS::S3::Bucket"))[0] as {
+    Properties: { LifecycleConfiguration: { Rules: Array<{ Id: string; Prefix?: string; ExpirationInDays?: number; NoncurrentVersionExpiration?: { NoncurrentDays: number } }> } };
+  };
+  const rules = bucket.Properties.LifecycleConfiguration.Rules;
+  assert.deepEqual(rules.map((r) => r.Id), ["nightly-14-days", "old-versions"]);
+  assert.equal(rules[0]?.Prefix, "rolerank/pg/");
+  assert.equal(rules[0]?.ExpirationInDays, 14);
+  assert.equal(rules[1]?.NoncurrentVersionExpiration?.NoncurrentDays, 1);
+  assert.equal(rules[1]?.ExpirationInDays, undefined); // nothing current outside pg/ ever expires
+});

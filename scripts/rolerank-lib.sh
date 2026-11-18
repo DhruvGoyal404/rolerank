@@ -28,7 +28,7 @@ SEED_PREFIX=rolerank/seed/    # scripts/seed-corpus.sh: the corpus for the first
 RELEASE_KEY=rolerank/final/release.json
 KEEP_FINAL=2
 ECR_MAX_BYTES=$((3 * 1073741824)) # 2 releases of 4 images are ~1.5 GB; more means a pile-up
-S3_MAX_BYTES=$((6 * 1073741824))  # 2 final sets of ~1.3 GB, plus locked old versions for 15 days
+S3_MAX_BYTES=$((6 * 1073741824))  # 2 final sets of ~0.3 GB, nightly sets for 14 days, locked old versions
 # On-demand, ap-south-1 (ARCHITECTURE.md, "Cost": AWS price files, 2026-10-31).
 PRICE_HOUR_USD=0.127 # m7g.xlarge 0.1166 + gp3 40 GB 0.0050 + public IPv4 0.005
 # Host placement (rolerank-up.sh, place_host): every AZ is tried for one type before the next type.
@@ -226,6 +226,32 @@ cf_set_a() {
 backup_alarm() { aws_ cloudwatch describe-alarms --alarm-name-prefix "$PERSISTENT-BackupMissing" --query 'MetricAlarms[0].AlarmName' --output text; }
 
 # newest_stamp PREFIX: the newest backup set's stamp under PREFIX (names carry a UTC stamp).
+# final_stamps: the stamps of the final backup sets, oldest first.
+final_stamps() {
+  aws_ s3api list-objects-v2 --bucket "$BUCKET" --prefix "$FINAL_PREFIX" --query 'Contents[].Key' --output text | tr '\t' '\n' | tr -d '\r' |
+    sed -n 's/^.*rolerank-\([0-9TZ]*\)-app\.dump\.age$/\1/p' | sort -u
+}
+
+# stale_finals: of the stamps on stdin, the ones to prune: every one but the newest KEEP_FINAL.
+# Fewer than that, it prints nothing, so the newest set is never pruned.
+stale_finals() { sort -u | head -n "-$KEEP_FINAL"; }
+
+# prune_finals KEEP: deletes the final sets older than the newest KEEP_FINAL, never KEEP (the set
+# just verified). A delete leaves a marker: Object Lock keeps each version for 14 days from its
+# creation, then the "old-versions" lifecycle rule removes it. Warns if more sets remain.
+prune_finals() {
+  local keep=$1 old k left
+  for old in $(final_stamps | stale_finals); do
+    [ "$old" = "$keep" ] && continue
+    for k in "rolerank-$old-app.dump.age" "rolerank-$old-corpus.dump.age" "rolerank-$old.counts" "caddy-$old.tar.gz"; do
+      aws_ s3 rm "s3://$BUCKET/$FINAL_PREFIX$k" --only-show-errors >/dev/null 2>&1 || true # the caddy file may not exist
+    done
+    echo "pruned backup set $old" >&2
+  done
+  left=$(final_stamps | wc -l | tr -d ' ')
+  [ "$left" -le "$KEEP_FINAL" ] || echo "warning: $left final backup sets remain after pruning (want $KEEP_FINAL); the audit lists them" >&2
+}
+
 newest_stamp() {
   aws_ s3api list-objects-v2 --bucket "$BUCKET" --prefix "$1" --query 'Contents[].Key' --output text | tr '\t' '\n' | tr -d '\r' |
     sed -n 's/^.*rolerank-\([0-9TZ]*\)-app\.dump\.age$/\1/p' | sort | tail -n 1
@@ -261,10 +287,15 @@ audit() {
     v=$((v + n))
   done
   report "$([ "$v" -le "$ECR_MAX_BYTES" ] && echo no || echo yes)" "ECR (rolerank/*): $((v / 1048576)) MiB, expected for current + previous release: ~\$$(awk "BEGIN{printf \"%.2f\", $v/1073741824*0.10}")/month (flagged above 3 GB)"
-  local in=${BUCKET:-$(bucket)}
-  v=$(aws_ s3api list-object-versions --bucket "$in" --query 'sum(Versions[].Size)' --output text 2>/dev/null || echo 0)
+  local BUCKET=${BUCKET:-$(bucket)} cur sets
+  v=$(aws_ s3api list-object-versions --bucket "$BUCKET" --query 'sum(Versions[].Size)' --output text 2>/dev/null || echo 0)
+  cur=$(aws_ s3api list-object-versions --bucket "$BUCKET" --query 'sum(Versions[?IsLatest].Size)' --output text 2>/dev/null || echo 0)
   [ "$v" = None ] && v=0
-  report "$([ "$v" -le "$S3_MAX_BYTES" ] && echo no || echo yes)" "S3 backups (all versions): $((v / 1048576)) MiB: ~\$$(awk "BEGIN{printf \"%.3f\", $v/1073741824*0.025}")/month (flagged above 6 GB)"
+  [ "$cur" = None ] && cur=0
+  sets=$(final_stamps)
+  report "$([ "$v" -le "$S3_MAX_BYTES" ] && echo no || echo yes)" "S3 backups: $((cur / 1048576)) MiB current, $(((v - cur) / 1048576)) MiB older versions (Object Lock, 14 days): ~\$$(awk "BEGIN{printf \"%.3f\", $v/1073741824*0.025}")/month (flagged above 6 GB)"
+  printf '         final backup sets kept: %s of %s (newest %s)\n' "$(grep -c . <<<"$sets" || true)" "$KEEP_FINAL" "$(tail -n 1 <<<"$sets")"
+  [ -n "$sets" ] || printf '  \033[31m%-6s\033[0m %s\n' WARN "no final backup set: the next up has nothing to restore" 
   n=$(aws_ cloudwatch describe-alarms --query 'length(MetricAlarms)' --output text)
   report "$([ "$n" -le 10 ] && echo no || echo yes)" "CloudWatch alarms (account): $n (first 10 free)"
   for region in $(aws_ ec2 describe-regions --query 'Regions[].RegionName' --output text | tr -d '\r'); do

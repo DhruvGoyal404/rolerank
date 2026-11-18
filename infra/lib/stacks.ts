@@ -83,7 +83,10 @@ export class RoleRankProdStack extends Stack {
       objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
       lifecycleRules: [
         { id: "nightly-14-days", prefix: BACKUP_PREFIX, expiration: Duration.days(14), abortIncompleteMultipartUploadAfter: Duration.days(1) },
-        { id: "old-versions", noncurrentVersionExpiration: Duration.days(15), expiredObjectDeleteMarker: true },
+        // A pruned or expired version goes a day after it stops being current, or as soon as Object
+        // Lock's 14 days from its creation pass, whichever is later (lifecycle never deletes a locked
+        // version). Current final sets have no expiry: while RoleRank is down they are its only copy.
+        { id: "old-versions", noncurrentVersionExpiration: Duration.days(1), expiredObjectDeleteMarker: true },
       ],
       removalPolicy: RemovalPolicy.RETAIN,
     });
