@@ -4,6 +4,7 @@ name: Dependency policy
 on:
   schedule:
     - cron: "30 1 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -18,3 +19,19 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: node scripts/check-deps.mjs api web worker extractor infra
+
+  # Report only, never fails (2026-11-19): github.com/microsoft/onnxruntime answered 404 from
+  # 2026-11-18, which breaks scripts/models.sh. If it is still down on 2026-11-22 the worker
+  # switches to the official onnxruntime-node npm package (prepared, not yet merged); remove this
+  # job then, or
+  # once the URL answers again.
+  onnxruntime-release:
+    name: ONNX Runtime release download (report only)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Does the GitHub release download answer?
+        run: |
+          url=https://github.com/microsoft/onnxruntime/releases/download/v1.31.0/onnxruntime-linux-aarch64-1.31.0.tgz
+          code=$(curl -s -o /dev/null -I -L --max-time 30 -w '%{http_code}' -A "RoleRankBot/0.1 (+https://rolerank.dhruvgoyal.tech/about/bot; bot@dhruvgoyal.tech)" "$url" || true)
+          echo "ONNX Runtime 1.31.0 release download: HTTP ${code:-none} ($url)" >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=ONNX Runtime release download::HTTP ${code:-none}"
