@@ -61,7 +61,9 @@ jobs:
           cache: npm
           cache-dependency-path: api/package-lock.json
       - run: npm ci
-      - run: npm audit
+      - name: npm audit, with docs/DEPENDENCY_EXCEPTIONS.md's accepted advisories
+        working-directory: .
+        run: node scripts/check-deps.mjs --audit api
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
@@ -97,7 +99,9 @@ jobs:
             web/package-lock.json
             api/package-lock.json
       - run: npm ci
-      - run: npm audit
+      - name: npm audit, with docs/DEPENDENCY_EXCEPTIONS.md's accepted advisories
+        working-directory: .
+        run: node scripts/check-deps.mjs --audit web
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
