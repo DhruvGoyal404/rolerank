@@ -33,8 +33,6 @@ advisory no longer appears, so the entry goes as soon as the fix is in.
 | Where | Package | Advisory | Recorded | Expires |
 |---|---|---|---|---|
 | infra | minimatch | GHSA-g3hv-75wg-m249 | 2026-11-09 | 2026-12-15 |
-| api | picomatch | GHSA-fc5q-39xc-vjpf | 2026-11-18 | 2026-12-31 |
-| web | picomatch | GHSA-fc5q-39xc-vjpf | 2026-11-18 | 2026-12-31 |
 
 minimatch 10.2.6 is bundled inside aws-cdk-lib (every release up to 2.275.0, checked
 2026-11-09), so an npm override can't replace it. It runs only when `cdk synth` builds the
@@ -43,10 +41,6 @@ the host. Remove the entry as soon as an aws-cdk-lib release that bundles minima
 later passes the 14-day rule, and by 2026-12-15 in any case. The owner accepted it on
 2026-11-09.
 
-picomatch GHSA-fc5q-39xc-vjpf (high, published 2026-10-19): a ReDoS when an attacker supplies the
-glob pattern (`+(*)`). Every release through 4.0.7, the newest, is affected, and there is no
-patched version (GitHub advisory, checked 2026-11-18). In `api` and `web` it comes only through
-build and test tooling (vite, vitest, typescript-eslint, tinyglobby, fdir), which match patterns
-from our own config, never one from a user; `npm ls --omit=dev picomatch` finds it in neither
-app's production dependencies. Remove both entries as soon as a fixed picomatch passes the
-14-day rule, and by 2026-12-31 in any case. The owner accepted it on 2026-11-18.
+picomatch GHSA-fc5q-39xc-vjpf was accepted for `api` and `web` on 2026-11-18 and removed the
+next day: GitHub withdrew the advisory on 2026-11-18 at 15:38 UTC, so npm audit no longer
+reports it.
