@@ -90,7 +90,7 @@ services:
     environment:
       CGO_ENABLED: "1"
       GOFLAGS: -buildvcs=false
-      GOTOOLCHAIN: auto # go.mod pins go1.27.3; the image is 1.27.2, the newest old enough
+      GOTOOLCHAIN: auto # go.mod pins go1.27.4; the image is 1.27.2, the newest old enough
       ROLERANK_CORPUS_URL: postgres://corpus_rw:${ROLERANK_PW_CORPUS_RW:?set in .env}@postgres:5432/corpus?sslmode=disable
       ROLERANK_ORT_LIB: /models/onnxruntime/onnxruntime-linux-x64-1.31.0/lib/libonnxruntime.so.1.31.0
       ROLERANK_EMBED_MODEL: /models/bge-small-en-v1.5/model.onnx
